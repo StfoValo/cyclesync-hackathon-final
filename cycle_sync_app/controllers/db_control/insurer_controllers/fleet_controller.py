@@ -4,12 +4,28 @@ from mcp_agent_server.ai_orchestrator import AIOrchestrator
 
 class FleetController(QObject):
 
-    SUPPLIERS = [
-        {"name": "Mirafiori Battery Hub", "type": "Pack Assembly & Second Life", "lat": 45.0315, "lon": 7.6254, "region": "Southern Europe"},
-        {"name": "ACC Gigafactory (Termoli)", "type": "Cell Manufacturing", "lat": 41.9880, "lon": 15.0160, "region": "Southern Europe"},
-        {"name": "LG Energy Solution (Wrocław)", "type": "Cell Manufacturing", "lat": 51.0438, "lon": 16.9410, "region": "Central Europe"},
-        {"name": "CATL (Erfurt)", "type": "Cell Manufacturing", "lat": 50.8932, "lon": 11.0374, "region": "DACH Region"},
-        {"name": "Samsung SDI (Kokomo)", "type": "Cell Manufacturing", "lat": 40.4864, "lon": -86.1336, "region": "North America"}
+    # --- UNIPOL CONVENTIONED NETWORK ---
+    SERVICE_PROVIDERS = [
+        {"name": "Autofficina Sprint", "type": "Officina", "lat": 45.5421, "lon": 9.2014, "region": "Lombardia"},
+        {"name": "Pneus Master", "type": "Gommista", "lat": 41.8905, "lon": 12.4942, "region": "Lazio"},
+        {"name": "Meccanica Elite", "type": "Officina", "lat": 37.5013, "lon": 15.0742, "region": "Sicilia"},
+        {"name": "Garage Centrale", "type": "Officina", "lat": 40.8522, "lon": 14.2681, "region": "Campania"},
+        {"name": "Tutto Gomme Nord", "type": "Gommista", "lat": 45.4381, "lon": 12.3185, "region": "Veneto"},
+        {"name": "RiparaAuto 24h", "type": "Officina", "lat": 44.4949, "lon": 11.3426, "region": "Emilia-Romagna"},
+        {"name": "Wheel Center Advanced", "type": "Gommista", "lat": 45.0703, "lon": 7.6869, "region": "Piemonte"},
+        {"name": "Officina del Sole", "type": "Officina", "lat": 41.1171, "lon": 16.8719, "region": "Puglia"},
+        {"name": "Pneus Express", "type": "Gommista", "lat": 43.7696, "lon": 11.2558, "region": "Toscana"},
+        {"name": "Carrozzeria Sud", "type": "Officina", "lat": 38.9054, "lon": 16.5873, "region": "Calabria"},
+        {"name": "Battistrada Sicuro", "type": "Gommista", "lat": 39.2238, "lon": 9.1217, "region": "Sardegna"},
+        {"name": "Service Rossi", "type": "Officina", "lat": 43.6158, "lon": 13.5189, "region": "Marche"},
+        {"name": "Officina Adriatica", "type": "Officina", "lat": 42.4618, "lon": 14.2161, "region": "Abruzzo"},
+        {"name": "Gomme & Co. Elite", "type": "Gommista", "lat": 46.0711, "lon": 13.2373, "region": "Friuli-Venezia Giulia"},
+        {"name": "Meccanica Ligure", "type": "Officina", "lat": 44.4056, "lon": 8.9463, "region": "Liguria"},
+        {"name": "Alpina Service", "type": "Officina", "lat": 46.0679, "lon": 11.1211, "region": "Trentino-Alto Adige"},
+        {"name": "Pneus Umbria", "type": "Gommista", "lat": 43.1107, "lon": 12.3908, "region": "Umbria"},
+        {"name": "Lucania Motors", "type": "Officina", "lat": 40.6333, "lon": 15.8000, "region": "Basilicata"},
+        {"name": "Molise Gomme", "type": "Gommista", "lat": 41.5603, "lon": 14.6599, "region": "Molise"},
+        {"name": "Garage Monte Bianco", "type": "Officina", "lat": 45.7373, "lon": 7.3201, "region": "Valle d'Aosta"}
     ]
 
     def __init__(self, map_view, ai_dashboard_view, model, account_id):
@@ -21,15 +37,10 @@ class FleetController(QObject):
         
         self.agent = AIOrchestrator()
         
-        # Wire the trigger button on the NEW AI view
+        # Wire UI logic
         self.ai_view.btn_request_ai_analysis.clicked.connect(self.trigger_ai_agent)
-        
-        # Listen for the signal from the Map View (Simulation)
         self.map_view.simulate_requested.connect(self.run_simulation)
-        
-        # --- 🚀 THE MISSING LINK: WIRE THE TOGGLE SWITCH ---
         self.map_view.view_toggle.currentItemChanged.connect(self.load_fleet_data)
-        # ---------------------------------------------------
         
         self.load_fleet_data()
         self.refresh_ai_dashboard_visuals()
@@ -49,22 +60,17 @@ class FleetController(QObject):
         """Passes both the fleet data and the supplier data to the map."""
         fleet_data = self.model.get_regional_kpis(self.account_id)
         
-        # --- FIX: Robust active view detection ---
-        active_view = 'fleet' # Default
-        
-        # 1. If triggered by a user click, the signal passes the routeKey directly
+        active_view = 'fleet' 
         if args and isinstance(args[0], str):
             active_view = args[0]
-            
-        # 2. If triggered during startup, safely check the readable text of the button
         else:
             current_item = self.map_view.view_toggle.currentItem()
-            if current_item and 'Supplier' in current_item.text():
+            if current_item and 'Network' in current_item.text(): # Updated text check
                 active_view = 'suppliers'
-        # ------------------------------------------
         
         if hasattr(self.map_view, 'render_map'):
-            self.map_view.render_map(fleet_data, self.SUPPLIERS, active_view)
+            # Pass the SERVICE_PROVIDERS instead of SUPPLIERS
+            self.map_view.render_map(fleet_data, self.SERVICE_PROVIDERS, active_view)
 
     def refresh_ai_dashboard_visuals(self):
         """Extracts data from the model to draw the histogram and top stats."""

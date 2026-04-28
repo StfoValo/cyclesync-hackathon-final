@@ -1,5 +1,4 @@
 from mcp_agent_server.core_llm_client import CoreLLMClient
-from mcp_agent_server.prompts.recycler_market_prompt import get_recycler_system_prompt, get_recycler_user_prompt
 from mcp_agent_server.prompts.oem_battery_prompt import get_oem_system_prompt, get_oem_user_prompt
 from models.data_manager.market_cache_manager import MarketCacheManager
 import time

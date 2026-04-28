@@ -2,7 +2,7 @@ import os
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, QFrame, QLabel, QFileDialog
 from PyQt6.QtGui import QPixmap
-from qfluentwidgets import LineEdit, DoubleSpinBox, PrimaryPushButton, SubtitleLabel, BodyLabel, FluentIcon, PushButton, ComboBox
+from qfluentwidgets import LineEdit, PrimaryPushButton, SubtitleLabel, BodyLabel, FluentIcon, PushButton, ComboBox
 
 class CarModelFormWidget(QWidget):
     form_submitted = pyqtSignal(dict)
@@ -24,60 +24,52 @@ class CarModelFormWidget(QWidget):
         card_layout.setContentsMargins(40, 40, 40, 40)
         card_layout.setSpacing(25)
         
-        self.title = SubtitleLabel("Define New Car Blueprint", self.card)
+        self.title = SubtitleLabel("Vehicle Registration & Telematics Setup", self.card)
         card_layout.addWidget(self.title, alignment=Qt.AlignmentFlag.AlignHCenter)
         
         content_layout = QHBoxLayout()
         card_layout.addLayout(content_layout)
         
-        # --- LEFT COLUMN (Form) ---
         form_layout = QFormLayout()
-        form_layout.setVerticalSpacing(18)
-        form_layout.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+        form_layout.setSpacing(20)
         
         self.model_name_input = LineEdit(self.card)
-        self.base_price_input = DoubleSpinBox(self.card)
-        self.base_price_input.setMaximum(1000000.0)
-        self.manufacture_cost_input = DoubleSpinBox(self.card)
-        self.manufacture_cost_input.setMaximum(1000000.0)
+        self.model_name_input.setPlaceholderText("e.g. Fiat 500e")
+        form_layout.addRow(BodyLabel("Model Name:", self.card), self.model_name_input)
+        
+        self.plate_input = LineEdit(self.card)
+        self.plate_input.setPlaceholderText("e.g. AB123CD")
+        form_layout.addRow(BodyLabel("License Plate:", self.card), self.plate_input)
         
         self.car_type_combo = ComboBox(self.card)
-        self.car_type_combo.addItems(["utilitarian", "sedan", "SUV", "sportscar"])
+        self.car_type_combo.addItems(["SUV", "Sedan", "Coupe", "Sportcar"])
+        form_layout.addRow(BodyLabel("Chassis Type:", self.card), self.car_type_combo)
         
         self.powertrain_combo = ComboBox(self.card)
-        self.powertrain_combo.addItems(["ICE", "BEV", "HEV"])
+        self.powertrain_combo.addItems(["BEV", "ICE", "PHEV", "HEV"])
+        form_layout.addRow(BodyLabel("Powertrain:", self.card), self.powertrain_combo)
         
         self.drivetrain_combo = ComboBox(self.card)
-        self.drivetrain_combo.addItems(["FWD", "RWD", "AWD"])
-        
-        form_layout.addRow(BodyLabel("Model Name:", self.card), self.model_name_input)
-        form_layout.addRow(BodyLabel("Base Price (€):", self.card), self.base_price_input)
-        form_layout.addRow(BodyLabel("Manufacture Cost (€):", self.card), self.manufacture_cost_input)
-        form_layout.addRow(BodyLabel("Car Type:", self.card), self.car_type_combo)
-        form_layout.addRow(BodyLabel("Powertrain:", self.card), self.powertrain_combo)
+        self.drivetrain_combo.addItems(["RWD", "AWD", "FWD"])
         form_layout.addRow(BodyLabel("Drivetrain:", self.card), self.drivetrain_combo)
         
-        content_layout.addLayout(form_layout)
+        content_layout.addLayout(form_layout, stretch=2)
         
-        # --- RIGHT COLUMN (Image Preview) ---
+        # Image Preview Section
         image_layout = QVBoxLayout()
-        image_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
-        
         self.image_preview = QLabel("No Image Selected", self.card)
-        self.image_preview.setFixedSize(200, 150)
+        self.image_preview.setFixedSize(300, 200)
         self.image_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_preview.setStyleSheet("QLabel { border: 2px dashed #555; border-radius: 8px; color: #aaa; }")
-        image_layout.addWidget(self.image_preview)
-        image_layout.addSpacing(10)
+        self.image_preview.setStyleSheet("border: 2px dashed #555; border-radius: 8px; background-color: #1e1e1e;")
+        image_layout.addWidget(self.image_preview, alignment=Qt.AlignmentFlag.AlignCenter)
         
-        self.btn_select_image = PushButton(FluentIcon.PHOTO, "Select Photo", self.card)
+        self.btn_select_image = PrimaryPushButton(FluentIcon.PHOTO, "Upload Vehicle Photo", self.card)
         self.btn_select_image.clicked.connect(self._on_select_image)
-        image_layout.addWidget(self.btn_select_image, alignment=Qt.AlignmentFlag.AlignHCenter)
+        image_layout.addWidget(self.btn_select_image, alignment=Qt.AlignmentFlag.AlignCenter)
         
-        content_layout.addLayout(image_layout)
+        content_layout.addLayout(image_layout, stretch=1)
         
-        # --- SUBMIT BUTTONS ---
-        self.submit_btn = PrimaryPushButton(FluentIcon.ADD, "Save Blueprint", self.card)
+        self.submit_btn = PrimaryPushButton(FluentIcon.SAVE, "Register Vehicle", self.card)
         self.submit_btn.clicked.connect(self._on_submit)
         
         btn_layout = QHBoxLayout()
@@ -105,8 +97,7 @@ class CarModelFormWidget(QWidget):
     def _on_submit(self):
         data = {
             "model_name": self.model_name_input.text(),
-            "base_price": self.base_price_input.value(),
-            "manufacture_cost": self.manufacture_cost_input.value(),
+            "plate_number": self.plate_input.text(),
             "car_type": self.car_type_combo.currentText(),
             "powertrain": self.powertrain_combo.currentText(),
             "drivetrain": self.drivetrain_combo.currentText(),

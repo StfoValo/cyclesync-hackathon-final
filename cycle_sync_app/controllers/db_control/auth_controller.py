@@ -43,3 +43,5 @@ class AuthController(QObject):
             'account_id': account_id,
             'username': username
         })
+
+    
