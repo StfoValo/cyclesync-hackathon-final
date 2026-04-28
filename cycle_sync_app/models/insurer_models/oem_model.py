@@ -5,24 +5,34 @@ class OEMModel:
     def __init__(self):
         DatabaseManager.initialize_database()
 
-    def create_car_model(self, model_name: str, base_price: float, manufacture_cost: float, car_type: str, powertrain: str, drivetrain: str, account_id: int, image_path: str = ""):
+    # Add 'owner_username' to the parameters
+    def create_car_model(self, model_name: str, car_type: str, powertrain: str, drivetrain: str, account_id: int, owner_username: str, plate_number: str, image_path: str = ""):
         conn = DatabaseManager.get_connection()
         cursor = conn.cursor()
+        
+        # 1. Defensively add the plate number column if it doesn't exist
         try:
+            cursor.execute("ALTER TABLE vehicles ADD COLUMN plate_number TEXT DEFAULT 'UNKNOWN'")
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass # Column already exists
+            
+        try:
+            # 2. Hardcode the old price constraints to 0.0 so the DB schema doesn't crash
             cursor.execute('''
                 INSERT INTO car_models (model_name, base_price, manufacture_cost, car_type, powertrain, drivetrain, owner_account_id, image_path)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (model_name, base_price, manufacture_cost, car_type, powertrain, drivetrain, account_id, image_path))
+            ''', (model_name, 0.0, 0.0, car_type, powertrain, drivetrain, account_id, image_path))
             
             model_id = cursor.lastrowid
             import uuid
             import datetime
             
             vin = f"ZAM{str(model_name)[:4].upper()}{str(uuid.uuid4().hex)[:6].upper()}"
-            owner = 'mario_driver'
             today = datetime.date.today().strftime('%Y-%m-%d')
             
-            cursor.execute("INSERT INTO vehicles (vin, model_id, owner_id, production_date, region_name) VALUES (?, ?, ?, ?, ?)", (vin, model_id, owner, today, 'Auto-Minted'))
+            # 3. Insert the new car with the Plate Number
+            cursor.execute("INSERT INTO vehicles (vin, model_id, owner_id, production_date, region_name, plate_number) VALUES (?, ?, ?, ?, ?, ?)", (vin, model_id, owner_username, today, 'Unipol-Registered', plate_number))
             cursor.execute("INSERT INTO vehicle_telemetry (vin, current_odometer_km, driving_score) VALUES (?, ?, ?)", (vin, 0, 100))
             
             conn.commit()
@@ -31,9 +41,9 @@ class OEMModel:
             tm = TireModel()
             tm.initialize_vehicle_tires(vin)
             
-            return True
+            return vin # <--- FIX: Return the VIN instead of True!
         except sqlite3.IntegrityError:
-            return False
+            return None
         finally:
             conn.close()
 

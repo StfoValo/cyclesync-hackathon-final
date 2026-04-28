@@ -1,39 +1,63 @@
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QFrame, QHBoxLayout, QLabel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QFrame, QHBoxLayout, QLabel, QStackedWidget
 from qfluentwidgets import SubtitleLabel, TitleLabel, BodyLabel, CaptionLabel, ProgressBar, SmoothScrollArea, PrimaryPushButton, FluentIcon
+
+# --- IMPORT YOUR OLD FORM ---
+from views.insurer_widgets.car_model_form_widget import CarModelFormWidget
 
 class GarageWidget(QWidget):
     trip_simulated = pyqtSignal(str)
+    vehicle_added = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setObjectName("GarageWidget")
         
-        # 1. Main Layout
+        # --- NEW: Stacked Widget Base ---
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         
-        # 2. Header
+        self.stacked_widget = QStackedWidget(self)
+        self.main_layout.addWidget(self.stacked_widget)
+        
+        # --- INDEX 0: The Garage Page ---
+        self.garage_page = QWidget()
+        self.garage_layout = QVBoxLayout(self.garage_page)
+        self.garage_layout.setContentsMargins(20, 20, 20, 20)
+        
+        header_layout = QHBoxLayout()
         self.title = SubtitleLabel("My Garage & Vehicle Identity", self)
-        self.main_layout.addWidget(self.title)
-        self.main_layout.addSpacing(20)
+        header_layout.addWidget(self.title)
+        header_layout.addStretch()
         
-        # 3. Scroll Area Setup (In case the driver owns multiple cars)
+        # The new "Buy/Register Car" button!
+        self.btn_add_car = PrimaryPushButton(FluentIcon.ADD, "Register New Vehicle", self)
+        header_layout.addWidget(self.btn_add_car)
+        self.garage_layout.addLayout(header_layout)
+        self.garage_layout.addSpacing(20)
+        
         self.scroll_area = SmoothScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         
-        # Container for the cards
         self.cards_container = QWidget()
         self.cards_container.setStyleSheet("background: transparent;")
-        
-        # THIS is the layout your controller was looking for!
         self.cards_layout = QVBoxLayout(self.cards_container) 
         self.cards_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.cards_layout.setSpacing(20)
         
         self.scroll_area.setWidget(self.cards_container)
-        self.main_layout.addWidget(self.scroll_area)
+        self.garage_layout.addWidget(self.scroll_area)
+        
+        # --- INDEX 1: The Registration Form Page ---
+        self.form_page = CarModelFormWidget(self)
+        # Rename the form title to fit the new context
+        self.form_page.title.setText("Vehicle Registration & Telematics Setup")
+        
+        # Add pages to stack
+        self.stacked_widget.addWidget(self.garage_page) # Index 0
+        self.stacked_widget.addWidget(self.form_page)   # Index 1
 
     def render_vehicle_card(self, vin, model_name, car_type, image_path, odometer, driving_score):
         card = QFrame(self.cards_container)
@@ -89,7 +113,7 @@ class GarageWidget(QWidget):
         details_layout.addLayout(telemetry_header_layout)
         
         odo_val = odometer if odometer is not None else 0
-        score_val = driving_score if driving_score is not None else 100
+        score_val = int(driving_score) if driving_score is not None else 100
         
         details_layout.addWidget(BodyLabel(f"Total Distance: {odo_val:,} km", card))
         details_layout.addWidget(BodyLabel(f"Eco-Driving Score: {score_val}/100", card))
