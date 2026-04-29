@@ -39,13 +39,23 @@ class FleetModel:
     def _ensure_region_columns(self):
         conn = DatabaseManager.get_connection()
         cursor = conn.cursor()
-        try:
-            cursor.execute("ALTER TABLE vehicles ADD COLUMN region_name TEXT")
-            cursor.execute("ALTER TABLE vehicles ADD COLUMN lat REAL")
-            cursor.execute("ALTER TABLE vehicles ADD COLUMN lon REAL")
-            conn.commit()
-        except sqlite3.OperationalError:
-            pass
+        
+        columns_to_add = [
+            ("region_name", "TEXT"),
+            ("lat", "REAL"),
+            ("lon", "REAL"),
+            ("driver_age", "INTEGER"),
+            ("driver_gender", "TEXT"),
+            ("vehicle_category", "TEXT") # <--- NEW COLUMN
+        ]
+        
+        for col_name, col_type in columns_to_add:
+            try:
+                cursor.execute(f"ALTER TABLE vehicles ADD COLUMN {col_name} {col_type}")
+            except sqlite3.OperationalError:
+                pass # Column already exists, move to the next one safely
+                
+        conn.commit()
         conn.close()
 
     def simulate_regional_fleet(self, account_id: int):
@@ -65,7 +75,6 @@ class FleetModel:
         telemetry_data = []
 
         for region in self.REGIONS:
-            # Safely scale down the generation to prevent DB freezing
             num_cars_per_model = max(1, int((region["coeff"] / self.SCALE_FACTOR) / 3))
             
             for _ in range(3): 
@@ -79,12 +88,29 @@ class FleetModel:
                     lat_jitter = region["lat"] + random.uniform(-0.4, 0.4)
                     lon_jitter = region["lon"] + random.uniform(-0.4, 0.4)
 
-                    vehicles_data.append((vin, model_id, 'SIMULATED', prod_date, region["name"], lat_jitter, lon_jitter))
+                    # Generate Demographics
+                    driver_age = random.choices(
+                        [random.randint(18,24), random.randint(25,34), random.randint(35,44), random.randint(45,54), random.randint(55,64), random.randint(65,80)],
+                        weights=[0.08, 0.15, 0.22, 0.25, 0.20, 0.10]
+                    )[0]
+                    driver_gender = random.choices(['Male', 'Female'], weights=[0.54, 0.46])[0]
+
+                    # Generate Vehicle Category
+                    veh_cat = random.choices(
+                        ['Utilitarian', 'Hatchback', 'SUV', 'Sedan', 'Sportscar'],
+                        weights=[0.42, 0.28, 0.20, 0.08, 0.02] 
+                    )[0]
+
+                    # ONLY ONE APPEND: Exactly 10 items to match the SQL query
+                    vehicles_data.append((vin, model_id, 'SIMULATED', prod_date, region["name"], lat_jitter, lon_jitter, driver_age, driver_gender, veh_cat))
+                    
+                    # ONLY ONE APPEND: Exactly 3 items for telemetry
                     odo = int(days_old * random.uniform(30, 60)) 
                     score = random.randint(40, 100) 
                     telemetry_data.append((vin, odo, score))
 
-        cursor.executemany("INSERT INTO vehicles (vin, model_id, owner_id, production_date, region_name, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?)", vehicles_data)
+        # Insert exactly 10 bindings (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        cursor.executemany("INSERT INTO vehicles (vin, model_id, owner_id, production_date, region_name, lat, lon, driver_age, driver_gender, vehicle_category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", vehicles_data)
         cursor.executemany("INSERT INTO vehicle_telemetry (vin, current_odometer_km, driving_score) VALUES (?, ?, ?)", telemetry_data)
         
         conn.commit()
@@ -178,22 +204,24 @@ class FleetModel:
 
             reg = regions[region]
             
-            # --- FIX: Scale up the real numbers for the AI ---
-            reg['total_bevs'] += self.SCALE_FACTOR
-            reg['sum_odo'] += (odo * self.SCALE_FACTOR)
-            reg['sum_soh'] += (soh * self.SCALE_FACTOR)
+            # --- FIX: Enforce 5% Italian EV Penetration Rate ---
+            REAL_BEV_SCALE = int(self.SCALE_FACTOR * 0.05) 
+            
+            reg['total_bevs'] += REAL_BEV_SCALE
+            reg['sum_odo'] += (odo * REAL_BEV_SCALE)
+            reg['sum_soh'] += (soh * REAL_BEV_SCALE)
 
             if months_to_eol <= 12:
-                reg['lithium_tons_at_risk'] += (0.5 * self.SCALE_FACTOR)
+                reg['lithium_tons_at_risk'] += (0.5 * REAL_BEV_SCALE)
 
             if months_to_eol <= 3:
-                reg['cohorts']['0-3_months'] += self.SCALE_FACTOR
+                reg['cohorts']['0-3_months'] += REAL_BEV_SCALE
             elif months_to_eol <= 6:
-                reg['cohorts']['3-6_months'] += self.SCALE_FACTOR
+                reg['cohorts']['3-6_months'] += REAL_BEV_SCALE
             elif months_to_eol <= 12:
-                reg['cohorts']['6-12_months'] += self.SCALE_FACTOR
+                reg['cohorts']['6-12_months'] += REAL_BEV_SCALE
             else:
-                reg['cohorts']['safe'] += self.SCALE_FACTOR
+                reg['cohorts']['safe'] += REAL_BEV_SCALE
 
         for r in regions.values():
             if r['total_bevs'] > 0:
