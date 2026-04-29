@@ -1,0 +1,233 @@
+import random
+from models.data_manager.database_manager import DatabaseManager
+from models.insurer_models.fleet_model import FleetModel
+
+class ActuarialModel:
+    def __init__(self):
+        self.fleet_model = FleetModel()
+        
+        # Italian RCA Baseline Metrics (Euros)
+        self.BASE_PREMIUM = 450.0 
+        
+        # Financial Multipliers based on Behavioral Telematics
+        self.DISCOUNT_SAFE = 0.85      # -15% for Score > 85
+        self.MULTIPLIER_MODERATE = 1.0 # 0% for Score 60-84
+        self.MALUS_RISK = 1.20         # +20% for Score < 60
+        
+        # Statistical Accident Probabilities per Cohort
+        self.PROB_SAFE = 0.032
+        self.PROB_MODERATE = 0.055
+        self.PROB_RISK = 0.125
+
+    def generate_executive_summary(self, account_id: int):
+        regional_kpis = self.fleet_model.get_regional_kpis(account_id)
+        
+        total_fleet = 0
+        total_safe = 0
+        total_mod = 0
+        total_risk = 0
+        
+        regional_financials = []
+
+        for r in regional_kpis:
+            cars = r['total_cars']
+            safe = r['risk_safe']
+            mod = r['risk_moderate']
+            risk = r['risk_high']
+            
+            total_fleet += cars
+            total_safe += safe
+            total_mod += mod
+            total_risk += risk
+            
+            reg_revenue = (safe * self.BASE_PREMIUM * self.DISCOUNT_SAFE) + \
+                          (mod * self.BASE_PREMIUM * self.MULTIPLIER_MODERATE) + \
+                          (risk * self.BASE_PREMIUM * self.MALUS_RISK)
+                          
+            # 1. Projected Claims (with Telematics behavioral shifts)
+            reg_accidents = (safe * self.PROB_SAFE) + (mod * self.PROB_MODERATE) + (risk * self.PROB_RISK)
+            
+            # --- FIX: 2. Simulate Current Registered Claims ---
+            # Assume historical baseline (5.5%) with a +/- 5% real-world variance
+            registered_claims = cars * self.PROB_MODERATE * random.uniform(0.95, 1.05)
+            
+            regional_financials.append({
+                "region": r['region_name'],
+                "total_cars": cars,
+                "revenue_eur": reg_revenue,
+                "projected_accidents": int(reg_accidents),
+                "registered_claims": int(registered_claims), # <--- NEW FIELD
+                "high_risk_ratio": (risk / cars) if cars > 0 else 0
+            })
+
+        # 3. Calculate Global Portfolio KPIs
+        if total_fleet == 0:
+            return None
+
+        total_revenue = (total_safe * self.BASE_PREMIUM * self.DISCOUNT_SAFE) + \
+                        (total_mod * self.BASE_PREMIUM * self.MULTIPLIER_MODERATE) + \
+                        (total_risk * self.BASE_PREMIUM * self.MALUS_RISK)
+                        
+        avg_premium = total_revenue / total_fleet
+        avg_discount = ((avg_premium / self.BASE_PREMIUM) - 1.0) * 100 # e.g., -8.4%
+
+        # Calculate how many accidents we PREVENTED by having safe drivers (compared to a baseline 5.5% for everyone)
+        baseline_accidents = total_fleet * self.PROB_MODERATE
+        actual_projected_accidents = (total_safe * self.PROB_SAFE) + (total_mod * self.PROB_MODERATE) + (total_risk * self.PROB_RISK)
+        claims_reduction_pct = ((baseline_accidents - actual_projected_accidents) / baseline_accidents) * 100
+
+        # Simulate Preventative Alerts (Tire/Brake warnings sent to High Risk drivers)
+        preventative_alerts_issued = int(total_risk * 0.45) # Assume 45% of high-risk drivers triggered an intervention alert
+
+        return {
+            "kpis": {
+                "total_monitored_fleet": total_fleet,
+                "average_premium_eur": avg_premium,
+                "average_discount_pct": avg_discount,
+                "claims_reduction_pct": claims_reduction_pct,
+                "preventative_alerts": preventative_alerts_issued
+            },
+            "regional_breakdown": sorted(regional_financials, key=lambda x: x['high_risk_ratio'], reverse=True)
+        }
+
+    def get_demographic_deep_dive(self):
+        """Aggregates claims data by Age, Gender, Vehicle Type, and Behavior."""
+        conn = DatabaseManager.get_connection()
+        cursor = conn.cursor()
+        
+        # --- FIX: We now query the diverse v.vehicle_category instead of c.car_type ---
+        cursor.execute(f'''
+            SELECT 
+                v.vehicle_category,
+                v.driver_gender,
+                CASE 
+                    WHEN v.driver_age BETWEEN 18 AND 24 THEN '18-24'
+                    WHEN v.driver_age BETWEEN 25 AND 34 THEN '25-34'
+                    WHEN v.driver_age BETWEEN 35 AND 44 THEN '35-44'
+                    WHEN v.driver_age BETWEEN 45 AND 54 THEN '45-54'
+                    WHEN v.driver_age BETWEEN 55 AND 64 THEN '55-64'
+                    ELSE '65+' END as age_group,
+                SUM(CASE WHEN t.driving_score >= 85 THEN 1 ELSE 0 END) * {self.fleet_model.SCALE_FACTOR} as safe_count,
+                SUM(CASE WHEN t.driving_score >= 60 AND t.driving_score < 85 THEN 1 ELSE 0 END) * {self.fleet_model.SCALE_FACTOR} as mod_count,
+                SUM(CASE WHEN t.driving_score < 60 THEN 1 ELSE 0 END) * {self.fleet_model.SCALE_FACTOR} as risk_count
+            FROM vehicles v
+            JOIN vehicle_telemetry t ON v.vin = t.vin
+            WHERE v.driver_age IS NOT NULL AND v.vehicle_category IS NOT NULL
+            GROUP BY v.vehicle_category, v.driver_gender, age_group
+        ''')
+        
+        results = cursor.fetchall()
+        conn.close()
+
+        payload = {
+            "genders": {"Male": 0, "Female": 0},
+            "age_groups": {"18-24": 0, "25-34": 0, "35-44": 0, "45-54": 0, "55-64": 0, "65+": 0},
+            "vehicle_types": {},
+            "behaviors": {"Safe (Eco)": 0, "Moderate": 0, "High Risk (Harsh)": 0}
+        }
+
+        for row in results:
+            veh_cat, gender, age_group, safe, mod, risk = row
+            
+            # Base baseline claims calculation
+            base_claims = (safe * self.PROB_SAFE) + (mod * self.PROB_MODERATE) + (risk * self.PROB_RISK)
+            
+            # --- FIX: Tweak % of claims by introducing Vehicle Risk Modifiers ---
+            safe_car_type = str(veh_cat).upper() if veh_cat else "UNKNOWN"
+            modifiers = {
+                'UTILITARIAN': 1.15, # +15% (City driving leads to frequent fender-benders)
+                'HATCHBACK': 1.00,   # Baseline
+                'SUV': 0.85,         # -15% (Safer, defensive family driving)
+                'SEDAN': 0.90,       # -10% (Usually older, more experienced demographic)
+                'SPORTSCAR': 1.40    # +40% (High speed, higher chance of loss of control)
+            }
+            
+            # The final dynamically weighted claims
+            projected_claims = int(base_claims * modifiers.get(safe_car_type, 1.0))
+            
+            if gender in payload["genders"]: payload["genders"][gender] += projected_claims
+            if age_group in payload["age_groups"]: payload["age_groups"][age_group] += projected_claims
+            payload["vehicle_types"][safe_car_type] = payload["vehicle_types"].get(safe_car_type, 0) + projected_claims
+            
+            # We also scale the behavior buckets visually
+            payload["behaviors"]["Safe (Eco)"] += int((safe * self.PROB_SAFE) * modifiers.get(safe_car_type, 1.0))
+            payload["behaviors"]["Moderate"] += int((mod * self.PROB_MODERATE) * modifiers.get(safe_car_type, 1.0))
+            payload["behaviors"]["High Risk (Harsh)"] += int((risk * self.PROB_RISK) * modifiers.get(safe_car_type, 1.0))
+
+        return payload
+
+    def get_asset_risk_portfolio(self):
+        """Aggregates physical health of Brakes, Tires, and Batteries globally AND regionally."""
+        regional_kpis = self.fleet_model.get_regional_kpis(0) 
+        
+        portfolio = {
+            "metrics": {
+                "avg_vsi_score": 0.0,
+                "total_critical_assets": 0,
+                "projected_hardware_claims_eur": 0.0
+            },
+            "global": {
+                "overall_vsi": {"Safe": 0, "Warning": 0, "Critical": 0},
+                "brakes": {"Safe (>6mm)": 0, "Warning (3-6mm)": 0, "Critical (<3mm)": 0},
+                "tires": {"Safe (>4mm)": 0, "Warning (2-4mm)": 0, "Critical (<2mm)": 0}
+            },
+            "regional": []
+        }
+        
+        total_cars = 0
+        total_vsi_sum = 0
+        
+        for r in regional_kpis:
+            cars = r['total_cars']
+            if cars == 0: continue
+            
+            safe_pct = r['risk_safe'] / cars
+            mod_pct = r['risk_moderate'] / cars
+            risk_pct = r['risk_high'] / cars
+            
+            # --- Hardware Calculations ---
+            b_crit = int(cars * risk_pct * 0.4) 
+            b_warn = int(cars * (risk_pct * 0.6 + mod_pct * 0.3))
+            b_safe = cars - b_crit - b_warn
+            
+            t_crit = int(cars * risk_pct * 0.3) 
+            t_warn = int(cars * (risk_pct * 0.7 + mod_pct * 0.4))
+            t_safe = cars - t_crit - t_warn
+            
+            v_crit = int(b_crit * 0.6 + t_crit * 0.4) 
+            v_warn = int(b_warn * 0.6 + t_warn * 0.4)
+            v_safe = cars - v_crit - v_warn
+            
+            # --- 1. Populate Global Sums ---
+            portfolio["global"]["brakes"]["Critical (<3mm)"] += b_crit
+            portfolio["global"]["brakes"]["Warning (3-6mm)"] += b_warn
+            portfolio["global"]["brakes"]["Safe (>6mm)"] += b_safe
+            
+            portfolio["global"]["tires"]["Critical (<2mm)"] += t_crit
+            portfolio["global"]["tires"]["Warning (2-4mm)"] += t_warn
+            portfolio["global"]["tires"]["Safe (>4mm)"] += t_safe
+            
+            portfolio["global"]["overall_vsi"]["Critical"] += v_crit
+            portfolio["global"]["overall_vsi"]["Warning"] += v_warn
+            portfolio["global"]["overall_vsi"]["Safe"] += v_safe
+            
+            # --- FIX: 2. Populate Regional Array ---
+            portfolio["regional"].append({
+                "region": r['region_name'],
+                "vsi": [v_safe, v_warn, v_crit],
+                "brakes": [b_safe, b_warn, b_crit],
+                "tires": [t_safe, t_warn, t_crit]
+            })
+            
+            total_cars += cars
+            total_vsi_sum += (v_safe * 85) + (v_warn * 60) + (v_crit * 30)
+
+        if total_cars > 0:
+            portfolio["metrics"]["avg_vsi_score"] = total_vsi_sum / total_cars
+            portfolio["metrics"]["total_critical_assets"] = portfolio["global"]["overall_vsi"]["Critical"]
+            portfolio["metrics"]["projected_hardware_claims_eur"] = portfolio["global"]["overall_vsi"]["Critical"] * 0.02 * 4500
+
+        # Sort the regions so the ones with the most critical issues appear at the top
+        portfolio["regional"].sort(key=lambda x: x["vsi"][2], reverse=True)
+
+        return portfolio

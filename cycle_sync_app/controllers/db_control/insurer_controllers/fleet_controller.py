@@ -1,6 +1,7 @@
 import json
 from PyQt6.QtCore import QObject
 from mcp_agent_server.ai_orchestrator import AIOrchestrator
+from models.insurer_models.actuarial_model import ActuarialModel # <--- NEW IMPORT
 
 class FleetController(QObject):
 
@@ -35,10 +36,11 @@ class FleetController(QObject):
         self.model = model
         self.account_id = account_id
         
+        # Instantiate the Actuarial Model so we can fetch the VSI scores
+        self.actuarial_model = ActuarialModel()
         self.agent = AIOrchestrator()
         
-        # Wire UI logic
-        self.ai_view.btn_request_ai_analysis.clicked.connect(self.trigger_ai_agent)
+        # --- FIX: Removed the old AI button wire, keeping only map signals ---
         self.map_view.simulate_requested.connect(self.run_simulation)
         self.map_view.view_toggle.currentItemChanged.connect(self.load_fleet_data)
         
@@ -47,13 +49,8 @@ class FleetController(QObject):
 
     def run_simulation(self):
         """Triggers the Monte Carlo simulation and refreshes both UIs."""
-        # 1. Tell the model to generate the new cars
         self.model.simulate_regional_fleet(self.account_id)
-        
-        # 2. Refresh the Map View
         self.load_fleet_data()
-        
-        # 3. Refresh the AI Dashboard Histogram
         self.refresh_ai_dashboard_visuals()
 
     def load_fleet_data(self, *args):
@@ -65,82 +62,24 @@ class FleetController(QObject):
             active_view = args[0]
         else:
             current_item = self.map_view.view_toggle.currentItem()
-            if current_item and 'Network' in current_item.text(): # Updated text check
+            if current_item and 'Network' in current_item.text(): 
                 active_view = 'suppliers'
         
         if hasattr(self.map_view, 'render_map'):
-            # Pass the SERVICE_PROVIDERS instead of SUPPLIERS
             self.map_view.render_map(fleet_data, self.SERVICE_PROVIDERS, active_view)
 
     def refresh_ai_dashboard_visuals(self):
-        """Extracts data from the model to draw the histogram and top stats."""
-        raw_analytics = self.model.get_bev_regional_analytics(self.account_id)
+        """Fetches the VSI Component data and pushes it to the Asset Risk Dashboard."""
+        # --- FIX: Replaced old battery fetching with the new VSI Portfolio ---
+        portfolio_data = self.actuarial_model.get_asset_risk_portfolio()
         
-        total_bevs = 0
-        total_lithium = 0.0
-        total_critical = 0
-        regions = []
-        
-        # We need TWO separate arrays for the grouped histogram
-        eol_0_3_counts = []
-        eol_3_6_counts = []
-        
-        for r in raw_analytics:
-            total_bevs += r['total_bevs']
-            total_lithium += r['lithium_tons_at_risk']
-            
-            count_0_3 = r['cohorts']['0-3_months']
-            count_3_6 = r['cohorts']['3-6_months']
-            critical = count_0_3 + count_3_6
-            total_critical += critical
-            
-            # Only add to graph if they have critical batteries to avoid clutter
-            # Only add to graph if they have critical batteries to avoid clutter
-            if critical > 0:
-                raw_name = r['region_name'].split('(')[0].strip()
-                
-                # --- FIX: STACK THE WORDS TO PREVENT HORIZONTAL OVERLAP ---
-                words = raw_name.split()
-                if len(words) > 1:
-                    # Turns "Northern Italy" into "Northern\nItaly"
-                    short_name = f"{words[0]}\n{' '.join(words[1:])}"
-                else:
-                    short_name = raw_name
-                # -----------------------------------------------------------
-                
-                regions.append(short_name)
-                eol_0_3_counts.append(count_0_3)
-                eol_3_6_counts.append(count_3_6)
-                
-        self.ai_view.populate_dashboard(total_bevs, total_lithium, total_critical, regions, eol_0_3_counts, eol_3_6_counts)
+        if hasattr(self.ai_view, 'populate_dashboard'):
+            self.ai_view.populate_dashboard(portfolio_data)
 
+    # Note: We can safely leave these AI methods here as stubs for when we rebuild 
+    # the AI Agent functionality in Tab 3 of your master plan!
     def trigger_ai_agent(self):
-        """Packages the data and streams the Gemini response to the UI."""
-        payload = self.get_ai_ingestion_payload()
-        self.ai_view.prepare_ai_stream()
-        stream = self.agent.run_oem_battery_analysis(payload)
-        self.ai_view.stream_ai_response(stream)
+        pass
 
     def get_ai_ingestion_payload(self) -> str:
-        """Structures the JSON payload with BOTH Fleet and Supplier data."""
-        regional_analytics = self.model.get_bev_regional_analytics(self.account_id)
-        
-        payload = {
-            "task": "predictive_supply_chain_analysis", 
-            "global_suppliers": self.SUPPLIERS, # <--- Added Suppliers to the AI Brain!
-            "regions": []
-        }
-        
-        for r in regional_analytics:
-            payload["regions"].append({
-                "Region": r['region_name'],
-                "Total Active BEVs": r['total_bevs'],
-                "Average Fleet SoH (%)": round(r['avg_soh'], 1),
-                "Critical EOL Cohorts": {
-                    "0-3 Months to EOL": r['cohorts']['0-3_months'],
-                    "3-6 Months to EOL": r['cohorts']['3-6_months']
-                },
-                "Estimated Material Yield (Tons)": round(r['lithium_tons_at_risk'], 2)
-            })
- 
-        return json.dumps(payload, indent=4)
+        return "{}"
