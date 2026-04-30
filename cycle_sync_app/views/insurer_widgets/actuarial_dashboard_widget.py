@@ -138,20 +138,23 @@ class ActuarialDashboardWidget(QWidget):
         html = f"""
         <!DOCTYPE html><html><head><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
-            /* We lock the body to exactly the window height so it can't scroll infinitely */
-            body {{ margin: 0; padding: 15px; background-color: #1e1e1e; font-family: sans-serif; box-sizing: border-box; height: 95vh; overflow: hidden; }}
-            .grid-container {{ display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 20px; height: 100%; }}
+            /* --- FIX: Enabled vertical scrolling so we can stack large charts cleanly --- */
+            body {{ margin: 0; padding: 15px; background-color: #1e1e1e; font-family: sans-serif; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; }}
             
-            /* The Card is now a Flexbox to strictly manage its internal space */
-            .card {{ background: #272727; border-radius: 10px; padding: 15px; border: 1px solid #3a3a3a; display: flex; flex-direction: column; }}
+            .grid-container {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding-bottom: 30px; }}
+            .card {{ background: #272727; border-radius: 10px; padding: 15px; border: 1px solid #3a3a3a; display: flex; flex-direction: column; height: 320px; }}
+            
+            /* --- FIX: The new full-width stacked card --- */
+            .wide-card {{ grid-column: span 2; height: 350px; }}
+            
             h3 {{ color: #aaa; text-align: center; font-size: 14px; margin: 0 0 10px 0; flex: 0 0 auto; }}
-            
-            /* The crucial wrapper that stops the Chart.js infinite expansion bug */
             .chart-wrapper {{ position: relative; flex: 1 1 auto; width: 100%; height: 0; }}
+            
+            ::-webkit-scrollbar {{ width: 8px; }} ::-webkit-scrollbar-track {{ background: #1e1e1e; }} ::-webkit-scrollbar-thumb {{ background: #555; border-radius: 4px; }}
         </style></head><body>
         <div class="grid-container">
             <div class="card">
-                <h3>Claims by Age Group</h3>
+                <h3>Claims by Driver Age Group</h3>
                 <div class="chart-wrapper"><canvas id="ageChart"></canvas></div>
             </div>
             <div class="card">
@@ -165,6 +168,11 @@ class ActuarialDashboardWidget(QWidget):
             <div class="card">
                 <h3>Claims by Behavioral Risk Segment</h3>
                 <div class="chart-wrapper"><canvas id="behaviorChart"></canvas></div>
+            </div>
+            
+            <div class="card wide-card">
+                <h3>Claims by Vehicle Age (Italian RCA Brackets)</h3>
+                <div class="chart-wrapper"><canvas id="vehicleAgeChart"></canvas></div>
             </div>
         </div>
         <script>
@@ -192,6 +200,13 @@ class ActuarialDashboardWidget(QWidget):
             new Chart(document.getElementById('behaviorChart'), {{
                 type: 'bar',
                 data: {{ labels: {json.dumps(list(d["behaviors"].keys()))}, datasets: [{{ label: 'Projected Claims', data: {json.dumps(list(d["behaviors"].values()))}, backgroundColor: ['#00A67E', '#E2B93B', '#FF5A5A'] }}]}},
+                options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }} }}
+            }});
+            
+            // --- FIX: Render the new Vehicle Age RCA Chart ---
+            new Chart(document.getElementById('vehicleAgeChart'), {{
+                type: 'bar',
+                data: {{ labels: {json.dumps(list(d["vehicle_ages"].keys()))}, datasets: [{{ label: 'Projected Claims', data: {json.dumps(list(d["vehicle_ages"].values()))}, backgroundColor: '#9C27B0' }}]}},
                 options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }} }}
             }});
         </script></body></html>"""

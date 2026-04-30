@@ -1,7 +1,7 @@
 import json
 from PyQt6.QtCore import QObject
-from mcp_agent_server.ai_orchestrator import AIOrchestrator
 from models.insurer_models.actuarial_model import ActuarialModel # <--- NEW IMPORT
+from mcp_agent_server.ai_orchestrator import AIOrchestrator
 
 class FleetController(QObject):
 
@@ -29,20 +29,25 @@ class FleetController(QObject):
         {"name": "Garage Monte Bianco", "type": "Officina", "lat": 45.7373, "lon": 7.3201, "region": "Valle d'Aosta"}
     ]
 
-    def __init__(self, map_view, ai_dashboard_view, model, account_id):
+    def __init__(self, map_view, ai_dashboard_view, strategy_view, model, account_id):
         super().__init__()
         self.map_view = map_view            
-        self.ai_view = ai_dashboard_view    
+        self.ai_view = ai_dashboard_view
+        self.strategy_view = strategy_view  # <--- FIX: Added the 3rd UI view!
         self.model = model
         self.account_id = account_id
         
-        # Instantiate the Actuarial Model so we can fetch the VSI scores
+        # Instantiate the models
         self.actuarial_model = ActuarialModel()
         self.agent = AIOrchestrator()
         
-        # --- FIX: Removed the old AI button wire, keeping only map signals ---
+        # Connect Map Signals
         self.map_view.simulate_requested.connect(self.run_simulation)
         self.map_view.view_toggle.currentItemChanged.connect(self.load_fleet_data)
+        
+        # --- FIX: Wire the 'Generate' button from the new AI Tab! ---
+        if hasattr(self.strategy_view, 'analyze_requested'):
+            self.strategy_view.analyze_requested.connect(self.trigger_ai_agent)
         
         self.load_fleet_data()
         self.refresh_ai_dashboard_visuals()
@@ -83,3 +88,57 @@ class FleetController(QObject):
 
     def get_ai_ingestion_payload(self) -> str:
         return "{}"
+
+    def trigger_ai_agent(self, selected_region: str):
+        """
+        Triggered by the UI when the Actuary clicks 'Analyze Region'.
+        Packages local data and streams the Gemini response back to the UI.
+        """
+        payload = self.get_ai_ingestion_payload(selected_region)
+        
+        # --- FIX: Send the stream to the strategy_view (The new AI Terminal), NOT the ai_view ---
+        if hasattr(self.strategy_view, 'prepare_ai_stream'):
+            self.strategy_view.prepare_ai_stream(selected_region)
+            
+        stream = self.agent.run_actuarial_strategy_analysis(payload)
+        
+        if hasattr(self.strategy_view, 'stream_ai_response'):
+            self.strategy_view.stream_ai_response(stream)
+
+    def get_ai_ingestion_payload(self, target_region: str) -> str:
+        """
+        Extracts ONLY the VSI data and Unipol partners for the selected region 
+        to ensure hyper-local, accurate AI orchestration.
+        """
+        # 1. Fetch the full national portfolio
+        portfolio_data = self.actuarial_model.get_asset_risk_portfolio()
+        
+        # 2. Extract ONLY the target region's physics data
+        region_stats = next((r for r in portfolio_data['regional'] if r['region'] == target_region), None)
+        
+        if not region_stats:
+            return json.dumps({"error": f"No telemetry data found for region: {target_region}"})
+            
+        # 3. Extract ONLY the Unipol repair network located in this specific region
+        local_network = [sp for sp in self.SERVICE_PROVIDERS if sp['region'] == target_region]
+        
+        # 4. Construct the highly-optimized LLM JSON Payload
+        payload = {
+            "Analysis_Target": target_region,
+            "Regional_Asset_Risk": {
+                "Overall_VSI": {
+                    "Safe": region_stats['vsi'][0],
+                    "Warning": region_stats['vsi'][1],
+                    "Critical_Failure_Risk": region_stats['vsi'][2]
+                },
+                "Braking_Systems": {
+                    "Critical_Need_Replacement (<3mm)": region_stats['brakes'][2]
+                },
+                "Tire_Wear": {
+                    "Critical_Blowout_Risk (<2mm)": region_stats['tires'][2]
+                }
+            },
+            "Available_Local_Network": local_network
+        }
+        
+        return json.dumps(payload, indent=2)

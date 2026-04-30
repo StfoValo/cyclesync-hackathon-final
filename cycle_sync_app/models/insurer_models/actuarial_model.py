@@ -91,11 +91,11 @@ class ActuarialModel:
         }
 
     def get_demographic_deep_dive(self):
-        """Aggregates claims data by Age, Gender, Vehicle Type, and Behavior."""
+        """Aggregates claims data by Age, Gender, Vehicle Type, Vehicle Age, and Behavior."""
         conn = DatabaseManager.get_connection()
         cursor = conn.cursor()
         
-        # --- FIX: We now query the diverse v.vehicle_category instead of c.car_type ---
+        # --- FIX: Added SQLite julianday() math to dynamically calculate RCA Vehicle Age Brackets ---
         cursor.execute(f'''
             SELECT 
                 v.vehicle_category,
@@ -107,13 +107,18 @@ class ActuarialModel:
                     WHEN v.driver_age BETWEEN 45 AND 54 THEN '45-54'
                     WHEN v.driver_age BETWEEN 55 AND 64 THEN '55-64'
                     ELSE '65+' END as age_group,
+                CASE 
+                    WHEN (julianday('now') - julianday(v.production_date))/365.25 <= 2 THEN '0-2 Years (New)'
+                    WHEN (julianday('now') - julianday(v.production_date))/365.25 <= 5 THEN '3-5 Years (Recent)'
+                    WHEN (julianday('now') - julianday(v.production_date))/365.25 <= 9 THEN '6-9 Years (Average)'
+                    ELSE '10+ Years (Old)' END as vehicle_age_group,
                 SUM(CASE WHEN t.driving_score >= 85 THEN 1 ELSE 0 END) * {self.fleet_model.SCALE_FACTOR} as safe_count,
                 SUM(CASE WHEN t.driving_score >= 60 AND t.driving_score < 85 THEN 1 ELSE 0 END) * {self.fleet_model.SCALE_FACTOR} as mod_count,
                 SUM(CASE WHEN t.driving_score < 60 THEN 1 ELSE 0 END) * {self.fleet_model.SCALE_FACTOR} as risk_count
             FROM vehicles v
             JOIN vehicle_telemetry t ON v.vin = t.vin
             WHERE v.driver_age IS NOT NULL AND v.vehicle_category IS NOT NULL
-            GROUP BY v.vehicle_category, v.driver_gender, age_group
+            GROUP BY v.vehicle_category, v.driver_gender, age_group, vehicle_age_group
         ''')
         
         results = cursor.fetchall()
@@ -123,36 +128,42 @@ class ActuarialModel:
             "genders": {"Male": 0, "Female": 0},
             "age_groups": {"18-24": 0, "25-34": 0, "35-44": 0, "45-54": 0, "55-64": 0, "65+": 0},
             "vehicle_types": {},
+            "vehicle_ages": {"0-2 Years (New)": 0, "3-5 Years (Recent)": 0, "6-9 Years (Average)": 0, "10+ Years (Old)": 0},
             "behaviors": {"Safe (Eco)": 0, "Moderate": 0, "High Risk (Harsh)": 0}
         }
 
         for row in results:
-            veh_cat, gender, age_group, safe, mod, risk = row
+            veh_cat, gender, age_group, veh_age_group, safe, mod, risk = row
             
-            # Base baseline claims calculation
             base_claims = (safe * self.PROB_SAFE) + (mod * self.PROB_MODERATE) + (risk * self.PROB_RISK)
             
-            # --- FIX: Tweak % of claims by introducing Vehicle Risk Modifiers ---
             safe_car_type = str(veh_cat).upper() if veh_cat else "UNKNOWN"
-            modifiers = {
-                'UTILITARIAN': 1.15, # +15% (City driving leads to frequent fender-benders)
-                'HATCHBACK': 1.00,   # Baseline
-                'SUV': 0.85,         # -15% (Safer, defensive family driving)
-                'SEDAN': 0.90,       # -10% (Usually older, more experienced demographic)
-                'SPORTSCAR': 1.40    # +40% (High speed, higher chance of loss of control)
+            
+            # RCA Modifiers: Vehicle Type Risk
+            type_modifiers = {
+                'UTILITARIAN': 1.15, 'HATCHBACK': 1.00, 'SUV': 0.85, 'SEDAN': 0.90, 'SPORTSCAR': 1.40 
             }
             
-            # The final dynamically weighted claims
-            projected_claims = int(base_claims * modifiers.get(safe_car_type, 1.0))
+            # --- FIX: RCA Modifiers: Vehicle Age Risk (Older cars fail more) ---
+            age_modifiers = {
+                '0-2 Years (New)': 0.95,
+                '3-5 Years (Recent)': 1.00,
+                '6-9 Years (Average)': 1.10,
+                '10+ Years (Old)': 1.25
+            }
+            
+            # The final double-weighted claims projection
+            projected_claims = int(base_claims * type_modifiers.get(safe_car_type, 1.0) * age_modifiers.get(veh_age_group, 1.0))
             
             if gender in payload["genders"]: payload["genders"][gender] += projected_claims
             if age_group in payload["age_groups"]: payload["age_groups"][age_group] += projected_claims
+            if veh_age_group in payload["vehicle_ages"]: payload["vehicle_ages"][veh_age_group] += projected_claims
             payload["vehicle_types"][safe_car_type] = payload["vehicle_types"].get(safe_car_type, 0) + projected_claims
             
-            # We also scale the behavior buckets visually
-            payload["behaviors"]["Safe (Eco)"] += int((safe * self.PROB_SAFE) * modifiers.get(safe_car_type, 1.0))
-            payload["behaviors"]["Moderate"] += int((mod * self.PROB_MODERATE) * modifiers.get(safe_car_type, 1.0))
-            payload["behaviors"]["High Risk (Harsh)"] += int((risk * self.PROB_RISK) * modifiers.get(safe_car_type, 1.0))
+            behavior_mod = type_modifiers.get(safe_car_type, 1.0) * age_modifiers.get(veh_age_group, 1.0)
+            payload["behaviors"]["Safe (Eco)"] += int((safe * self.PROB_SAFE) * behavior_mod)
+            payload["behaviors"]["Moderate"] += int((mod * self.PROB_MODERATE) * behavior_mod)
+            payload["behaviors"]["High Risk (Harsh)"] += int((risk * self.PROB_RISK) * behavior_mod)
 
         return payload
 
