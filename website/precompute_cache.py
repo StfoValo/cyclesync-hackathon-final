@@ -14,10 +14,23 @@ def run_precomputation():
     print("Initializing UI Cache Database...")
     init_db()
 
-    print("Loading models (this might take a while)...")
+    print("Loading models...")
     actuarial_model = ActuarialModel()
     fleet_model = FleetModel()
 
+    # ==========================================
+    # FIX: FORCE A NEW DATA SIMULATION FIRST!
+    # ==========================================
+    print("🚗 Simulating 8.8 Million Telemetry records across all 20 regions...")
+    success = fleet_model.simulate_regional_fleet(account_id=0)
+    if not success:
+        print("❌ CRITICAL ERROR: Could not run simulation. Make sure car_models exist in cyclesync.db!")
+        return
+    print("✅ Simulation complete! Database populated with all 20 regions.")
+
+    # ==========================================
+    # NOW WE CACHE THE FRESH DATA
+    # ==========================================
     print("Precomputing actuarial summary...")
     summary = actuarial_model.generate_executive_summary(account_id=0)
     set_cache('actuarial_summary', summary)
@@ -30,9 +43,19 @@ def run_precomputation():
     portfolio = actuarial_model.get_asset_risk_portfolio()
     set_cache('asset_risk_portfolio', portfolio)
 
+    # --- FIX: Move BEV Regional Analytics UP so it gets calculated FIRST ---
+    print("Precomputing BEV regional analytics...")
+    bev_analytics = fleet_model.get_bev_regional_analytics(account_id=0)
+    set_cache('bev_regional_analytics', bev_analytics)
+
+    # --- FIX: Pass the exact same calculated data into the ESG metrics ---
     print("Precomputing ESG sustainability metrics...")
-    esg = actuarial_model.get_esg_sustainability_metrics()
+    esg = actuarial_model.get_esg_sustainability_metrics(portfolio_data=portfolio, bev_data=bev_analytics)
     set_cache('esg_metrics', esg)
+
+    print("Precomputing fleet regional KPIs...")
+    regional_kpis = fleet_model.get_regional_kpis(0)
+    set_cache('fleet_regional_kpis', regional_kpis)
 
     print("Precomputing fleet regional KPIs...")
     regional_kpis = fleet_model.get_regional_kpis(0)
@@ -42,7 +65,7 @@ def run_precomputation():
     bev_analytics = fleet_model.get_bev_regional_analytics(account_id=0)
     set_cache('bev_regional_analytics', bev_analytics)
 
-    print("Precomputation completed successfully! The UI will now load instantly.")
+    print("🎉 Precomputation completed successfully! The UI will now load instantly.")
 
 if __name__ == "__main__":
     run_precomputation()

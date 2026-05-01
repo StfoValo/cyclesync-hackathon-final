@@ -1,61 +1,148 @@
 import time
 import os
+import json
 import google.generativeai as genai
+from groq import Groq
 from dotenv import load_dotenv
 
 class CoreLLMClient:
     def __init__(self):
         load_dotenv()
-        # 🚨 Ensure your real Gemini API key is here! 🚨
-        self.api_key = os.getenv("GEMINI_API_KEY") 
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
-        self.request_timestamps = []
-
-    def _is_rate_limited(self):
-        current_time = time.time()
-        self.request_timestamps = [t for t in self.request_timestamps if current_time - t < 60]
-        if len(self.request_timestamps) >= 10:
-            return True
-        self.request_timestamps.append(current_time)
-        return False
-
-    def stream_inference(self, system_instruction: str, user_prompt: str, on_fallback=None):
-        """Executes the API call with a strict retry loop and streaming."""
         
-        fallback_text = "### 📱 PUSH NOTIFICATION PREVIEW\n⚠️ Alert: Critical brake pad wear detected in your area. Avoid accidents and get 15% off replacement at Autofficina Sprint today! Book now.\n\n### 🎯 CAMPAIGN RATIONALE\nTriggered by a 24% spike in critical brake telemetry in this region, utilizing the nearest available network partner."
-        
-        if self._is_rate_limited():
-            if on_fallback:
-                on_fallback()
-            for i in range(0, len(fallback_text), 5):
-                yield fallback_text[i:i+5]
-                time.sleep(0.05)
-            return
-            
-        # Combine the system rules and the user data
+        # --- TIER 1: Gemini Setup ---
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY") 
+        if self.gemini_api_key:
+            genai.configure(api_key=self.gemini_api_key)
+            self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+
+        # --- TIER 2: Groq Setup ---
+        self.groq_api_key = os.getenv("GROQ_API_KEY")
+        self.groq_client = Groq(api_key=self.groq_api_key) if self.groq_api_key else None
+
+        # Path to our Shadow Cache file
+        self.cache_file_path = os.path.join(os.path.dirname(__file__), "fallback_responses.json")
+
+    def stream_inference(self, system_instruction: str, user_prompt: str, region: str = "default"):
         full_prompt = f"SYSTEM INSTRUCTION:\n{system_instruction}\n\nUSER PAYLOAD:\n{user_prompt}"
-        
-        max_retries = 3
-        retry_delay = 26 
-        
-        for attempt in range(max_retries):
+        prompt_type = "logistics" if "Reverse Logistics" in system_instruction else "campaign"
+
+        # ==========================================
+        # TIER 1: GROQ (LLAMA 3.1)
+        # ==========================================
+        if self.groq_client:
             try:
-                response = self.model.generate_content(full_prompt, stream=True)
-                for chunk in response:
-                    if chunk.text:
-                        yield chunk.text
-                break  
+                print(f"[LLM Router] Attempting Tier 1: Groq Fallback for {region} (8.0s timeout)...")
+                
+                # --- FIX: Updated to the new supported Llama 3.1 model and enforced 8.0s timeout ---
+                completion = self.groq_client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    stream=True,
+                    timeout=8.0 
+                )
+                
+                full_text_accumulator = ""
+                for chunk in completion:
+                    if chunk.choices[0].delta.content:
+                        content = chunk.choices[0].delta.content
+                        full_text_accumulator += content
+                        yield content
+                
+                self._save_regional_fallback(prompt_type, region, full_text_accumulator)
+                return 
                 
             except Exception as e:
-                error_msg = str(e)
-                if "429" in error_msg or "Quota" in error_msg:
-                    if on_fallback:
-                        on_fallback()
-                    for i in range(0, len(fallback_text), 5):
-                        yield fallback_text[i:i+5]
-                        time.sleep(0.05)
-                    return
-                else:
-                    yield f"\n\n**[❌ ERROR]** Connection to Gemini Core failed: {error_msg}"
-                    break
+                print(f"[LLM Router] ⚠️ Groq failed or timed out: {str(e)}")
+        
+        # ==========================================
+        # TIER 2: GOOGLE GEMINI
+        # ==========================================
+        try:
+            print(f"[LLM Router] Attempting Tier 2: Gemini for {region} (3.0s timeout)...")
+            
+            # --- FIX: Enforcing the 8.0s timeout ---
+            response = self.gemini_model.generate_content(
+                full_prompt, 
+                stream=True,
+                request_options={"timeout": 3.0} 
+            )
+            
+            full_text_accumulator = ""
+            for chunk in response:
+                if chunk.text:
+                    full_text_accumulator += chunk.text
+                    yield chunk.text
+            
+            self._save_regional_fallback(prompt_type, region, full_text_accumulator)
+            return 
+            
+        except Exception as e:
+            print(f"[LLM Router] ⚠️ Gemini failed or timed out: {str(e)}")
+
+        
+
+        # ==========================================
+        # TIER 3: REGION-AWARE LOCAL CACHE
+        # ==========================================
+        print(f"[LLM Router] 🛑 All APIs failed. Engaging Tier 3 Local Cache for {region}...")
+        
+        time.sleep(0.8) 
+        
+        cached_response = self._get_regional_fallback(prompt_type, region)
+            
+        words = cached_response.split(" ")
+        for word in words:
+            yield word + " "
+            time.sleep(0.04)
+
+    # ---------------------------------------------------------
+    # DYNAMIC CACHE MANAGER LOGIC
+    # ---------------------------------------------------------
+    def _save_regional_fallback(self, prompt_type: str, region: str, response_text: str):
+        """Silently saves successful LLM generations to a JSON file ONLY if it doesn't already exist."""
+        try:
+            fallbacks = {"logistics": {}, "campaign": {}}
+            if os.path.exists(self.cache_file_path):
+                with open(self.cache_file_path, "r", encoding="utf-8") as f:
+                    fallbacks = json.load(f)
+            
+            # Ensure the structure exists
+            if prompt_type not in fallbacks:
+                fallbacks[prompt_type] = {}
+                
+            # --- NEW: THE WRITE-LOCK BYPASS ---
+            if region in fallbacks[prompt_type]:
+                print(f"[Shadow Cache] ⏭️ Cache already exists for {region} ({prompt_type}). Skipping disk write.")
+                return # Instantly exit the function, saving CPU and Disk I/O!
+                
+            # If we get here, the region doesn't exist yet, so we save it.
+            fallbacks[prompt_type][region] = response_text
+            
+            with open(self.cache_file_path, "w", encoding="utf-8") as f:
+                json.dump(fallbacks, f, indent=4)
+            print(f"[Shadow Cache] ✅ Successfully saved new fallback response for {region} ({prompt_type}).")
+            
+        except Exception as e:
+            print(f"[Shadow Cache Error] Could not save to JSON: {e}")
+
+    def _get_regional_fallback(self, prompt_type: str, region: str) -> str:
+        """Reads the perfectly formatted regional response from the JSON file."""
+        try:
+            if os.path.exists(self.cache_file_path):
+                with open(self.cache_file_path, "r", encoding="utf-8") as f:
+                    fallbacks = json.load(f)
+                
+                category = fallbacks.get(prompt_type, {})
+                
+                # Try to get exact region, if not, try to get a "default" one, if not, fallback string
+                if region in category:
+                    return category[region]
+                elif "default" in category:
+                    return category["default"]
+                    
+            return "### ⚠️ SYSTEM OFFLINE\nCould not connect to AI services or retrieve local regional cache."
+        except Exception as e:
+            return f"### ⚠️ CACHE ERROR\n{str(e)}"

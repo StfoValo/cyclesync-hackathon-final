@@ -6,10 +6,8 @@ from models.data_manager.database_manager import DatabaseManager
 from models.driver_models.powertrain_models.bev_model import BEVModel
 
 class FleetModel:
-    # 1 Simulated Row = 2,500 Real Cars (Keeps the app blazing fast!)
     SCALE_FACTOR = 2500 
     
-    # --- EXCLUSIVE ITALIAN REGIONS (Actual Unipol Market Size - 22%) ---
     REGIONS = [
         {"name": "Lombardia", "lat": 45.4642, "lon": 9.1900, "coeff": 1386000},
         {"name": "Lazio", "lat": 41.9028, "lon": 12.4964, "coeff": 858000},
@@ -46,14 +44,14 @@ class FleetModel:
             ("lon", "REAL"),
             ("driver_age", "INTEGER"),
             ("driver_gender", "TEXT"),
-            ("vehicle_category", "TEXT") # <--- NEW COLUMN
+            ("vehicle_category", "TEXT") 
         ]
         
         for col_name, col_type in columns_to_add:
             try:
                 cursor.execute(f"ALTER TABLE vehicles ADD COLUMN {col_name} {col_type}")
             except sqlite3.OperationalError:
-                pass # Column already exists, move to the next one safely
+                pass 
                 
         conn.commit()
         conn.close()
@@ -62,9 +60,21 @@ class FleetModel:
         conn = DatabaseManager.get_connection()
         cursor = conn.cursor()
 
-        cursor.execute("SELECT id FROM car_models")
-        model_rows = cursor.fetchall()
-        if not model_rows:
+        # --- FIX 1: Explicitly separate BEVs and ICE models to guarantee electric representation ---
+        cursor.execute("SELECT id FROM car_models WHERE powertrain = 'BEV'")
+        bev_models = cursor.fetchall()
+
+        cursor.execute("SELECT id FROM car_models WHERE powertrain != 'BEV' OR powertrain IS NULL")
+        other_models = cursor.fetchall()
+
+        # Fallback if DB doesn't have powertrains set up
+        if not bev_models or not other_models:
+            cursor.execute("SELECT id FROM car_models")
+            all_models = cursor.fetchall()
+            bev_models = all_models
+            other_models = all_models
+
+        if not bev_models:
             conn.close()
             return False 
 
@@ -77,9 +87,14 @@ class FleetModel:
         for region in self.REGIONS:
             num_cars_per_model = max(1, int((region["coeff"] / self.SCALE_FACTOR) / 3))
             
-            for _ in range(3): 
-                model_id = random.choice(model_rows)[0]
-                
+            # --- FIX 2: Guarantee 1 BEV and 2 Non-BEVs per region ---
+            chosen_models = [
+                random.choice(bev_models)[0],
+                random.choice(other_models)[0],
+                random.choice(other_models)[0]
+            ]
+            
+            for model_id in chosen_models:
                 for _ in range(num_cars_per_model):
                     vin = f"SIM{uuid.uuid4().hex[:14].upper()}"
                     days_old = random.randint(30, 3650)
@@ -88,28 +103,23 @@ class FleetModel:
                     lat_jitter = region["lat"] + random.uniform(-0.4, 0.4)
                     lon_jitter = region["lon"] + random.uniform(-0.4, 0.4)
 
-                    # Generate Demographics
                     driver_age = random.choices(
                         [random.randint(18,24), random.randint(25,34), random.randint(35,44), random.randint(45,54), random.randint(55,64), random.randint(65,80)],
                         weights=[0.08, 0.15, 0.22, 0.25, 0.20, 0.10]
                     )[0]
                     driver_gender = random.choices(['Male', 'Female'], weights=[0.54, 0.46])[0]
 
-                    # Generate Vehicle Category
                     veh_cat = random.choices(
                         ['Utilitarian', 'Hatchback', 'SUV', 'Sedan', 'Sportscar'],
                         weights=[0.42, 0.28, 0.20, 0.08, 0.02] 
                     )[0]
 
-                    # ONLY ONE APPEND: Exactly 10 items to match the SQL query
                     vehicles_data.append((vin, model_id, 'SIMULATED', prod_date, region["name"], lat_jitter, lon_jitter, driver_age, driver_gender, veh_cat))
                     
-                    # ONLY ONE APPEND: Exactly 3 items for telemetry
                     odo = int(days_old * random.uniform(30, 60)) 
                     score = random.randint(40, 100) 
                     telemetry_data.append((vin, odo, score))
 
-        # Insert exactly 10 bindings (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         cursor.executemany("INSERT INTO vehicles (vin, model_id, owner_id, production_date, region_name, lat, lon, driver_age, driver_gender, vehicle_category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", vehicles_data)
         cursor.executemany("INSERT INTO vehicle_telemetry (vin, current_odometer_km, driving_score) VALUES (?, ?, ?)", telemetry_data)
         
@@ -121,7 +131,6 @@ class FleetModel:
         conn = DatabaseManager.get_connection()
         cursor = conn.cursor()
         
-        # --- FIX: Multiply the results by the Scale Factor so the UI shows Millions! ---
         cursor.execute(f'''
             SELECT v.region_name, 
                    COUNT(v.vin) * {self.SCALE_FACTOR} as total_cars,
@@ -192,8 +201,9 @@ class FleetModel:
             years_to_eol = max((soh - 80.0) / annual_loss_rate, 0) if annual_loss_rate > 0 else 10.0
             months_to_eol = years_to_eol * 12
 
-            if random.random() < 0.12:
-                months_to_eol = random.uniform(1.0, 5.5) 
+            # --- FIX 3: Increase "Hackathon Demo" failure rate from 12% to 35% ---
+            if random.random() < 0.35:
+                months_to_eol = random.uniform(0.5, 2.9) # Force it directly into the 0-3 month bucket!
 
             if region not in regions:
                 regions[region] = {
@@ -204,7 +214,6 @@ class FleetModel:
 
             reg = regions[region]
             
-            # --- FIX: Enforce 5% Italian EV Penetration Rate ---
             REAL_BEV_SCALE = int(self.SCALE_FACTOR * 0.05) 
             
             reg['total_bevs'] += REAL_BEV_SCALE
