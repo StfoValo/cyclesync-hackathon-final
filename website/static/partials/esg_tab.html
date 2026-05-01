@@ -1,0 +1,89 @@
+<header class="mb-8">
+    <h2 class="text-3xl font-bold text-white tracking-tight mb-2">ESG & Circular Economy</h2>
+    <p class="text-slate-400">Virtual emissions sensor and component second-life ledger.</p>
+</header>
+
+<!-- Top Section: Virtual Emissions Sensor -->
+<div class="mb-10">
+    <h3 class="text-xl font-bold text-white mb-4 border-b border-white/10 pb-2">Virtual Emissions Sensor</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass-panel rounded-xl p-6 border border-white/5 shadow-lg">
+            <p class="text-sm text-slate-400 mb-1">Baseline CO2 (Tons)</p>
+            <p class="text-3xl font-bold text-slate-300" id="esg-kpi-baseline">--</p>
+        </div>
+        <div class="glass-panel rounded-xl p-6 border border-white/5 shadow-lg">
+            <p class="text-sm text-slate-400 mb-1">Real Telematics CO2 (Tons)</p>
+            <p class="text-3xl font-bold text-slate-300" id="esg-kpi-real">--</p>
+        </div>
+        <div class="glass-panel rounded-xl p-6 border border-emerald-500/30 shadow-lg bg-emerald-500/10 relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 opacity-10">
+                <svg class="w-32 h-32 text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+            </div>
+            <p class="text-sm text-emerald-300 mb-1 relative z-10">Total CO2 Saved (Tons)</p>
+            <p class="text-3xl font-bold text-emerald-400 relative z-10" id="esg-kpi-saved">--</p>
+        </div>
+        <div class="glass-panel rounded-xl p-6 border border-emerald-500/30 shadow-lg bg-emerald-500/10 relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 opacity-10">
+                <svg class="w-32 h-32 text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+            </div>
+            <p class="text-sm text-emerald-300 mb-1 relative z-10">Equivalent Trees Planted</p>
+            <p class="text-3xl font-bold text-emerald-400 relative z-10" id="esg-kpi-trees">--</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Section: The Second Life Component Ledger -->
+<div>
+    <h3 class="text-xl font-bold text-white mb-4 border-b border-white/10 pb-2">The Second Life Component Ledger</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Tires Column -->
+        <div class="glass-panel rounded-2xl p-6 flex flex-col border border-white/5 h-[400px]">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-emerald-500/30">
+                    <span class="text-emerald-400 font-bold">T</span>
+                </div>
+                <h4 class="text-slate-300 font-semibold">Tires Recovered</h4>
+            </div>
+            <p class="text-3xl font-bold text-white mb-6 pl-11" id="esg-kpi-tires-total">--</p>
+            <div class="relative flex-1 w-full min-h-[200px]">
+                <div class="absolute inset-0">
+                    <canvas id="esgTiresChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Brakes Column -->
+        <div class="glass-panel rounded-2xl p-6 flex flex-col border border-white/5 h-[400px]">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-emerald-500/30">
+                    <span class="text-emerald-400 font-bold">B</span>
+                </div>
+                <h4 class="text-slate-300 font-semibold">Brake Pads Recovered</h4>
+            </div>
+            <p class="text-3xl font-bold text-white mb-6 pl-11" id="esg-kpi-brakes-total">--</p>
+            <div class="relative flex-1 w-full min-h-[200px]">
+                <div class="absolute inset-0">
+                    <canvas id="esgBrakesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- EV Batteries Column -->
+        <div class="glass-panel rounded-2xl p-6 flex flex-col border border-white/5 h-[400px]">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-emerald-500/30">
+                    <span class="text-emerald-400 font-bold">EV</span>
+                </div>
+                <h4 class="text-slate-300 font-semibold">EV Batteries Recovered</h4>
+            </div>
+            <p class="text-3xl font-bold text-white mb-6 pl-11" id="esg-kpi-batteries-total">--</p>
+            <div class="relative flex-1 w-full min-h-[200px]">
+                <div class="absolute inset-0">
+                    <canvas id="esgBatteriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

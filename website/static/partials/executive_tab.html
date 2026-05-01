@@ -1,0 +1,91 @@
+                <header class="mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white tracking-tight mb-2">Executive Risk Summary</h2>
+                        <p class="text-slate-400">Actuarial financial projections and demographic deep dives.</p>
+                    </div>
+                    <div class="flex bg-slate-800 rounded-lg p-1 border border-white/5">
+                        <button id="btn-view-regional" class="px-4 py-2 rounded-md text-sm font-medium bg-brand-600 text-white shadow transition-all">Regional Overview</button>
+                        <button id="btn-view-demographic" class="px-4 py-2 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Demographic Deep Dive</button>
+                    </div>
+                </header>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="glass-panel rounded-xl p-6 border border-white/5 shadow-lg">
+                        <p class="text-sm text-slate-400 mb-1">Total Monitored Fleet</p>
+                        <p class="text-3xl font-bold text-white" id="kpi-total-fleet">--</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-6 border border-white/5 shadow-lg">
+                        <p class="text-sm text-slate-400 mb-1">Avg Premium (EUR)</p>
+                        <p class="text-3xl font-bold text-white" id="kpi-avg-premium">--</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-6 border border-white/5 shadow-lg">
+                        <p class="text-sm text-slate-400 mb-1">Telematics Discount</p>
+                        <p class="text-3xl font-bold text-emerald-400" id="kpi-discount">--</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-6 border border-white/5 shadow-lg">
+                        <p class="text-sm text-slate-400 mb-1">Claims Reduction</p>
+                        <p class="text-3xl font-bold text-brand-400" id="kpi-claims-reduction">--</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-6 min-h-[450px] flex flex-col border border-white/5 overflow-y-auto">
+                    <div id="regional-charts" class="w-full h-[400px]">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                    <div id="demographic-charts" class="hidden w-full">
+                        <style>
+                            .demo-grid-container {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 20px;
+                                width: 100%;
+                            }
+
+                            .demo-card {
+                                border-radius: 10px;
+                                padding: 15px;
+                                display: flex;
+                                flex-direction: column;
+                                height: 320px;
+                                background: rgba(30, 41, 59, 0.4);
+                                border: 1px solid rgba(255, 255, 255, 0.05);
+                            }
+
+                            .demo-wide-card {
+                                grid-column: span 2;
+                                height: 350px;
+                            }
+
+                            .demo-chart-wrapper {
+                                position: relative;
+                                flex: 1 1 auto;
+                                width: 100%;
+                                height: 0;
+                            }
+                        </style>
+                        <div class="demo-grid-container w-full">
+                            <div class="demo-card">
+                                <h3 class="text-slate-400 text-sm text-center mb-2 font-semibold">Claims by Driver Age
+                                    Group</h3>
+                                <div class="demo-chart-wrapper"><canvas id="ageChart"></canvas></div>
+                            </div>
+                            <div class="demo-card">
+                                <h3 class="text-slate-400 text-sm text-center mb-2 font-semibold">Claims by Gender</h3>
+                                <div class="demo-chart-wrapper"><canvas id="genderChart"></canvas></div>
+                            </div>
+                            <div class="demo-card">
+                                <h3 class="text-slate-400 text-sm text-center mb-2 font-semibold">Claims by Vehicle
+                                    Category</h3>
+                                <div class="demo-chart-wrapper"><canvas id="vehicleChart"></canvas></div>
+                            </div>
+                            <div class="demo-card">
+                                <h3 class="text-slate-400 text-sm text-center mb-2 font-semibold">Claims by Behavioral
+                                    Risk Segment</h3>
+                                <div class="demo-chart-wrapper"><canvas id="behaviorChart"></canvas></div>
+                            </div>
+                            <div class="demo-card demo-wide-card">
+                                <h3 class="text-slate-400 text-sm text-center mb-2 font-semibold">Claims by Vehicle Age
+                                    (Italian RCA Brackets)</h3>
+                                <div class="demo-chart-wrapper"><canvas id="vehicleAgeChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
