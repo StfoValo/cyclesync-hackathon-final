@@ -115,3 +115,19 @@ def get_fleet_map(view: str = 'fleet'):
             ).add_to(fleet_map)
 
     return HTMLResponse(fleet_map.get_root().render())
+
+@router.get("/api/actuarial/esg")
+async def get_esg_dashboard():
+    """Fetches the precomputed ESG and Circular Economy metrics."""
+    try:
+        import sqlite3, json
+        conn = sqlite3.connect('ui_cache.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT data FROM cache WHERE key='esg_circular_metrics'")
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            return json.loads(row[0])
+        return {"error": "ESG cache not found"}
+    except Exception as e:
+        return {"error": f"Database error: {str(e)}"}

@@ -1,16 +1,27 @@
 import os
 import json
+import sqlite3
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
-from models.insurer_models.actuarial_model import ActuarialModel
 from mcp_agent_server.ai_orchestrator import AIOrchestrator
-from models.insurer_models.actuarial_model import ActuarialModel
-from models.insurer_models.fleet_model import FleetModel
 
 router = APIRouter()
 orchestrator = AIOrchestrator()
-actuarial_model = ActuarialModel()
 
+# --- THE FIX: A bulletproof local cache reader ---
+def get_cache(key: str):
+    try:
+        # Connects directly to the database in your root folder
+        conn = sqlite3.connect('ui_cache.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT data FROM cache WHERE key=?", (key,))
+        row = cursor.fetchone()
+        conn.close()
+        return json.loads(row[0]) if row else {}
+    except Exception as e:
+        print(f"⚠️ Cache read error: {e}")
+        return {}
+        
 @router.get("/api/ai/orchestrate/{region}")
 async def orchestrate_ai(request: Request, region: str): 
     client_ip = request.client.host
