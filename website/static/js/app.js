@@ -300,13 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnAnalyze.disabled = true;
             btnAnalyze.innerHTML = "Orchestrating Network...";
             
-            aiTerminal.innerHTML = `⚠️ Fetching live telemetry for <b>${region}</b>...\n\n`;
-
-            // Reset KPIs
-            document.getElementById('ai-kpi-targeted').innerText = "---";
-            document.getElementById('ai-kpi-opened').innerText = "---";
-            document.getElementById('ai-kpi-booked').innerText = "---";
-            document.getElementById('ai-kpi-roi').innerText = "---";
+            aiTerminal.innerHTML = `<b style='color: #00A67E;'>[INIT]</b> Ingesting VSI Telemetry and Local Supply Chain for <b>${region}</b>...\n\n`;
 
             try {
                 const response = await fetch(`/api/ai/orchestrate/${region}`);
@@ -318,24 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (done) break;
                     
                     const chunk = decoder.decode(value, { stream: true });
-                    const cleanChunk = chunk.replace(/###/g, '').replace(/\*\*/g, '');
+                    const cleanChunk = chunk.replace(/###/g, '\n\n>>').replace(/\*\*/g, '');
                     aiTerminal.innerHTML += cleanChunk;
                     aiTerminal.scrollTop = aiTerminal.scrollHeight;
                 }
                 
-                // Simulate analytics arriving 1.5s later
-                setTimeout(() => {
-                    const targeted = Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000;
-                    const opened = Math.floor(targeted * (Math.random() * (0.45 - 0.35) + 0.35));
-                    const booked = Math.floor(opened * (Math.random() * (0.12 - 0.08) + 0.08));
-                    const roi = booked * (Math.random() * (4500 - 2500) + 2500);
-                    
-                    document.getElementById('ai-kpi-targeted').innerText = targeted.toLocaleString();
-                    document.getElementById('ai-kpi-opened').innerText = Math.floor((opened / targeted) * 100) + "%";
-                    document.getElementById('ai-kpi-booked').innerText = booked.toLocaleString();
-                    document.getElementById('ai-kpi-roi').innerText = '€' + roi.toLocaleString(undefined, {maximumFractionDigits: 0});
-                }, 1500);
-                
+                aiTerminal.innerHTML += "\n\n<b style='color: #00A67E;'>[PROCESS COMPLETE]</b> Directives ready for dispatch.";
             } catch (error) {
                 aiTerminal.innerHTML += `\n\n<b style='color: #FF5A5A;'>[ERROR]</b> ${error.message}`;
             } finally {
