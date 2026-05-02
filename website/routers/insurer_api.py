@@ -121,11 +121,13 @@ async def get_esg_dashboard():
     """Fetches the precomputed ESG and Circular Economy metrics."""
     try:
         import sqlite3, json, os
-        # Give Python the absolute path to website/ui_cache.db
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ui_cache.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute("SELECT data FROM cache WHERE key='esg_circular_metrics'")
+        
+        # --- THE FIX: Correct table, correct columns, and correct key ('esg_metrics') ---
+        cursor.execute("SELECT json_data FROM api_cache WHERE endpoint_key='esg_metrics'")
+        
         row = cursor.fetchone()
         conn.close()
         if row:

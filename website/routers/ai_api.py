@@ -11,11 +11,13 @@ orchestrator = AIOrchestrator()
 # --- THE FIX: A bulletproof local cache reader ---
 def get_cache(key: str):
     try:
-        # Give Python the absolute path to website/ui_cache.db
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ui_cache.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute("SELECT data FROM cache WHERE key=?", (key,))
+        
+        # --- THE FIX: Correct table (api_cache) and columns (json_data, endpoint_key) ---
+        cursor.execute("SELECT json_data FROM api_cache WHERE endpoint_key=?", (key,))
+        
         row = cursor.fetchone()
         conn.close()
         return json.loads(row[0]) if row else {}
