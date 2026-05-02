@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CycleSync | Driver App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 400: '#5cffff', 500: '#00E5FF' },
+                        darkbg: '#050a11',
+                        cardbg: '#0f1725'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050a11;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .glass-card {
+            background: #0f1725;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+        }
+
+        .glow-ring {
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.15), inset 0 0 20px rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="h-[100dvh] w-screen flex flex-col overflow-hidden">
+
+    <header class="flex items-center justify-between px-4 py-4 shrink-0">
+        <a href="/dashboard" class="text-white p-2 -ml-2 hover:text-brand-400 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                </path>
+            </svg>
+        </a>
+        <h1 class="text-[15px] font-semibold tracking-wide text-slate-200">Manutenzione consigliata</h1>
+        <div class="w-6"></div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-5 pb-8 flex flex-col">
+
+        <div class="flex justify-center mt-8 mb-10">
+            <div class="w-32 h-32 rounded-full glow-ring flex items-center justify-center relative">
+                <div class="absolute inset-0 rounded-full border border-brand-500/20 scale-110"></div>
+                <div class="absolute inset-0 rounded-full border border-brand-500/10 scale-125"></div>
+
+                <svg class="w-10 h-10 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                    </path>
+                </svg>
+                <div class="absolute top-8 right-8 w-3.5 h-3.5 bg-red-500 border-2 border-darkbg rounded-full"></div>
+            </div>
+        </div>
+
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold mb-3 tracking-tight">Manutenzione consigliata</h2>
+            <p class="text-slate-400 text-[15px] leading-relaxed px-2">
+                Abbiamo rilevato un'usura anomala delle pastiglie dei freni. Intervieni per guidare in sicurezza e
+                ottenere un vantaggio sulla tua polizza.
+            </p>
+        </div>
+
+        <div class="glass-card flex flex-col overflow-hidden mb-10">
+
+            <div class="flex items-start gap-4 p-4 border-b border-white/5">
+                <div class="mt-0.5 opacity-90">
+                    <svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-[15px] mb-0.5 text-white">Sconto polizza attivabile</h4>
+                    <p class="text-sm text-slate-400">Dopo l'intervento riceverai <span
+                            class="text-brand-400 font-semibold">-2.7%</span></p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 p-4 border-b border-white/5">
+                <div class="mt-0.5 opacity-90">
+                    <svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-[15px] mb-0.5 text-white">Riduzione rischio sinistri</h4>
+                    <p class="text-sm text-slate-400">Fino a <span class="text-brand-400 font-semibold">-30.8%</span>
+                        intervenendo ora</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 p-4">
+                <div class="mt-0.5 opacity-90">
+                    <svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-[15px] mb-0.5 text-white">Officine convenzionate</h4>
+                    <p class="text-sm text-slate-400">Trova l'officina più vicina a te</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3 mt-auto">
+            <button
+                class="w-full bg-brand-500 hover:bg-brand-400 text-black font-semibold py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors">
+                Trova officina convenzionata
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+            <button
+                class="w-full bg-transparent border border-white/20 text-slate-300 font-semibold py-3.5 rounded-xl hover:bg-white/5 transition-colors">
+                Ignora per ora
+            </button>
+        </div>
+    </main>
+
+</body>
+
+</html>

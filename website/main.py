@@ -34,5 +34,15 @@ def read_dashboard():
     """Serves the enterprise dashboard."""
     return FileResponse(os.path.join(static_dir, "dashboard.html"))
 
+@app.get("/driver")
+def read_driver_app():
+    """Serves the consumer-facing mobile web app."""
+    return FileResponse(os.path.join(static_dir, "user_app.html"))
+
 # Mount static files for JS, CSS, and Images
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+@app.get("/driver")
+def read_driver_app():
+    """Serves the consumer-facing mobile web app."""
+    return FileResponse(os.path.join(static_dir, "user_app.html"))
