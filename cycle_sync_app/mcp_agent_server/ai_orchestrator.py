@@ -1,6 +1,6 @@
 from mcp_agent_server.core_llm_client import CoreLLMClient
-from mcp_agent_server.prompts.actuary_prompt import get_actuary_system_prompt, get_actuary_user_prompt
-from .prompts import get_actuary_system_prompt, get_logistics_system_prompt
+from .prompts.actuary_prompt import get_actuary_system_prompt
+from .prompts.reverse_logistics_prompt import get_logistics_system_prompt
 import time
 
 class AIOrchestrator:
