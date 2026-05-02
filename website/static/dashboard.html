@@ -93,9 +93,17 @@
 
         <div
             class="p-4 md:p-6 flex items-center justify-between md:justify-start gap-3 border-b border-white/5 shrink-0">
-            <img src="/static/cyclesync_logo.png" alt="CycleSync Logo" class="h-8 md:h-10 w-auto">
+            <div class="flex items-center gap-2">
+                <svg class="w-6 h-6 md:w-8 md:h-8 text-brand-500 drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]"
+                    fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M5.5 3L18.5 12L5.5 21V15L11.5 12L5.5 9V3Z" />
+                </svg>
+                <span class="text-xl md:text-2xl font-bold tracking-tight text-white">Cycle<span
+                        class="text-brand-500">Sync</span></span>
+            </div>
 
-            <div class="md:hidden w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">
+            <div
+                class="md:hidden w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center border border-slate-500">
                 <span class="text-xs font-bold text-white">OA</span>
             </div>
         </div>
@@ -170,7 +178,7 @@
             class="absolute top-0 left-0 w-full h-96 bg-brand-600/10 blur-3xl -z-10 rounded-b-[100px] pointer-events-none">
         </div>
 
-        <div class="p-4 md:p-8 max-w-7xl mx-auto h-full">
+        <div class="p-4 pb-32 md:p-8 max-w-7xl mx-auto min-h-full">
 
             <div id="telemetry-view" class="view-section active"></div>
             <div id="executive-view" class="view-section"></div>
