@@ -83,6 +83,17 @@ window.translations = {
         "asset-chart-gbrake": "Global Brakes",
         "asset-chart-gtire": "Global Tires",
 
+        // Chart Labels (Asset & VSI)
+        "chart-safe": "Safe (Eco)",
+        "chart-warn": "Moderate Risk",
+        "chart-crit": "Critical Risk",
+        "chart-safe-b": "Healthy (<40% Wear)",
+        "chart-warn-b": "Warning (40-80% Wear)",
+        "chart-crit-b": "Replace Subito (>80%)",
+        "chart-safe-t": "Healthy Tread",
+        "chart-warn-t": "Worn Tread",
+        "chart-crit-t": "Bald/Illegal Tread",
+
         // Partials: AI Routing
         "ai-title": "AI Routing Directive",
         "ai-subtitle": "LLM-powered strategic intelligence and policy recommendations.",
@@ -197,6 +208,17 @@ window.translations = {
         "asset-chart-gvsi": "VSI Globale",
         "asset-chart-gbrake": "Freni Globali",
         "asset-chart-gtire": "Pneumatici Globali",
+
+        // Chart Labels (Asset & VSI)
+        "chart-safe": "Sicuro (Eco)",
+        "chart-warn": "Rischio Moderato",
+        "chart-crit": "Rischio Critico",
+        "chart-safe-b": "Sano (<40% Usura)",
+        "chart-warn-b": "Attenzione (40-80% Usura)",
+        "chart-crit-b": "Sostituire Subito (>80%)",
+        "chart-safe-t": "Battistrada Sano",
+        "chart-warn-t": "Battistrada Usurato",
+        "chart-crit-t": "Battistrada Illegale",
 
         // Partials: AI Routing
         "ai-title": "Direttiva di Routing IA",
