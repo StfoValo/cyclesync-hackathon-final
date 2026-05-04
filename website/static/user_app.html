@@ -93,10 +93,11 @@
                     <button onclick="window.setLanguage('it')" id="lang-it-app"
                         class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-all text-slate-400 hover:text-white">IT</button>
                 </div>
+
                 <a href="/dashboard"
-                    class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800 border-2 border-brand-500/30 overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.2)]">
-                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Andrea&backgroundColor=0f1725"
-                        alt="Avatar" class="w-full h-full object-cover">
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-600 text-slate-300 hover:text-white hover:border-brand-400 transition-all shadow-lg group">
+                    <span class="text-sm group-hover:scale-110 transition-transform">🏢</span>
+                    <span class="text-[10px] font-bold tracking-wide uppercase">Portal</span>
                 </a>
             </div>
         </header>
@@ -415,6 +416,14 @@
                 document.getElementById('nav-alert').classList.remove('text-slate-500');
             }
         }
+
+        // FIX: Force translation sync slightly after the DOM loads to avoid race conditions
+        setTimeout(() => {
+            if (window.setLanguage) {
+                const savedLang = localStorage.getItem('cyclesync_lang') || 'en';
+                window.setLanguage(savedLang);
+            }
+        }, 50);
     </script>
 </body>
 

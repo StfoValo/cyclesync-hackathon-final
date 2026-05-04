@@ -129,6 +129,16 @@ window.translations = {
         "esg-step-3": "3. Second-Life Routing",
         "esg-term-wait": "Awaiting regional selection to begin triage...",
 
+        // Chart Labels (ESG)
+        "chart-Asphalt": "Asphalt Recycling",
+        "chart-Energy": "Energy Recovery",
+        "chart-Landfill": "Landfill (Waste)",
+        "chart-Scrap": "Scrap Metal Smelting",
+        "chart-Friction": "Friction Material",
+        "chart-Grid": "Grid Storage",
+        "chart-Black": "Black Mass Recycling",
+        "chart-Hazardous": "Hazardous Waste",
+
         // Driver App
         "driver-hello": "Hi, Andrea",
         "driver-sos": "Quick SOS",
@@ -293,6 +303,16 @@ window.translations = {
         "esg-step-2": "2. Analisi Usura Telemetria &rarr;",
         "esg-step-3": "3. Routing Seconda Vita",
         "esg-term-wait": "In attesa di selezione regionale per iniziare il triage...",
+
+        // Chart Labels (ESG)
+        "chart-Asphalt": "Riciclo Asfalto",
+        "chart-Energy": "Recupero Energetico",
+        "chart-Landfill": "Discarica (Scarto)",
+        "chart-Scrap": "Fusione Rottami",
+        "chart-Friction": "Materiale d'Attrito",
+        "chart-Grid": "Accumulo Rete (Grid)",
+        "chart-Black": "Riciclo Black Mass",
+        "chart-Hazardous": "Rifiuti Pericolosi",
 
         // Driver App
         "driver-hello": "Ciao, Andrea",
