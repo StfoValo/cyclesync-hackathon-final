@@ -337,15 +337,28 @@ window.translations = {
 
 window.setLanguage = function (lang) {
     localStorage.setItem('cyclesync_lang', lang);
+
+    // Grab Desktop Buttons
     const btnEn = document.getElementById('lang-en');
     const btnIt = document.getElementById('lang-it');
 
+    // Grab Mobile App Buttons
+    const btnEnApp = document.getElementById('lang-en-app');
+    const btnItApp = document.getElementById('lang-it-app');
+
+    const activeClass = "px-3 py-1.5 md:px-3 md:py-1.5 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-bold transition-all bg-brand-500 text-slate-900 shadow-[0_0_10px_rgba(0,229,255,0.4)]";
+    const inactiveClass = "px-3 py-1.5 md:px-3 md:py-1.5 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-bold transition-all text-slate-400 hover:text-white bg-transparent shadow-none";
+
     if (lang === 'en') {
-        if (btnEn) btnEn.className = "px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-brand-500 text-slate-900 shadow-[0_0_10px_rgba(0,229,255,0.4)]";
-        if (btnIt) btnIt.className = "px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-400 hover:text-white bg-transparent shadow-none";
+        if (btnEn) btnEn.className = activeClass;
+        if (btnEnApp) btnEnApp.className = activeClass;
+        if (btnIt) btnIt.className = inactiveClass;
+        if (btnItApp) btnItApp.className = inactiveClass;
     } else {
-        if (btnIt) btnIt.className = "px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-brand-500 text-slate-900 shadow-[0_0_10px_rgba(0,229,255,0.4)]";
-        if (btnEn) btnEn.className = "px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-400 hover:text-white bg-transparent shadow-none";
+        if (btnIt) btnIt.className = activeClass;
+        if (btnItApp) btnItApp.className = activeClass;
+        if (btnEn) btnEn.className = inactiveClass;
+        if (btnEnApp) btnEnApp.className = inactiveClass;
     }
 
     document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -360,8 +373,3 @@ window.setLanguage = function (lang) {
     }
     window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-    const savedLang = localStorage.getItem('cyclesync_lang') || 'en';
-    window.setLanguage(savedLang);
-});
