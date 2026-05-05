@@ -15,12 +15,29 @@
 </header>
 
 <div
-    class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg mb-6 md:mb-8 max-w-3xl mx-auto flex gap-3">
-    <input type="text" value="AB 123 CD" placeholder="Enter License Plate or Claim ID..."
-        class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-rose-500 transition-colors font-mono uppercase tracking-widest text-lg">
+    class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg mb-6 md:mb-8 max-w-4xl mx-auto flex flex-col md:flex-row gap-3">
+    <div class="flex-1 relative">
+        <select id="claim-selector"
+            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-rose-500 transition-colors text-sm md:text-base cursor-pointer appearance-none">
+            <option value="AB123CD" data-i18n="adj-opt-fraud">AB 123 CD - Caso Frode / Negligenza Guidatore</option>
+            <option value="EF456GH" data-i18n="adj-opt-good">EF 456 GH - Guidatore Virtuoso (Approvazione Istantanea)
+            </option>
+            <option value="XY789ZZ" data-i18n="adj-opt-defect">XY 789 ZZ - Difetto Hardware OEM (Azione di Rivalsa)
+            </option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </div>
+    </div>
     <button
-        class="bg-rose-600 hover:bg-rose-500 text-white px-6 md:px-8 py-3 rounded-lg font-bold transition-colors shadow-[0_0_15px_rgba(225,29,72,0.4)]">
-        <span data-i18n="adj-search">Search</span>
+        class="bg-rose-600 hover:bg-rose-500 text-white px-6 md:px-8 py-3 rounded-lg font-bold transition-colors shadow-[0_0_15px_rgba(225,29,72,0.4)] flex items-center justify-center gap-2 shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <span data-i18n="adj-search">Search / Fetch Data</span>
     </button>
 </div>
 

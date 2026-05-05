@@ -162,6 +162,11 @@ window.translations = {
         "adj-btn-deny": "Deny Claim",
         "adj-btn-investigate": "Investigate Further",
 
+        // Dropdown Options
+        "adj-opt-fraud": "AB 123 CD - Fraud Case / Driver Negligence",
+        "adj-opt-good": "EF 456 GH - Virtuous Driver (Instant Approval)",
+        "adj-opt-defect": "XY 789 ZZ - OEM Hardware Defect (Subrogation Opportunity)",
+
         // Driver App
         "driver-hello": "Hi, Andrea",
         "driver-sos": "Quick SOS",
@@ -359,6 +364,10 @@ window.translations = {
         "adj-ai-desc": "Si raccomanda il rifiuto del sinistro. La telemetria immutabile indica che il conducente ha subito una perdita del 45% dell'efficienza frenante in 3 settimane e ha esplicitamente ignorato 3 avvisi critici prima del tamponamento. La responsabilità ricade interamente sulla negligenza del conducente, non su un guasto meccanico improvviso.",
         "adj-btn-deny": "Rifiuta Sinistro",
         "adj-btn-investigate": "Indaga Oltre",
+
+        "adj-opt-fraud": "AB 123 CD - Caso Frode / Negligenza Guidatore",
+        "adj-opt-good": "EF 456 GH - Guidatore Virtuoso (Approvazione Istantanea)",
+        "adj-opt-defect": "XY 789 ZZ - Difetto Hardware OEM (Azione di Rivalsa)",
 
         // Driver App
         "driver-hello": "Ciao, Andrea",
