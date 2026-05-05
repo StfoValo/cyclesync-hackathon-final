@@ -167,6 +167,23 @@ window.translations = {
         "adj-opt-good": "EF 456 GH - Virtuous Driver (Instant Approval)",
         "adj-opt-defect": "XY 789 ZZ - OEM Hardware Defect (Subrogation Opportunity)",
 
+        "adj-good-score": "85/100 (HEALTHY)",
+        "adj-good-event-1": "Routine monthly VSI diagnostic completed.",
+        "adj-good-event-2": "All systems report nominal operation.",
+        "adj-good-event-3": "Third-party collision reported. Telemetry locked.",
+        "adj-good-ai": "Claim approval recommended. Telemetry confirms safe driving and excellent vehicle maintenance prior to the incident. No negligence detected.",
+        "adj-btn-approve": "Approve Claim",
+        "adj-btn-fasttrack": "Fast-Track Payout",
+
+        "adj-defect-score": "78/100 (WARNING)",
+        "adj-defect-batt": "Thermal Runaway",
+        "adj-defect-event-1": "Routine VSI diagnostic completed. All clear.",
+        "adj-defect-event-2": "CRITICAL: Sudden thermal anomaly detected in Battery Cell Block 4.",
+        "adj-defect-event-3": "Power steering failure flag triggered by BMS.",
+        "adj-defect-event-4": "Collision reported. Telemetry locked.",
+        "adj-defect-ai": "Subrogation recommended. Driver maintenance was flawless. Telemetry indicates a catastrophic, spontaneous failure of the EV Battery management system (OEM fault) 2 minutes prior to impact, causing loss of vehicle control. Initiate recovery against manufacturer.",
+        "adj-btn-subrogate": "Initiate Subrogation",
+
         // Driver App
         "driver-hello": "Hi, Andrea",
         "driver-sos": "Quick SOS",
@@ -365,9 +382,28 @@ window.translations = {
         "adj-btn-deny": "Rifiuta Sinistro",
         "adj-btn-investigate": "Indaga Oltre",
 
+        // Dropdown Options
+
         "adj-opt-fraud": "AB 123 CD - Caso Frode / Negligenza Guidatore",
         "adj-opt-good": "EF 456 GH - Guidatore Virtuoso (Approvazione Istantanea)",
         "adj-opt-defect": "XY 789 ZZ - Difetto Hardware OEM (Azione di Rivalsa)",
+
+        "adj-good-score": "85/100 (SANO)",
+        "adj-good-event-1": "Diagnostica mensile di routine VSI completata.",
+        "adj-good-event-2": "Tutti i sistemi segnalano un funzionamento nominale.",
+        "adj-good-event-3": "Segnalato sinistro con terze parti. Telemetria bloccata.",
+        "adj-good-ai": "Si raccomanda l'approvazione del sinistro. La telemetria conferma una guida sicura e un'eccellente manutenzione del veicolo prima dell'incidente. Nessuna negligenza rilevata.",
+        "adj-btn-approve": "Approva Sinistro",
+        "adj-btn-fasttrack": "Pagamento Rapido (Fast-Track)",
+
+        "adj-defect-score": "78/100 (ATTENZIONE)",
+        "adj-defect-batt": "Fuga Termica (Runaway)",
+        "adj-defect-event-1": "Diagnostica VSI completata. Nessuna anomalia.",
+        "adj-defect-event-2": "CRITICO: Rilevata improvvisa anomalia termica nel Blocco Celle Batteria 4.",
+        "adj-defect-event-3": "Segnale di guasto al servosterzo attivato dal BMS.",
+        "adj-defect-event-4": "Sinistro segnalato. Telemetria bloccata.",
+        "adj-defect-ai": "Si raccomanda l'azione di rivalsa. La manutenzione del conducente era impeccabile. La telemetria indica un guasto catastrofico e spontaneo del sistema di gestione della batteria EV (colpa dell'OEM) 2 minuti prima dell'impatto, causando la perdita di controllo del veicolo. Avviare il recupero contro il produttore.",
+        "adj-btn-subrogate": "Avvia Azione di Rivalsa",
 
         // Driver App
         "driver-hello": "Ciao, Andrea",

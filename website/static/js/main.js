@@ -3,6 +3,7 @@ import { initActuarial } from './views/actuarial.js';
 import { initPredictiveAsset } from './views/predictive_asset.js';
 import { initAIStrategy } from './views/ai_strategy.js';
 import { initESG } from './views/esg.js';
+import { initAdjuster } from './views/adjuster.js';
 
 const viewModules = {
     'telemetry-view': { path: '/static/partials/telemetry_tab.html', init: initTelemetry },
@@ -10,7 +11,7 @@ const viewModules = {
     'asset-view': { path: '/static/partials/asset_tab.html', init: initPredictiveAsset },
     'ai-view': { path: '/static/partials/ai_tab.html', init: initAIStrategy },
     'esg-view': { path: '/static/partials/esg_tab.html', init: initESG },
-    'adjuster-view': { path: '/static/partials/adjuster_tab.html', init: null }
+    'adjuster-view': { path: '/static/partials/adjuster_tab.html', init: initAdjuster }
 };
 
 const loadedViews = new Set();
