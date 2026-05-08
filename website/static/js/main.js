@@ -1,9 +1,9 @@
-import { initTelemetry } from './views/telemetry.js';
-import { initActuarial } from './views/actuarial.js';
-import { initPredictiveAsset } from './views/predictive_asset.js';
-import { initAIStrategy } from './views/ai_strategy.js';
-import { initESG } from './views/esg.js';
-import { initAdjuster } from './views/adjuster.js';
+import { initTelemetry } from './views/telemetry.js?v=2';
+import { initActuarial } from './views/actuarial.js?v=2';
+import { initPredictiveAsset } from './views/predictive_asset.js?v=2';
+import { initAIStrategy } from './views/ai_strategy.js?v=2';
+import { initESG } from './views/esg.js?v=2';
+import { initAdjuster } from './views/adjuster.js?v=2';
 
 const viewModules = {
     'telemetry-view': { path: '/static/partials/telemetry_tab.html', init: initTelemetry },

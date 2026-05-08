@@ -28,7 +28,7 @@ export function initActuarial() {
     const btnViewRegional = document.getElementById('btn-view-regional');
     const btnViewDemographic = document.getElementById('btn-view-demographic');
     const btnViewAsset = document.getElementById('btn-view-asset');
-    
+
     const regionalCharts = document.getElementById('regional-charts');
     const demographicCharts = document.getElementById('demographic-charts');
     const executiveContentWrapper = document.getElementById('executive-content-wrapper');
@@ -38,19 +38,19 @@ export function initActuarial() {
         btnViewRegional.addEventListener('click', () => {
             console.log("🖱️ [Actuarial] 'Regional Overview' button clicked.");
             activeSubView = 'regional';
-            
+
             btnViewRegional.classList.add('bg-brand-600', 'text-white', 'shadow');
             btnViewRegional.classList.remove('text-slate-400', 'hover:text-white');
 
             btnViewDemographic.classList.remove('bg-brand-600', 'text-white', 'shadow');
             btnViewDemographic.classList.add('text-slate-400', 'hover:text-white');
-            
+
             btnViewAsset.classList.remove('bg-brand-600', 'text-white', 'shadow');
             btnViewAsset.classList.add('text-slate-400', 'hover:text-white');
 
             executiveContentWrapper.classList.remove('hidden');
             assetContentWrapper.classList.add('hidden');
-            
+
             regionalCharts.classList.remove('hidden');
             demographicCharts.classList.add('hidden');
             loadRegionalCharts();
@@ -59,13 +59,13 @@ export function initActuarial() {
         btnViewDemographic.addEventListener('click', () => {
             console.log("🖱️ [Actuarial] 'Demographic Deep Dive' button clicked.");
             activeSubView = 'demographic';
-            
+
             btnViewDemographic.classList.add('bg-brand-600', 'text-white', 'shadow');
             btnViewDemographic.classList.remove('text-slate-400', 'hover:text-white');
 
             btnViewRegional.classList.remove('bg-brand-600', 'text-white', 'shadow');
             btnViewRegional.classList.add('text-slate-400', 'hover:text-white');
-            
+
             btnViewAsset.classList.remove('bg-brand-600', 'text-white', 'shadow');
             btnViewAsset.classList.add('text-slate-400', 'hover:text-white');
 
@@ -76,17 +76,17 @@ export function initActuarial() {
             regionalCharts.classList.add('hidden');
             loadDemographics();
         });
-        
+
         btnViewAsset.addEventListener('click', () => {
             console.log("🖱️ [Actuarial] 'Asset Risk' button clicked.");
             activeSubView = 'asset';
-            
+
             btnViewAsset.classList.add('bg-brand-600', 'text-white', 'shadow');
             btnViewAsset.classList.remove('text-slate-400', 'hover:text-white');
 
             btnViewRegional.classList.remove('bg-brand-600', 'text-white', 'shadow');
             btnViewRegional.classList.add('text-slate-400', 'hover:text-white');
-            
+
             btnViewDemographic.classList.remove('bg-brand-600', 'text-white', 'shadow');
             btnViewDemographic.classList.add('text-slate-400', 'hover:text-white');
 
@@ -238,7 +238,11 @@ function renderDemographics(d) {
             console.log("🏗️ [Actuarial] Creating NEW ageChart instance.");
             ageChart = new Chart(document.getElementById('ageChart'), {
                 type: 'bar',
-                data: { labels: Object.keys(d.age_groups).map(k => getT('chart-age-' + ['<25', '25-35', '36-50', '51-65', '>65'].indexOf(k))), datasets: [{ label: getT('chart-proj-claims-short'), data: Object.values(d.age_groups), backgroundColor: '#4CAF50' }] },
+                // THE FIX: We removed the strict 'indexOf' array and now just count the items dynamically (i + 1)
+                data: {
+                    labels: Object.keys(d.age_groups).map((k, i) => getT('chart-age-' + (i + 1))),
+                    datasets: [{ label: getT('chart-proj-claims'), data: Object.values(d.age_groups), backgroundColor: '#4CAF50' }]
+                },
                 options: commonOptions
             });
         } else {
@@ -250,7 +254,7 @@ function renderDemographics(d) {
             console.log("🏗️ [Actuarial] Creating NEW genderChart instance.");
             genderChart = new Chart(document.getElementById('genderChart'), {
                 type: 'doughnut',
-                data: { labels: Object.keys(d.genders).map(k => getT('chart-gender-' + (['Male', 'Female', 'Corporate/Other'].indexOf(k)+1))), datasets: [{ data: Object.values(d.genders), backgroundColor: ['#2196F3', '#E91E63'], borderWidth: 0 }] },
+                data: { labels: Object.keys(d.genders).map(k => getT('chart-gender-' + k)), datasets: [{ data: Object.values(d.genders), backgroundColor: ['#2196F3', '#E91E63'], borderWidth: 0 }] },
                 // 2. Add it to genderChart options
                 options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { datalabels: false } }
             });
@@ -262,7 +266,7 @@ function renderDemographics(d) {
             console.log("🏗️ [Actuarial] Creating NEW vehicleChart instance.");
             vehicleChart = new Chart(document.getElementById('vehicleChart'), {
                 type: 'bar',
-                data: { labels: Object.keys(d.vehicle_types).map(k => getT('chart-veh-' + (['Sedan', 'SUV', 'Compact', 'Sports', 'Van'].indexOf(k)+1))), datasets: [{ label: getT('chart-proj-claims-short'), data: Object.values(d.vehicle_types), backgroundColor: '#FF9800' }] },
+                data: { labels: Object.keys(d.vehicle_types).map(k => getT('chart-veh-' + k)), datasets: [{ label: getT('chart-proj-claims-short'), data: Object.values(d.vehicle_types), backgroundColor: '#FF9800' }] },
                 // 3. Add it to vehicleChart options
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: false } }
             });
@@ -274,7 +278,7 @@ function renderDemographics(d) {
             console.log("🏗️ [Actuarial] Creating NEW behaviorChart instance.");
             behaviorChart = new Chart(document.getElementById('behaviorChart'), {
                 type: 'bar',
-                data: { labels: Object.keys(d.behaviors).map(k => getT('chart-beh-' + (['Aggressive', 'Moderate', 'Safe', 'Telematics-Optimized'].indexOf(k)+1))), datasets: [{ label: getT('chart-proj-claims-short'), data: Object.values(d.behaviors), backgroundColor: ['#00A67E', '#E2B93B', '#FF5A5A'] }] },
+                data: { labels: Object.keys(d.behaviors).map(k => getT('chart-beh-' + k)), datasets: [{ label: getT('chart-proj-claims-short'), data: Object.values(d.behaviors), backgroundColor: ['#00A67E', '#E2B93B', '#FF5A5A'] }] },
                 options: commonOptions
             });
         } else {
@@ -285,7 +289,7 @@ function renderDemographics(d) {
             console.log("🏗️ [Actuarial] Creating NEW vehicleAgeChart instance.");
             vehicleAgeChart = new Chart(document.getElementById('vehicleAgeChart'), {
                 type: 'bar',
-                data: { labels: Object.keys(d.vehicle_ages).map(k => getT('chart-vehage-' + (['0-3 Years', '4-7 Years', '8-12 Years', '>12 Years'].indexOf(k)+1))), datasets: [{ label: getT('chart-proj-claims-short'), data: Object.values(d.vehicle_ages), backgroundColor: '#9C27B0' }] },
+                data: { labels: Object.keys(d.vehicle_ages).map(k => getT('chart-vehage-' + k)), datasets: [{ label: getT('chart-proj-claims-short'), data: Object.values(d.vehicle_ages), backgroundColor: '#9C27B0' }] },
                 options: commonOptions
             });
         } else {
