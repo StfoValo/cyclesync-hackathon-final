@@ -1,38 +1,56 @@
+import { initPredictiveAsset } from './predictive_asset.js';
+
 let cachedSummaryData = null;
 let cachedDemographicsData = null;
 let riskChart, ageChart, genderChart, vehicleChart, behaviorChart, vehicleAgeChart;
 
 let isInitialized = false;
 
+let activeSubView = 'regional'; // can be 'regional', 'demographic', 'asset'
+
 export function initActuarial() {
     console.log("🚀 [Actuarial] initActuarial called. isInitialized:", isInitialized);
 
     if (isInitialized) {
-        const regionalCharts = document.getElementById('regional-charts');
-        if (regionalCharts && !regionalCharts.classList.contains('hidden')) {
+        if (activeSubView === 'regional') {
             console.log("🔄 [Actuarial] Re-rendering Regional Charts from main tab switch.");
             loadRegionalCharts();
-        } else {
+        } else if (activeSubView === 'demographic') {
             console.log("🔄 [Actuarial] Re-rendering Demographic Charts from main tab switch.");
             loadDemographics();
+        } else if (activeSubView === 'asset') {
+            console.log("🔄 [Actuarial] Re-rendering Asset Charts from main tab switch.");
+            initPredictiveAsset();
         }
         return;
     }
 
     const btnViewRegional = document.getElementById('btn-view-regional');
     const btnViewDemographic = document.getElementById('btn-view-demographic');
+    const btnViewAsset = document.getElementById('btn-view-asset');
+    
     const regionalCharts = document.getElementById('regional-charts');
     const demographicCharts = document.getElementById('demographic-charts');
+    const executiveContentWrapper = document.getElementById('executive-content-wrapper');
+    const assetContentWrapper = document.getElementById('asset-content-wrapper');
 
-    if (btnViewRegional && btnViewDemographic && regionalCharts && demographicCharts) {
+    if (btnViewRegional && btnViewDemographic && btnViewAsset && regionalCharts && demographicCharts && executiveContentWrapper && assetContentWrapper) {
         btnViewRegional.addEventListener('click', () => {
             console.log("🖱️ [Actuarial] 'Regional Overview' button clicked.");
+            activeSubView = 'regional';
+            
             btnViewRegional.classList.add('bg-brand-600', 'text-white', 'shadow');
             btnViewRegional.classList.remove('text-slate-400', 'hover:text-white');
 
             btnViewDemographic.classList.remove('bg-brand-600', 'text-white', 'shadow');
             btnViewDemographic.classList.add('text-slate-400', 'hover:text-white');
+            
+            btnViewAsset.classList.remove('bg-brand-600', 'text-white', 'shadow');
+            btnViewAsset.classList.add('text-slate-400', 'hover:text-white');
 
+            executiveContentWrapper.classList.remove('hidden');
+            assetContentWrapper.classList.add('hidden');
+            
             regionalCharts.classList.remove('hidden');
             demographicCharts.classList.add('hidden');
             loadRegionalCharts();
@@ -40,15 +58,42 @@ export function initActuarial() {
 
         btnViewDemographic.addEventListener('click', () => {
             console.log("🖱️ [Actuarial] 'Demographic Deep Dive' button clicked.");
+            activeSubView = 'demographic';
+            
             btnViewDemographic.classList.add('bg-brand-600', 'text-white', 'shadow');
             btnViewDemographic.classList.remove('text-slate-400', 'hover:text-white');
 
             btnViewRegional.classList.remove('bg-brand-600', 'text-white', 'shadow');
             btnViewRegional.classList.add('text-slate-400', 'hover:text-white');
+            
+            btnViewAsset.classList.remove('bg-brand-600', 'text-white', 'shadow');
+            btnViewAsset.classList.add('text-slate-400', 'hover:text-white');
+
+            executiveContentWrapper.classList.remove('hidden');
+            assetContentWrapper.classList.add('hidden');
 
             demographicCharts.classList.remove('hidden');
             regionalCharts.classList.add('hidden');
             loadDemographics();
+        });
+        
+        btnViewAsset.addEventListener('click', () => {
+            console.log("🖱️ [Actuarial] 'Asset Risk' button clicked.");
+            activeSubView = 'asset';
+            
+            btnViewAsset.classList.add('bg-brand-600', 'text-white', 'shadow');
+            btnViewAsset.classList.remove('text-slate-400', 'hover:text-white');
+
+            btnViewRegional.classList.remove('bg-brand-600', 'text-white', 'shadow');
+            btnViewRegional.classList.add('text-slate-400', 'hover:text-white');
+            
+            btnViewDemographic.classList.remove('bg-brand-600', 'text-white', 'shadow');
+            btnViewDemographic.classList.add('text-slate-400', 'hover:text-white');
+
+            executiveContentWrapper.classList.add('hidden');
+            assetContentWrapper.classList.remove('hidden');
+
+            initPredictiveAsset();
         });
 
         isInitialized = true;
@@ -69,11 +114,12 @@ window.addEventListener('languageChanged', () => {
     if (behaviorChart) { behaviorChart.destroy(); behaviorChart = null; }
     if (vehicleAgeChart) { vehicleAgeChart.destroy(); vehicleAgeChart = null; }
 
-    const regionalCharts = document.getElementById('regional-charts');
-    if (regionalCharts && !regionalCharts.classList.contains('hidden')) {
+    if (activeSubView === 'regional') {
         if (cachedSummaryData) renderRegionalCharts(cachedSummaryData);
-    } else {
+    } else if (activeSubView === 'demographic') {
         if (cachedDemographicsData) renderDemographics(cachedDemographicsData);
+    } else if (activeSubView === 'asset') {
+        initPredictiveAsset();
     }
 });
 

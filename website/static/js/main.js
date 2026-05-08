@@ -8,7 +8,6 @@ import { initAdjuster } from './views/adjuster.js';
 const viewModules = {
     'telemetry-view': { path: '/static/partials/telemetry_tab.html', init: initTelemetry },
     'executive-view': { path: '/static/partials/executive_tab.html', init: initActuarial },
-    'asset-view': { path: '/static/partials/asset_tab.html', init: initPredictiveAsset },
     'ai-view': { path: '/static/partials/ai_tab.html', init: initAIStrategy },
     'esg-view': { path: '/static/partials/esg_tab.html', init: initESG },
     'adjuster-view': { path: '/static/partials/adjuster_tab.html', init: initAdjuster }
@@ -35,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const config = viewModules[targetId];
                 if (!config) return;
 
-                const response = await fetch(config.path);
+                const cacheBuster = '?v=' + new Date().getTime();
+                const response = await fetch(config.path + cacheBuster);
                 if (!response.ok) throw new Error("Failed to load partial");
                 const html = await response.text();
                 section.innerHTML = html;

@@ -189,17 +189,29 @@ window.translations = {
         "adj-defect-ai": "Third-party payout authorized under mandatory RCA law. However, telemetry proves gross negligence (15% brake capacity ignored for 2 weeks). Initiate 'Rivalsa' (Subrogation) to recover full claim costs from the policyholder.",
         "adj-btn-subrogate": "Initiate Rivalsa against Driver",
 
-        // CycleVision Modal
-        "adj-btn-vision": "👁️ Run CycleVision CNN Triage",
-        "cv-title": "CycleVision CNN Triage",
-        "cv-mech-claim": "Mechanic Request:",
-        "cv-mech-val": "Front Radiator Assembly - €14,000",
-        "cv-ai-analysis": "AI Visual Analysis:",
-        "cv-ai-val": "0% Structural Damage. Component intact.",
-        "cv-fraud-risk": "Fraud Probability:",
-        "cv-fraud-val": "98% (CRITICAL)",
-        "cv-desc": "⚠️ FRAUD ALERT: Visual evidence explicitly contradicts the mechanic's €14,000 claim. AI confirms the radiator and structural supports are intact. Telemetry confirms a low-speed impact (< 10km/h). Recommendation: Block payout immediately.",
-        "cv-close": "Close Scan",
+        // CycleVision Modal (General & Scenario 1 - Radiator)
+        "adj-btn-vision": "👁️ Esegui Triage Visivo CycleVision",
+        "cv-title": "Triage CNN CycleVision",
+        "cv-mech-claim": "Richiesta Meccanico:",
+        "cv-mech-val": "Gruppo Radiatore Anteriore - €14.000",
+        "cv-ai-analysis": "Analisi Visiva IA:",
+        "cv-ai-val": "0% Danni Strutturali. Componente intatto.",
+        "cv-fraud-risk": "Probabilità di Frode:",
+        "cv-fraud-val": "98% (CRITICO)",
+        "cv-desc": "⚠️ ALLERTA FRODE: L'evidenza visiva contraddice esplicitamente la richiesta di €14.000 del meccanico. L'IA conferma che il radiatore e i supporti strutturali sono intatti. La telemetria conferma un impatto a bassa velocità (< 10km/h). Raccomandazione: Bloccare immediatamente il pagamento.",
+        "cv-close": "Chiudi Scansione",
+
+        // CycleVision - Good Driver (Scenario 2 - Bumper)
+        "cv-good-mech-claim": "Sostituzione Paraurti Anteriore - €1.200",
+        "cv-good-ai-val": "Il profilo del danno corrisponde ai dati di impatto.",
+        "cv-good-fraud-val": "4% (SICURO)",
+        "cv-good-desc": "✅ VERIFICATO: L'evidenza visiva corrisponde al referto di collisione e alla telemetria. Il danno è isolato alla zona d'impatto senza condizioni preesistenti. Pagamento approvato.",
+
+        // CycleVision - RCA Negligence (Scenario 3 - Brakes)
+        "cv-defect-mech-claim": "Guasto Freni - €8.500 (Pagamento Terzi)",
+        "cv-defect-ai-val": "0% Materiale d'attrito. Grave rigatura del disco.",
+        "cv-defect-fraud-val": "95% (GRAVE NEGLIGENZA)",
+        "cv-defect-desc": "⚠️ ALLERTA RIVALSA: La scansione visiva del gruppo freni mostra l'esaurimento completo del materiale d'attrito e rigature metallo su metallo. Questo conferma la telemetria: il conducente ha ignorato l'usura critica per settimane. Procedere con la rivalsa.",
 
         // Driver App
         "driver-hello": "Hi, Andrea",
@@ -426,7 +438,7 @@ window.translations = {
         "adj-defect-ai": "Pagamento al terzo autorizzato come previsto dalla legge RCA. Tuttavia, la telemetria prova grave negligenza (freni al 15% ignorati per 2 settimane). Avviare 'Rivalsa' per recuperare i costi totali del sinistro dall'assicurato.",
         "adj-btn-subrogate": "Avvia Rivalsa contro Assicurato",
 
-        // CycleVision Modal
+        // CycleVision Modal (General & Scenario 1 - Radiator)
         "adj-btn-vision": "👁️ Esegui Triage Visivo CycleVision",
         "cv-title": "Triage CNN CycleVision",
         "cv-mech-claim": "Richiesta Meccanico:",
@@ -437,6 +449,18 @@ window.translations = {
         "cv-fraud-val": "98% (CRITICO)",
         "cv-desc": "⚠️ ALLERTA FRODE: L'evidenza visiva contraddice esplicitamente la richiesta di €14.000 del meccanico. L'IA conferma che il radiatore e i supporti strutturali sono intatti. La telemetria conferma un impatto a bassa velocità (< 10km/h). Raccomandazione: Bloccare immediatamente il pagamento.",
         "cv-close": "Chiudi Scansione",
+
+        // CycleVision - Good Driver (Scenario 2 - Bumper)
+        "cv-good-mech-claim": "Sostituzione Paraurti Anteriore - €1.200",
+        "cv-good-ai-val": "Il profilo del danno corrisponde ai dati di impatto.",
+        "cv-good-fraud-val": "4% (SICURO)",
+        "cv-good-desc": "✅ VERIFICATO: L'evidenza visiva corrisponde al referto di collisione e alla telemetria. Il danno è isolato alla zona d'impatto senza condizioni preesistenti. Pagamento approvato.",
+
+        // CycleVision - RCA Negligence (Scenario 3 - Brakes)
+        "cv-defect-mech-claim": "Guasto Freni - €8.500 (Pagamento Terzi)",
+        "cv-defect-ai-val": "0% Materiale d'attrito. Grave rigatura del disco.",
+        "cv-defect-fraud-val": "95% (GRAVE NEGLIGENZA)",
+        "cv-defect-desc": "⚠️ ALLERTA RIVALSA: La scansione visiva del gruppo freni mostra l'esaurimento completo del materiale d'attrito e rigature metallo su metallo. Questo conferma la telemetria: il conducente ha ignorato l'usura critica per settimane. Procedere con la rivalsa.",
 
         // Driver App
         "driver-hello": "Ciao, Andrea",
