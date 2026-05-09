@@ -24,7 +24,7 @@ def run_precomputation():
     print("🚗 Simulating 8.8 Million Telemetry records across all 20 regions...")
     success = fleet_model.simulate_regional_fleet(account_id=0)
     if not success:
-        print("❌ CRITICAL ERROR: Could not run simulation. Make sure car_models exist in cyclesync.db!")
+        print("❌ CRITICAL ERROR: Could not run simulation. Make sure car_models exist in veritwin.db!")
         return
     print("✅ Simulation complete! Database populated with all 20 regions.")
 

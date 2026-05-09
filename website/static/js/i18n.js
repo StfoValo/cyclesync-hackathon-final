@@ -21,7 +21,7 @@ window.translations = {
         "ecosystem-1-desc": "Ingest live telemetry to detect component wear, acting as an immutable audit trail prior to crashes.",
         "ecosystem-2-title": "Proactive Steering",
         "ecosystem-2-desc": "Push alerts to the Driver App, steering users strictly into affiliated, cost-controlled mechanic networks.",
-        "ecosystem-3-title": "CycleVision CNN",
+        "ecosystem-3-title": "VeriVision CNN",
         "ecosystem-3-desc": "AI computer vision instantly cross-references mechanic photos against telemetry to block fraudulent payouts.",
         "ecosystem-4-title": "Automated Rivalsa",
         "ecosystem-4-desc": "Provide adjusters with the legal, technical proof required to deny CASKO claims or initiate RCA Subrogation.",
@@ -178,7 +178,7 @@ window.translations = {
         "adj-event-2": "Push notification sent to Driver App (Action Required).",
         "adj-event-3": "Driver manually dismissed maintenance alert.",
         "adj-event-4": "Collision reported. Telemetry locked.",
-        "adj-ai-title": "CycleSync AI Adjudicator",
+        "adj-ai-title": "VeriTwin AI Adjudicator",
         "adj-ai-desc": "CASKO claim denial recommended. Telemetry proves the vehicle was operating with tires below the 3mm contractual limit. The driver explicitly dismissed alerts prior to the crash. Under CASKO terms, driver negligence voids own-damage coverage.",
         "adj-btn-deny": "Deny CASKO Claim",
         "adj-btn-investigate": "Investigate Further",
@@ -204,9 +204,9 @@ window.translations = {
         "adj-defect-ai": "Third-party payout authorized under mandatory RCA law. However, telemetry proves gross negligence (15% brake capacity ignored for 2 weeks). Initiate 'Rivalsa' (Subrogation) to recover full claim costs from the policyholder.",
         "adj-btn-subrogate": "Initiate Rivalsa against Driver",
 
-        // CycleVision Modal (General & Scenario 1 - Radiator)
-        "adj-btn-vision": "👁️ Esegui Triage Visivo CycleVision",
-        "cv-title": "Triage CNN CycleVision",
+        // VeriVision Modal (General & Scenario 1 - Radiator)
+        "adj-btn-vision": "👁️ Esegui Triage Visivo VeriVision",
+        "cv-title": "Triage CNN VeriVision",
         "cv-mech-claim": "Richiesta Meccanico:",
         "cv-mech-val": "Gruppo Radiatore Anteriore - €14.000",
         "cv-ai-analysis": "Analisi Visiva IA:",
@@ -216,13 +216,13 @@ window.translations = {
         "cv-desc": "⚠️ ALLERTA FRODE: L'evidenza visiva contraddice esplicitamente la richiesta di €14.000 del meccanico. L'IA conferma che il radiatore e i supporti strutturali sono intatti. La telemetria conferma un impatto a bassa velocità (< 10km/h). Raccomandazione: Bloccare immediatamente il pagamento.",
         "cv-close": "Chiudi Scansione",
 
-        // CycleVision - Good Driver (Scenario 2 - Bumper)
+        // VeriVision - Good Driver (Scenario 2 - Bumper)
         "cv-good-mech-claim": "Sostituzione Paraurti Anteriore - €1.200",
         "cv-good-ai-val": "Il profilo del danno corrisponde ai dati di impatto.",
         "cv-good-fraud-val": "4% (SICURO)",
         "cv-good-desc": "✅ VERIFICATO: L'evidenza visiva corrisponde al referto di collisione e alla telemetria. Il danno è isolato alla zona d'impatto senza condizioni preesistenti. Pagamento approvato.",
 
-        // CycleVision - RCA Negligence (Scenario 3 - Brakes)
+        // VeriVision - RCA Negligence (Scenario 3 - Brakes)
         "cv-defect-mech-claim": "Guasto Freni - €8.500 (Pagamento Terzi)",
         "cv-defect-ai-val": "0% Materiale d'attrito. Grave rigatura del disco.",
         "cv-defect-fraud-val": "95% (GRAVE NEGLIGENZA)",
@@ -285,7 +285,7 @@ window.translations = {
         "ecosystem-1-desc": "Acquisisci la telemetria in tempo reale per rilevare l'usura, agendo come registro immutabile prima dei sinistri.",
         "ecosystem-2-title": "Indirizzamento Rete",
         "ecosystem-2-desc": "Invia avvisi all'App Guidatore, indirizzando gli utenti esclusivamente verso reti di meccanici convenzionati (es. UnipolService).",
-        "ecosystem-3-title": "CycleVision CNN",
+        "ecosystem-3-title": "VeriVision CNN",
         "ecosystem-3-desc": "La computer vision IA incrocia istantaneamente le foto dei meccanici con la telemetria per bloccare i pagamenti fraudolenti.",
         "ecosystem-4-title": "Rivalsa Automatica",
         "ecosystem-4-desc": "Fornisce ai periti la prova tecnica legale necessaria per negare i sinistri CASKO o avviare l'azione di Rivalsa RCA.",
@@ -442,7 +442,7 @@ window.translations = {
         "adj-event-2": "Notifica push inviata all'App Guidatore (Azione Richiesta).",
         "adj-event-3": "Il guidatore ha ignorato l'avviso di manutenzione.",
         "adj-event-4": "Sinistro segnalato. Telemetria bloccata.",
-        "adj-ai-title": "Adjudicator AI CycleSync",
+        "adj-ai-title": "Adjudicator AI VeriTwin",
         "adj-ai-desc": "Si raccomanda il rifiuto del sinistro CASKO. La telemetria prova che il veicolo operava con pneumatici sotto il limite contrattuale di 3mm. Il conducente ha ignorato gli avvisi. Secondo le condizioni CASKO, la negligenza annulla la copertura per danni propri.",
         "adj-btn-deny": "Rifiuta Sinistro CASKO",
         "adj-btn-investigate": "Indaga Oltre",
@@ -468,9 +468,9 @@ window.translations = {
         "adj-defect-ai": "Pagamento al terzo autorizzato come previsto dalla legge RCA. Tuttavia, la telemetria prova grave negligenza (freni al 15% ignorati per 2 settimane). Avviare 'Rivalsa' per recuperare i costi totali del sinistro dall'assicurato.",
         "adj-btn-subrogate": "Avvia Rivalsa contro Assicurato",
 
-        // CycleVision Modal (General & Scenario 1 - Radiator)
-        "adj-btn-vision": "👁️ Esegui Triage Visivo CycleVision",
-        "cv-title": "Triage CNN CycleVision",
+        // VeriVision Modal (General & Scenario 1 - Radiator)
+        "adj-btn-vision": "👁️ Esegui Triage Visivo VeriVision",
+        "cv-title": "Triage CNN VeriVision",
         "cv-mech-claim": "Richiesta Meccanico:",
         "cv-mech-val": "Gruppo Radiatore Anteriore - €14.000",
         "cv-ai-analysis": "Analisi Visiva IA:",
@@ -480,13 +480,13 @@ window.translations = {
         "cv-desc": "⚠️ ALLERTA FRODE: L'evidenza visiva contraddice esplicitamente la richiesta di €14.000 del meccanico. L'IA conferma che il radiatore e i supporti strutturali sono intatti. La telemetria conferma un impatto a bassa velocità (< 10km/h). Raccomandazione: Bloccare immediatamente il pagamento.",
         "cv-close": "Chiudi Scansione",
 
-        // CycleVision - Good Driver (Scenario 2 - Bumper)
+        // VeriVision - Good Driver (Scenario 2 - Bumper)
         "cv-good-mech-claim": "Sostituzione Paraurti Anteriore - €1.200",
         "cv-good-ai-val": "Il profilo del danno corrisponde ai dati di impatto.",
         "cv-good-fraud-val": "4% (SICURO)",
         "cv-good-desc": "✅ VERIFICATO: L'evidenza visiva corrisponde al referto di collisione e alla telemetria. Il danno è isolato alla zona d'impatto senza condizioni preesistenti. Pagamento approvato.",
 
-        // CycleVision - RCA Negligence (Scenario 3 - Brakes)
+        // VeriVision - RCA Negligence (Scenario 3 - Brakes)
         "cv-defect-mech-claim": "Guasto Freni - €8.500 (Pagamento Terzi)",
         "cv-defect-ai-val": "0% Materiale d'attrito. Grave rigatura del disco.",
         "cv-defect-fraud-val": "95% (GRAVE NEGLIGENZA)",
@@ -534,7 +534,7 @@ window.translations = {
 };
 
 window.setLanguage = function (lang) {
-    localStorage.setItem('cyclesync_lang', lang);
+    localStorage.setItem('veritwin_lang', lang);
 
     // Grab Desktop Buttons
     const btnEn = document.getElementById('lang-en');

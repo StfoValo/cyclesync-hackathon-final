@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // THE FIX: Instantly translate the newly injected HTML!
                 if (window.setLanguage) {
-                    window.setLanguage(localStorage.getItem('cyclesync_lang') || 'en');
+                    window.setLanguage(localStorage.getItem('veritwin_lang') || 'en');
                 }
 
                 if (config.init) {
@@ -82,5 +82,5 @@ document.addEventListener('DOMContentLoaded', () => {
         loadView(activeItem.getAttribute('data-target'));
     }
 
-    console.log("CycleSync Frontend Shell Initialized.");
+    console.log("VeriTwin Frontend Shell Initialized.");
 });

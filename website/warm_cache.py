@@ -2,7 +2,7 @@ import requests
 import time
 
 # Replace with your actual Render URL
-BASE_URL = "https://cyclesync-digital-twin.onrender.com"
+BASE_URL = "https://veritwin-digital-twin.onrender.com"
 
 # ALL 20 Italian Regions from your Dashboard Dropdowns
 TARGET_REGIONS = [
@@ -31,7 +31,7 @@ TARGET_REGIONS = [
 # The languages supported by your i18n engine
 LANGUAGES = ["en", "it"]
 
-print(f"🚀 Starting CycleSync Cloud Cache Pre-Warmer for ALL regions...")
+print(f"🚀 Starting VeriTwin Cloud Cache Pre-Warmer for ALL regions...")
 total_calls = len(TARGET_REGIONS) * len(LANGUAGES) * 2
 print(f"📊 Total AI endpoints to warm up: {total_calls}\n")
 

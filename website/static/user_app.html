@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CycleSync | Driver App</title>
+    <title>VeriTwin | Driver App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
@@ -83,7 +83,7 @@
 
         <header class="flex items-center justify-between mb-8">
             <div>
-                <p class="text-slate-400 text-sm font-medium mb-1">CycleSync Home</p>
+                <p class="text-slate-400 text-sm font-medium mb-1">VeriTwin Home</p>
                 <h1 data-i18n="driver-hello" class="text-2xl font-bold tracking-tight">Ciao, Andrea</h1>
             </div>
             <div class="flex items-center gap-3">
@@ -420,7 +420,7 @@
         // FIX: Force translation sync slightly after the DOM loads to avoid race conditions
         setTimeout(() => {
             if (window.setLanguage) {
-                const savedLang = localStorage.getItem('cyclesync_lang') || 'en';
+                const savedLang = localStorage.getItem('veritwin_lang') || 'en';
                 window.setLanguage(savedLang);
             }
         }, 50);

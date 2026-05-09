@@ -57,7 +57,7 @@
 │   │   ├── 📁 telemetry_simulation
 │   │   │   └── 📄 trip_simulator.py
 │   │   ├── 📄 auth_model.py
-│   │   ├── 📄 cyclesync.db
+│   │   ├── 📄 veritwin.db
 │   │   └── 📄 README_models.md
 │   ├── 📁 storage
 │   │   ├── 📁 car_photos
@@ -109,7 +109,7 @@
 └── 📄 print_tree.py
 
 ## Description of the project
-CycleSync is a modular and multi-tenant application designed for the automotive lifecycle. It serves as a bridge between OEMs (Original Equipment Manufacturers), car owners, and recyclers.
+VeriTwin is a modular and multi-tenant application designed for the automotive lifecycle. It serves as a bridge between OEMs (Original Equipment Manufacturers), car owners, and recyclers.
 
 The application provides the following core features:
 
