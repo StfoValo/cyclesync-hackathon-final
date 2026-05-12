@@ -96,7 +96,7 @@ async def orchestrate_ai(request: Request, region: str, lang: str = "en"):
 # ==========================================
 # PIPELINE 3: ESG & Circular Logistics (Groq/Gemini Streaming)
 # ==========================================
-@router.get("/api/ai/logistics/{component_type}")
+@router.get("/api/ai/circular-logistics/{component_type}")
 async def circular_logistics_ai(request: Request, component_type: str, lang: str = "en"):
     """Handles the 'Run Component Triage' button in the ESG tab"""
     print(f"♻️ Triggering AI Logistics for component: {component_type}")
