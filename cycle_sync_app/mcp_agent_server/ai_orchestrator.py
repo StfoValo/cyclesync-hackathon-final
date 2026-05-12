@@ -1,6 +1,7 @@
 from mcp_agent_server.core_llm_client import CoreLLMClient
 from .prompts.actuary_prompt import get_actuary_system_prompt, get_actuary_user_prompt
 from .prompts.reverse_logistics_prompt import get_logistics_system_prompt, get_logistics_user_prompt
+from .prompts.risk_prompt import get_risk_system_prompt, get_risk_user_prompt
 import time
 
 class AIOrchestrator:
@@ -49,4 +50,18 @@ class AIOrchestrator:
         user_prompt = get_logistics_user_prompt(json_payload)
         
         for chunk in self.llm_client.stream_inference(system_instruction, user_prompt, region, lang):
+            yield chunk
+
+    def run_predefined_risk_query(self, question_id: str, question_text: str, json_payload: str, lang: str = "en"):
+        # 2. Build the Prompts
+        system_instruction = get_risk_system_prompt()
+        if lang == "it":
+            system_instruction += "\n\nIMPORTANT: You MUST generate your ENTIRE response in fluent Italian."
+        else:
+            system_instruction += "\n\nIMPORTANT: You MUST generate your ENTIRE response in English."
+            
+        user_prompt = get_risk_user_prompt(question_text, json_payload)
+        
+        # 3. Stream the Groq/Gemini response
+        for chunk in self.llm_client.stream_inference(system_instruction, user_prompt, question_id, lang):
             yield chunk
