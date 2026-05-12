@@ -2,191 +2,299 @@
     <div>
         <div class="flex items-center gap-3 mb-1 md:mb-2">
             <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                </path>
             </svg>
-            <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight"><span data-i18n="exec-title"><span data-i18n="exec-title">Executive Risk Summary</span></span></h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight"><span data-i18n="exec-title"><span
+                        data-i18n="exec-title">Executive Risk Summary</span></span></h2>
         </div>
-        <p class="text-sm md:text-base text-slate-400"><span data-i18n="exec-subtitle"><span data-i18n="exec-subtitle">Actuarial financial projections and demographic deep dives.</span></span></p>
+        <p class="text-sm md:text-base text-slate-400"><span data-i18n="exec-subtitle"><span
+                    data-i18n="exec-subtitle">Actuarial financial projections and demographic deep dives.</span></span>
+        </p>
     </div>
     <div class="flex bg-slate-800/80 backdrop-blur-sm rounded-lg p-1 border border-white/10 w-full md:w-auto">
         <button id="btn-view-regional"
-            class="flex-1 md:flex-none px-3 md:px-5 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium bg-brand-600 text-white shadow-lg transition-all whitespace-nowrap"><span data-i18n="exec-btn-regional"><span data-i18n="exec-btn-regional">Regional
-            Overview</span></span></button>
+            class="flex-1 md:flex-none px-3 md:px-5 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium bg-brand-600 text-white shadow-lg transition-all whitespace-nowrap"><span
+                data-i18n="exec-btn-regional"><span data-i18n="exec-btn-regional">Regional
+                    Overview</span></span></button>
         <button id="btn-view-demographic"
-            class="flex-1 md:flex-none px-3 md:px-5 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium text-slate-400 hover:text-white transition-all whitespace-nowrap"><span data-i18n="exec-btn-demo"><span data-i18n="exec-btn-demo">Demographics</span></span></button>
+            class="flex-1 md:flex-none px-3 md:px-5 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium text-slate-400 hover:text-white transition-all whitespace-nowrap"><span
+                data-i18n="exec-btn-demo"><span data-i18n="exec-btn-demo">Demographics</span></span></button>
         <button id="btn-view-asset"
-            class="flex-1 md:flex-none px-3 md:px-5 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium text-slate-400 hover:text-white transition-all whitespace-nowrap"><span data-i18n="asset-title"><span data-i18n="asset-title">Asset Risk</span></span></button>
+            class="flex-1 md:flex-none px-3 md:px-5 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium text-slate-400 hover:text-white transition-all whitespace-nowrap"><span
+                data-i18n="asset-title"><span data-i18n="asset-title">Asset Risk</span></span></button>
     </div>
 </header>
 
+<div
+    class="mt-6 mb-8 shrink-0 clear-both relative z-10 glass-panel rounded-2xl flex flex-col border border-brand-500/30 overflow-hidden shadow-[0_0_30px_rgba(0,229,255,0.05)]">
+    <div
+        class="bg-gradient-to-r from-slate-900 to-brand-900/20 px-5 py-4 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl">🤖</span>
+            <div>
+                <h3 class="text-white font-bold tracking-wide">VeriTwin AI Analyst</h3>
+                <p class="text-xs text-brand-400">Connected to Actuarial Data Lake</p>
+            </div>
+        </div>
+        <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981] animate-pulse"></div>
+    </div>
+
+    <div id="risk-chat-history" class="p-5 h-64 overflow-y-auto flex flex-col gap-4 bg-slate-900/50 scroll-smooth">
+        <div class="flex gap-3">
+            <div
+                class="w-8 h-8 rounded-full bg-brand-500/20 flex items-center justify-center shrink-0 border border-brand-500/50">
+                <span class="text-xs">AI</span>
+            </div>
+            <div class="bg-slate-800 text-slate-200 text-sm p-3 rounded-2xl rounded-tl-none border border-white/5">
+                <span data-i18n="ai-chat-welcome">Hello. I am the VeriTwin Actuarial AI. I can analyze risk exposure,
+                    driver behavior, and premium optimization across your fleet. Select an analysis vector below.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-5 py-4 bg-slate-800/80 flex flex-col gap-2 border-t border-white/5" id="suggested-questions">
+        <p class="text-xs text-brand-400 font-semibold mb-1 uppercase tracking-wider"><span
+                data-i18n="ai-chat-select">Select Analysis Vector:</span></p>
+
+        <div id="q-group-regional" class="flex flex-col gap-2">
+            <button data-qid="exec_reg_1"
+                class="suggested-q text-left text-sm bg-slate-700/50 text-white px-4 py-3 rounded-lg border border-white/10 hover:border-brand-500 hover:bg-brand-500/10 transition-all cursor-pointer flex justify-between items-center group">
+                <span data-i18n="ai-q-reg-1">Compare the average premium and risk distribution across regions.</span>
+                <span class="text-brand-500 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+            <button data-qid="exec_reg_2"
+                class="suggested-q text-left text-sm bg-slate-700/50 text-white px-4 py-3 rounded-lg border border-white/10 hover:border-brand-500 hover:bg-brand-500/10 transition-all cursor-pointer flex justify-between items-center group">
+                <span data-i18n="ai-q-reg-2">Which region shows the highest concentration of critical claims?</span>
+                <span class="text-brand-500 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+        </div>
+
+        <div id="q-group-demo" class="flex flex-col gap-2 hidden">
+            <button data-qid="exec_demo_1"
+                class="suggested-q text-left text-sm bg-slate-700/50 text-white px-4 py-3 rounded-lg border border-white/10 hover:border-brand-500 hover:bg-brand-500/10 transition-all cursor-pointer flex justify-between items-center group">
+                <span data-i18n="ai-q-demo-1">Analyze claim frequencies by driver age and gender.</span>
+                <span class="text-brand-500 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+            <button data-qid="exec_demo_2"
+                class="suggested-q text-left text-sm bg-slate-700/50 text-white px-4 py-3 rounded-lg border border-white/10 hover:border-brand-500 hover:bg-brand-500/10 transition-all cursor-pointer flex justify-between items-center group">
+                <span data-i18n="ai-q-demo-2">What is the correlation between vehicle category and behavioral
+                    risk?</span>
+                <span class="text-brand-500 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+        </div>
+
+        <div id="q-group-asset" class="flex flex-col gap-2 hidden">
+            <button data-qid="exec_asset_1"
+                class="suggested-q text-left text-sm bg-slate-700/50 text-white px-4 py-3 rounded-lg border border-white/10 hover:border-brand-500 hover:bg-brand-500/10 transition-all cursor-pointer flex justify-between items-center group">
+                <span data-i18n="ai-q-asset-1">Show me the component risk distribution across the fleet.</span>
+                <span class="text-brand-500 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+            <button data-qid="exec_asset_2"
+                class="suggested-q text-left text-sm bg-slate-700/50 text-white px-4 py-3 rounded-lg border border-white/10 hover:border-brand-500 hover:bg-brand-500/10 transition-all cursor-pointer flex justify-between items-center group">
+                <span data-i18n="ai-q-asset-2">Analyze the global VSI scores and project hardware failure costs.</span>
+                <span class="text-brand-500 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div id="executive-content-wrapper">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
-    <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+        <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="exec-kpi-total"><span
+                        data-i18n="exec-kpi-total">Total Monitored Fleet</span></span></p>
+            <p class="text-xl md:text-3xl font-bold text-white" id="kpi-total-fleet">--</p>
         </div>
-        <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="exec-kpi-total"><span data-i18n="exec-kpi-total">Total Monitored Fleet</span></span></p>
-        <p class="text-xl md:text-3xl font-bold text-white" id="kpi-total-fleet">--</p>
-    </div>
-    <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+        <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="exec-kpi-avg"><span
+                        data-i18n="exec-kpi-avg">Avg Premium (EUR)</span></span></p>
+            <p class="text-xl md:text-3xl font-bold text-white" id="kpi-avg-premium">--</p>
         </div>
-        <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="exec-kpi-avg"><span data-i18n="exec-kpi-avg">Avg Premium (EUR)</span></span></p>
-        <p class="text-xl md:text-3xl font-bold text-white" id="kpi-avg-premium">--</p>
-    </div>
-    <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+        <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="exec-kpi-disc"><span
+                        data-i18n="exec-kpi-disc">Telematics Discount</span></span></p>
+            <p class="text-xl md:text-3xl font-bold text-emerald-400" id="kpi-discount">--</p>
         </div>
-        <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="exec-kpi-disc"><span data-i18n="exec-kpi-disc">Telematics Discount</span></span></p>
-        <p class="text-xl md:text-3xl font-bold text-emerald-400" id="kpi-discount">--</p>
-    </div>
-    <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-        </div>
-        <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="exec-kpi-claims"><span data-i18n="exec-kpi-claims">Claims Reduction</span></span></p>
-        <p class="text-xl md:text-3xl font-bold text-brand-400" id="kpi-claims-reduction">--</p>
-    </div>
-</div>
-
-<div class="glass-panel rounded-2xl p-4 md:p-6 min-h-[400px] flex flex-col border border-white/5">
-
-    <div id="regional-charts" class="w-full h-[300px] md:h-[400px] relative">
-        <canvas id="riskChart"></canvas>
-    </div>
-
-    <div id="demographic-charts" class="hidden w-full">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 w-full">
-
+        <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
             <div
-                class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[280px] md:h-[320px] bg-slate-800/40 border border-white/5">
-                <h3
-                    class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
-                    <span data-i18n="exec-chart-age"><span data-i18n="exec-chart-age">Claims by Driver Age Group</span></span></h3>
-                <div class="relative flex-1 w-full min-h-[200px]">
-                    <canvas id="ageChart"></canvas>
-                </div>
+                class="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
-
-            <div
-                class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[280px] md:h-[320px] bg-slate-800/40 border border-white/5">
-                <h3
-                    class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
-                    <span data-i18n="exec-chart-gender"><span data-i18n="exec-chart-gender">Claims by Gender</span></span></h3>
-                <div class="relative flex-1 w-full min-h-[200px]">
-                    <canvas id="genderChart"></canvas>
-                </div>
-            </div>
-
-            <div
-                class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[280px] md:h-[320px] bg-slate-800/40 border border-white/5">
-                <h3
-                    class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
-                    <span data-i18n="exec-chart-vehicle"><span data-i18n="exec-chart-vehicle">Claims by Vehicle Category</span></span></h3>
-                <div class="relative flex-1 w-full min-h-[200px]">
-                    <canvas id="vehicleChart"></canvas>
-                </div>
-            </div>
-
-            <div
-                class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[280px] md:h-[320px] bg-slate-800/40 border border-white/5">
-                <h3
-                    class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
-                    <span data-i18n="exec-chart-behavior"><span data-i18n="exec-chart-behavior">Claims by Behavioral Risk</span></span></h3>
-                <div class="relative flex-1 w-full min-h-[200px]">
-                    <canvas id="behaviorChart"></canvas>
-                </div>
-            </div>
-
-            <div
-                class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[300px] md:h-[350px] bg-slate-800/40 border border-white/5 lg:col-span-2">
-                <h3
-                    class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
-                    <span data-i18n="exec-chart-vehage"><span data-i18n="exec-chart-vehage">Claims by Vehicle Age (Italian RCA)</span></span></h3>
-                <div class="relative flex-1 w-full min-h-[200px]">
-                    <canvas id="vehicleAgeChart"></canvas>
-                </div>
-            </div>
-
+            <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="exec-kpi-claims"><span
+                        data-i18n="exec-kpi-claims">Claims Reduction</span></span></p>
+            <p class="text-xl md:text-3xl font-bold text-brand-400" id="kpi-claims-reduction">--</p>
         </div>
     </div>
-</div>
+
+    <div class="glass-panel rounded-2xl p-4 md:p-6 min-h-[400px] flex flex-col border border-white/5">
+
+        <div id="regional-charts" class="w-full h-[300px] md:h-[400px] relative">
+            <canvas id="riskChart"></canvas>
+        </div>
+
+        <div id="demographic-charts" class="hidden w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 w-full">
+
+                <div
+                    class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[280px] md:h-[320px] bg-slate-800/40 border border-white/5">
+                    <h3
+                        class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
+                        <span data-i18n="exec-chart-age"><span data-i18n="exec-chart-age">Claims by Driver Age
+                                Group</span></span>
+                    </h3>
+                    <div class="relative flex-1 w-full min-h-[200px]">
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                </div>
+
+                <div
+                    class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[280px] md:h-[320px] bg-slate-800/40 border border-white/5">
+                    <h3
+                        class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
+                        <span data-i18n="exec-chart-gender"><span data-i18n="exec-chart-gender">Claims by
+                                Gender</span></span>
+                    </h3>
+                    <div class="relative flex-1 w-full min-h-[200px]">
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                </div>
+
+                <div
+                    class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[280px] md:h-[320px] bg-slate-800/40 border border-white/5">
+                    <h3
+                        class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
+                        <span data-i18n="exec-chart-vehicle"><span data-i18n="exec-chart-vehicle">Claims by Vehicle
+                                Category</span></span>
+                    </h3>
+                    <div class="relative flex-1 w-full min-h-[200px]">
+                        <canvas id="vehicleChart"></canvas>
+                    </div>
+                </div>
+
+                <div
+                    class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[280px] md:h-[320px] bg-slate-800/40 border border-white/5">
+                    <h3
+                        class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
+                        <span data-i18n="exec-chart-behavior"><span data-i18n="exec-chart-behavior">Claims by Behavioral
+                                Risk</span></span>
+                    </h3>
+                    <div class="relative flex-1 w-full min-h-[200px]">
+                        <canvas id="behaviorChart"></canvas>
+                    </div>
+                </div>
+
+                <div
+                    class="glass-panel rounded-xl p-4 md:p-5 flex flex-col h-[300px] md:h-[350px] bg-slate-800/40 border border-white/5 lg:col-span-2">
+                    <h3
+                        class="text-slate-400 text-xs md:text-sm text-center mb-2 md:mb-4 font-semibold uppercase tracking-wider">
+                        <span data-i18n="exec-chart-vehage"><span data-i18n="exec-chart-vehage">Claims by Vehicle Age
+                                (Italian RCA)</span></span>
+                    </h3>
+                    <div class="relative flex-1 w-full min-h-[200px]">
+                        <canvas id="vehicleAgeChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="asset-content-wrapper" class="hidden">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8">
-    <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+        <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="asset-kpi-vsi"><span
+                        data-i18n="asset-kpi-vsi">Fleet Average VSI Score</span></span></p>
+            <p class="text-xl md:text-3xl font-bold text-white" id="kpi-vsi">0.0/100</p>
         </div>
-        <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="asset-kpi-vsi"><span data-i18n="asset-kpi-vsi">Fleet Average VSI Score</span></span></p>
-        <p class="text-xl md:text-3xl font-bold text-white" id="kpi-vsi">0.0/100</p>
-    </div>
-    <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+        <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="asset-kpi-crit"><span
+                        data-i18n="asset-kpi-crit">Vehicles in Critical State</span></span></p>
+            <p class="text-xl md:text-3xl font-bold text-white" id="kpi-critical">0</p>
         </div>
-        <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="asset-kpi-crit"><span data-i18n="asset-kpi-crit">Vehicles in Critical State</span></span></p>
-        <p class="text-xl md:text-3xl font-bold text-white" id="kpi-critical">0</p>
-    </div>
-    <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+        <div class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="asset-kpi-hw"><span
+                        data-i18n="asset-kpi-hw">Projected Hardware Claims</span></span></p>
+            <p class="text-xl md:text-3xl font-bold text-white" id="kpi-hardware-cost">€0.00</p>
         </div>
-        <p class="text-xs md:text-sm text-slate-400 mb-1"><span data-i18n="asset-kpi-hw"><span data-i18n="asset-kpi-hw">Projected Hardware Claims</span></span></p>
-        <p class="text-xl md:text-3xl font-bold text-white" id="kpi-hardware-cost">€0.00</p>
-    </div>
-</div>
-
-<div class="flex flex-col gap-4 md:gap-6">
-    <div
-        class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[350px] md:h-[450px] lg:h-[500px] flex flex-col border border-white/5">
-        <h3
-            class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
-            <span data-i18n="asset-chart-vsi"><span data-i18n="asset-chart-vsi">Regional Fleet Safety Index (VSI) Breakdown</span></span></h3>
-        <div class="relative flex-1 w-full h-0"><canvas id="vsiRegionChart"></canvas></div>
     </div>
 
-    <div
-        class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[350px] md:h-[450px] lg:h-[500px] flex flex-col border border-white/5">
-        <h3
-            class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
-            <span data-i18n="asset-chart-brake"><span data-i18n="asset-chart-brake">Regional Brake Pad Degradation Matrix</span></span></h3>
-        <div class="relative flex-1 w-full h-0"><canvas id="brakeRegionChart"></canvas></div>
-    </div>
-
-    <div
-        class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[350px] md:h-[450px] lg:h-[500px] flex flex-col border border-white/5">
-        <h3
-            class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
-            <span data-i18n="asset-chart-tire"><span data-i18n="asset-chart-tire">Regional Tire Tread Wear Analytics</span></span></h3>
-        <div class="relative flex-1 w-full h-0"><canvas id="tireRegionChart"></canvas></div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+    <div class="flex flex-col gap-4 md:gap-6">
         <div
-            class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[280px] md:h-[300px] flex flex-col border border-white/5">
+            class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[350px] md:h-[450px] lg:h-[500px] flex flex-col border border-white/5">
             <h3
                 class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
-                <span data-i18n="asset-chart-gvsi"><span data-i18n="asset-chart-gvsi">Global VSI</span></span></h3>
-            <div class="relative flex-1 w-full h-0"><canvas id="vsiGlobalChart"></canvas></div>
+                <span data-i18n="asset-chart-vsi"><span data-i18n="asset-chart-vsi">Regional Fleet Safety Index (VSI)
+                        Breakdown</span></span>
+            </h3>
+            <div class="relative flex-1 w-full h-0"><canvas id="vsiRegionChart"></canvas></div>
         </div>
+
         <div
-            class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[280px] md:h-[300px] flex flex-col border border-white/5">
+            class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[350px] md:h-[450px] lg:h-[500px] flex flex-col border border-white/5">
             <h3
                 class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
-                <span data-i18n="asset-chart-gbrake"><span data-i18n="asset-chart-gbrake">Global Brakes</span></span></h3>
-            <div class="relative flex-1 w-full h-0"><canvas id="brakeGlobalChart"></canvas></div>
+                <span data-i18n="asset-chart-brake"><span data-i18n="asset-chart-brake">Regional Brake Pad Degradation
+                        Matrix</span></span>
+            </h3>
+            <div class="relative flex-1 w-full h-0"><canvas id="brakeRegionChart"></canvas></div>
         </div>
+
         <div
-            class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[280px] md:h-[300px] flex flex-col border border-white/5">
+            class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[350px] md:h-[450px] lg:h-[500px] flex flex-col border border-white/5">
             <h3
                 class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
-                <span data-i18n="asset-chart-gtire"><span data-i18n="asset-chart-gtire">Global Tires</span></span></h3>
-            <div class="relative flex-1 w-full h-0"><canvas id="tireGlobalChart"></canvas></div>
+                <span data-i18n="asset-chart-tire"><span data-i18n="asset-chart-tire">Regional Tire Tread Wear
+                        Analytics</span></span>
+            </h3>
+            <div class="relative flex-1 w-full h-0"><canvas id="tireRegionChart"></canvas></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+            <div
+                class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[280px] md:h-[300px] flex flex-col border border-white/5">
+                <h3
+                    class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
+                    <span data-i18n="asset-chart-gvsi"><span data-i18n="asset-chart-gvsi">Global VSI</span></span>
+                </h3>
+                <div class="relative flex-1 w-full h-0"><canvas id="vsiGlobalChart"></canvas></div>
+            </div>
+            <div
+                class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[280px] md:h-[300px] flex flex-col border border-white/5">
+                <h3
+                    class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
+                    <span data-i18n="asset-chart-gbrake"><span data-i18n="asset-chart-gbrake">Global
+                            Brakes</span></span>
+                </h3>
+                <div class="relative flex-1 w-full h-0"><canvas id="brakeGlobalChart"></canvas></div>
+            </div>
+            <div
+                class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-6 h-[280px] md:h-[300px] flex flex-col border border-white/5">
+                <h3
+                    class="text-slate-400 text-xs md:text-sm text-center font-semibold mb-2 md:mb-4 border-b border-white/10 pb-2 uppercase tracking-wider">
+                    <span data-i18n="asset-chart-gtire"><span data-i18n="asset-chart-gtire">Global Tires</span></span>
+                </h3>
+                <div class="relative flex-1 w-full h-0"><canvas id="tireGlobalChart"></canvas></div>
+            </div>
         </div>
     </div>
-</div>
 </div>

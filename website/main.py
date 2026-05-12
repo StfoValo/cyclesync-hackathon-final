@@ -13,12 +13,21 @@ sys.path.insert(0, cycle_sync_app_dir)
 sys.path.insert(0, current_dir)
 
 from routers.insurer_api import router as insurer_router
-from routers.ai_api import router as ai_router
+from routers.ai_api import router as ai_router # ✅ This is the correct, safe import!
 
 app = FastAPI()
 
 app.include_router(insurer_router)
 app.include_router(ai_router)
+
+# Setup path for models
+current_dir = os.path.dirname(os.path.abspath(__file__))
+cycle_sync_app_dir = os.path.abspath(os.path.join(current_dir, "..", "cycle_sync_app"))
+sys.path.insert(0, cycle_sync_app_dir)
+
+# --- THE FIX: Tell Python to look inside the current 'website' folder for routers ---
+sys.path.insert(0, current_dir)
+
 
 static_dir = os.path.join(current_dir, "static")
 os.makedirs(static_dir, exist_ok=True)

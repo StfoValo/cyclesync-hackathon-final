@@ -62,6 +62,18 @@ window.translations = {
         "exec-chart-behavior": "Claims by Behavioral Risk",
         "exec-chart-vehage": "Claims by Vehicle Age (Italian RCA)",
 
+        // Partials: Executive Predefined Chat
+        "exec-ai-intro": "Hello. I am the VeriTwin Actuarial AI. I can analyze risk exposure, driver behavior, and premium optimization across your fleet. Select an analysis vector below.",
+        "exec-ai-regional": "Regional Risk",
+        "exec-ai-demo": "Demographics",
+        "exec-ai-asset": "Asset Risk",
+        "exec-q-reg-1": "Analyze regional risk KPIs and total active fleet.",
+        "exec-q-reg-2": "Compare average premiums across top regions.",
+        "exec-q-demo-1": "Analyze behavioral demographics and projected ROI.",
+        "exec-q-demo-2": "Explain the claims distribution by driver age.",
+        "exec-q-asset-1": "Show me the component risk distribution across the fleet.",
+        "exec-q-asset-2": "Identify hardware claims projections for critical vehicles.",
+
         // Partials: Asset
         "asset-title": "Predictive Asset Risk",
         "asset-subtitle": "Vehicle State Index (VSI) and component degradation analytics.",
@@ -266,6 +278,16 @@ window.translations = {
         "driver-eco-title": "Eco Impact",
         "driver-co2-saved": "CO2 Saved",
         "driver-trees": "Equivalent Trees",
+
+        // AI Chat Module
+        "ai-chat-welcome": "Hello. I am the VeriTwin Actuarial AI. I can analyze risk exposure, driver behavior, and premium optimization across your fleet. Select an analysis vector below.",
+        "ai-chat-select": "Select Analysis Vector:",
+        "ai-q-reg-1": "Compare the average premium and risk distribution across regions.",
+        "ai-q-reg-2": "Which region shows the highest concentration of critical claims?",
+        "ai-q-demo-1": "Analyze claim frequencies by driver age and gender.",
+        "ai-q-demo-2": "What is the correlation between vehicle category and behavioral risk?",
+        "ai-q-asset-1": "Show me the component risk distribution across the fleet.",
+        "ai-q-asset-2": "Analyze the global VSI scores and project hardware failure costs."
     },
     it: {
         // Landing Page
@@ -325,6 +347,18 @@ window.translations = {
         "exec-chart-vehicle": "Sinistri per Categoria Veicolo",
         "exec-chart-behavior": "Sinistri per Rischio Comportamentale",
         "exec-chart-vehage": "Sinistri per Età Veicolo (RCA Italiana)",
+
+        // Partials: Executive Predefined Chat
+        "exec-ai-intro": "Ciao. Sono l'AI Attuariale VeriTwin. Posso analizzare l'esposizione al rischio, il comportamento dei conducenti e l'ottimizzazione dei premi nella tua flotta. Seleziona un vettore di analisi qui sotto.",
+        "exec-ai-regional": "Rischio Regionale",
+        "exec-ai-demo": "Demografia",
+        "exec-ai-asset": "Rischio Asset",
+        "exec-q-reg-1": "Analizza i KPI di rischio regionale e la flotta attiva totale.",
+        "exec-q-reg-2": "Confronta i premi medi tra le principali regioni.",
+        "exec-q-demo-1": "Analizza la demografia comportamentale e il ROI previsto.",
+        "exec-q-demo-2": "Spiega la distribuzione dei sinistri per età del conducente.",
+        "exec-q-asset-1": "Mostra la distribuzione del rischio dei componenti nella flotta.",
+        "exec-q-asset-2": "Identifica le proiezioni dei sinistri hardware per i veicoli critici.",
 
         // Partials: Asset
         "asset-title": "Rischio Asset Predittivo",
@@ -530,6 +564,16 @@ window.translations = {
         "driver-eco-title": "Impatto Eco",
         "driver-co2-saved": "CO2 Risparmiata",
         "driver-trees": "Alberi Equivalenti",
+
+        // AI Chat Module
+        "ai-chat-welcome": "Salve. Sono l'IA Attuariale VeriTwin. Posso analizzare l'esposizione al rischio, il comportamento dei conducenti e l'ottimizzazione dei premi in tutta la flotta. Seleziona un vettore di analisi qui sotto.",
+        "ai-chat-select": "Seleziona Vettore di Analisi:",
+        "ai-q-reg-1": "Confronta il premio medio e la distribuzione del rischio tra le regioni.",
+        "ai-q-reg-2": "Quale regione mostra la più alta concentrazione di sinistri critici?",
+        "ai-q-demo-1": "Analizza le frequenze dei sinistri per età e sesso del conducente.",
+        "ai-q-demo-2": "Qual è la correlazione tra categoria di veicolo e rischio comportamentale?",
+        "ai-q-asset-1": "Mostra la distribuzione del rischio dei componenti nella flotta.",
+        "ai-q-asset-2": "Analizza i punteggi VSI globali e proietta i costi dei guasti hardware."
     }
 };
 

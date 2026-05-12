@@ -1,94 +1,117 @@
 import os
 import json
 import sqlite3
+import asyncio
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from mcp_agent_server.ai_orchestrator import AIOrchestrator
 
 router = APIRouter()
+
+# Instantiate Stefano's Orchestrator
 orchestrator = AIOrchestrator()
 
-# --- THE FIX: A bulletproof local cache reader ---
+# ==========================================
+# HELPER: Bulletproof Local Cache Reader
+# ==========================================
 def get_cache(key: str):
     try:
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ui_cache.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        
-        # --- THE FIX: Correct table (api_cache) and columns (json_data, endpoint_key) ---
         cursor.execute("SELECT json_data FROM api_cache WHERE endpoint_key=?", (key,))
-        
         row = cursor.fetchone()
         conn.close()
         return json.loads(row[0]) if row else {}
     except Exception as e:
         print(f"⚠️ Cache read error: {e}")
         return {}
-        
+
+# ==========================================
+# PIPELINE 1: Executive Risk Chat (Deterministic)
+# ==========================================
+class PredefinedChatRequest(BaseModel):
+    question_id: str
+    question_text: str
+    language: str = "en"
+
+@router.post("/api/ai/ask-predefined")
+async def ask_predefined_endpoint(request: PredefinedChatRequest):
+    """Handles predefined button clicks and feeds exact cache data to Groq."""
+    
+    # Map the Question ID to the correct Database Cache
+    if request.question_id in ["exec_reg_1", "exec_reg_2"]:
+        context_data = get_cache('fleet_regional_kpis')
+    elif request.question_id in ["exec_demo_1", "exec_demo_2"]:
+        context_data = get_cache('demographic_deep_dive')
+    elif request.question_id in ["exec_asset_1", "exec_asset_2"]:
+        context_data = get_cache('asset_risk_portfolio')
+    else:
+        context_data = {"status": "No specific data required."}
+
+    # Convert the dictionary back to a JSON string for the prompt
+    json_payload = json.dumps(context_data)
+    
+    # Call the orchestrator to stream the LLM response
+    response_generator = orchestrator.run_predefined_risk_query(
+        question_id=request.question_id,
+        question_text=request.question_text,
+        json_payload=json_payload,
+        lang=request.language
+    )
+    
+    return StreamingResponse(response_generator, media_type="text/plain")
+    
+# ==========================================
+# PIPELINE 2: AI Routing Strategy (Groq/Gemini Streaming)
+# ==========================================
 @router.get("/api/ai/orchestrate/{region}")
 async def orchestrate_ai(request: Request, region: str, lang: str = "en"): 
+    """Handles the 'Run AI Strategy' button in the AI Route tab"""
     client_ip = request.client.host
     print(f"🧠 USER {client_ip} triggered AI Strategy for region: {region} (Lang: {lang})")
     
-    portfolio = get_cache('asset_risk_portfolio')
-    region_data = next((r for r in portfolio.get("regional", []) if r["region"] == region), None)
+    # 1. Fetch real live data from your cache
+    fleet_data = get_cache('fleet_data')
+    asset_risk = get_cache('asset_risk_global')
     
-    payload = json.dumps(region_data) if region_data else f'{{"region": "{region}", "status": "no data"}}'
+    # 2. Combine into payload
+    context_payload = json.dumps({
+        "target_region": region,
+        "fleet_metrics": fleet_data,
+        "risk_metrics": asset_risk
+    })
     
-    def generate():
-        for chunk in orchestrator.run_actuarial_strategy_analysis(payload, region, lang):
-            yield chunk
+    # 3. Call orchestrator
+    response_generator = orchestrator.run_actuarial_strategy_analysis(
+        json_payload=context_payload, 
+        region=region, 
+        lang=lang
+    )
+    
+    # 4. Stream response
+    return StreamingResponse(response_generator, media_type="text/plain")
 
-    return StreamingResponse(generate(), media_type="text/event-stream")
-
-
-@router.get("/api/ai/circular-logistics/{region}")
-async def orchestrate_circular_logistics(region: str, lang: str = 'en'):
-    payload = build_reverse_logistics_payload(region)
-    def generate():
-        # Pass lang into the orchestrator
-        for chunk in orchestrator.run_circular_logistics_analysis(payload, region, lang):
-            yield chunk
-    return StreamingResponse(generate(), media_type="text/event-stream")
-
-
-def build_reverse_logistics_payload(target_region: str) -> str:
-    """
-    Creates a hyper-local ESG routing payload for the AI using cached data.
-    Gracefully handles regions that might not have BEV telemetry.
-    """
-    # 1. Fetch Actuarial Risk Portfolio (Tires & Brakes) from Cache
-    portfolio = get_cache('asset_risk_portfolio')
-    region_actuarial = next((r for r in portfolio.get("regional", []) if r["region"] == target_region), None)
-
-    # 2. Fetch BEV Telemetry from Cache
-    bev_analytics = get_cache('bev_regional_analytics')
-    region_bev = next((r for r in bev_analytics if r["region_name"] == target_region), None)
-
-    # 3. Check for core Actuarial data
-    if not region_actuarial:
-        return json.dumps({"error": f"Insufficient actuarial data to run logistics for {target_region}"})
-
-    # --- FIX: Gracefully default BEV volumes to 0 if the region has no electric cars! ---
-    bev_volumes = region_bev['cohorts']['0-3_months'] if region_bev else 0
-
-    # 4. Define Regional Recycling Hubs
-    recycling_hubs = [
-        {"Name": f"Cobat Battery Extraction Center ({target_region})", "Specialty": "Black Mass Recycling"},
-        {"Name": f"Enel X 2nd-Life Hub ({target_region})", "Specialty": "Grid Storage Repurposing"},
-        {"Name": f"Ecopneus Rubber Granulate Plant", "Specialty": "Asphalt Recycling"},
-        {"Name": f"Fonderie Metallurgiche Nord", "Specialty": "Scrap Metal Smelting"}
-    ]
-
-    # 5. Construct the Payload
-    payload = {
-        "Target_Region": target_region,
-        "End_Of_Life_Volumes": {
-            "Brake_Pads": region_actuarial['brakes'][2], 
-            "Tires": region_actuarial['tires'][2],       
-            "EV_Batteries": bev_volumes 
-        },
-        "Available_Recycling_Hubs": recycling_hubs
-    }
-
-    return json.dumps(payload, indent=2)
+# ==========================================
+# PIPELINE 3: ESG & Circular Logistics (Groq/Gemini Streaming)
+# ==========================================
+@router.get("/api/ai/logistics/{component_type}")
+async def circular_logistics_ai(request: Request, component_type: str, lang: str = "en"):
+    """Handles the 'Run Component Triage' button in the ESG tab"""
+    print(f"♻️ Triggering AI Logistics for component: {component_type}")
+    
+    esg_data = get_cache('esg_metrics')
+    
+    context_payload = json.dumps({
+        "component": component_type,
+        "esg_telemetry": esg_data
+    })
+    
+    response_generator = orchestrator.run_circular_logistics_analysis(
+        json_payload=context_payload,
+        region="Italy",
+        lang=lang
+    )
+    
+    return StreamingResponse(response_generator, media_type="text/plain")
