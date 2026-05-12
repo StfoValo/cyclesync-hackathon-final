@@ -46,3 +46,11 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 def read_driver_app():
     """Serves the consumer-facing mobile web app."""
     return FileResponse(os.path.join(static_dir, "user_app.html"))
+
+@app.head("/")
+async def ping_head():
+    """
+    Intercepts UptimeRobot's HEAD requests and returns a 200 OK 
+    so it stops logging 405 Method Not Allowed errors.
+    """
+    return {"status": "VeriTwin is awake!"}
