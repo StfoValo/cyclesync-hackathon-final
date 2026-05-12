@@ -3,17 +3,17 @@ document.addEventListener('click', async (e) => {
     const btnRegional = e.target.closest('#btn-view-regional');
     const btnDemo = e.target.closest('#btn-view-demographic');
     const btnAsset = e.target.closest('#btn-view-asset');
-    
+
     if (btnRegional || btnDemo || btnAsset) {
         const qGroupRegional = document.getElementById('q-group-regional');
         const qGroupDemo = document.getElementById('q-group-demo');
         const qGroupAsset = document.getElementById('q-group-asset');
-        
+
         if (qGroupRegional && qGroupDemo && qGroupAsset) {
             qGroupRegional.classList.add('hidden');
             qGroupDemo.classList.add('hidden');
             qGroupAsset.classList.add('hidden');
-            
+
             if (btnRegional) qGroupRegional.classList.remove('hidden');
             if (btnDemo) qGroupDemo.classList.remove('hidden');
             if (btnAsset) qGroupAsset.classList.remove('hidden');
@@ -67,19 +67,11 @@ async function handlePredefinedQuery(questionId, questionText) {
             console.log("Stream chunk:", chunk);
             fullText += chunk;
 
-            // Format markdown (lists, bold, breaks)
-            let formattedText = fullText
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/(?:^|\n)(?:[*\+\-]\s+.*(?:\n|$))+/g, function(match) {
-                    const items = match.trim().split(/\n/).map(line => {
-                        return '<li>' + line.replace(/^[*\+\-]\s+/, '') + '</li>';
-                    }).join('');
-                    return '<ul class="list-disc ml-4 space-y-1 my-2">' + items + '</ul>';
-                })
-                .replace(/\n\n/g, '<br><br>')
-                .replace(/\n/g, '<br>');
+            // Let marked.js perfectly parse the markdown into HTML!
+            bubbleContent.innerHTML = marked.parse(fullText);
 
-            bubbleContent.innerHTML = formattedText;
+            // Add the prose-ai class to ensure our table/markdown CSS applies
+            bubbleContent.classList.add('prose-ai');
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
