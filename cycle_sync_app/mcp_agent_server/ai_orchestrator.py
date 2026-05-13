@@ -21,10 +21,10 @@ class AIOrchestrator:
         system_instruction = get_actuary_system_prompt()
         if lang == "it":
             system_instruction += "\n\nIMPORTANT: You MUST generate your ENTIRE response in fluent Italian."
-            print("SYSTEM INSTRUCTION: ", system_instruction)
+
         else:
             system_instruction += "\n\nIMPORTANT: You MUST generate your ENTIRE response in English."
-            print("SYSTEM INSTRUCTION: ", system_instruction)
+
             
         user_prompt = get_actuary_user_prompt(json_payload)
             

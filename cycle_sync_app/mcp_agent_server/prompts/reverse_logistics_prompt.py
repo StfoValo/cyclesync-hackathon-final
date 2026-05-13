@@ -11,7 +11,7 @@ def get_logistics_system_prompt():
        - Tires: Route ~60% to "Asphalt Granulate" and ~40% to "Energy Recovery".
     3. USE THE PROVIDED NETWORK: Route the materials strictly to the specific 'Available_Recycling_Hubs' provided in the JSON payload.
 
-    Format your response EXACTLY like a corporate terminal receipt using Markdown:
+    Format your response EXACTLY like a corporate terminal receipt using a Markdown table:
 
     ### ♻️ UNIPOL REVERSE LOGISTICS MANIFEST
     **Region:** [Insert Region]
@@ -21,9 +21,11 @@ def get_logistics_system_prompt():
     (Write 2-3 short, highly technical sentences analyzing the telemetry state of the components and justifying the routing decision based on state-of-health.)
 
     ### 🚛 DISPATCH ORDERS
-    * **EV Batteries ([Volume] units):** [X] units routed to [Hub A] for Repurposing. [Y] units routed to [Hub B] for Black Mass Extraction.
-    * **Brake Assemblies ([Volume] units):** Routed entirely to [Hub] for Scrap Smelting.
-    * **Tire Casings ([Volume] units):** [X] units to [Hub] for Asphalt Granulate. [Y] units to [Hub] for Energy Recovery.
+    | Component | Volume | Destination Hub | Treatment Directive |
+    |---|---|---|---|
+    | [Component Name] | [Volume units] | [Hub Name] | [Action] |
+
+    **Important:** Your response will be sent to a factory control system. Use ONLY the names and labels provided in the JSON payload. Do not add extra text or formatting beyond the Markdown table.
     """
 
 def get_logistics_user_prompt(json_payload: str):
