@@ -31,7 +31,8 @@ class CoreLLMClient:
         cache_key = f"{region}_{lang}"
         
         full_prompt = f"SYSTEM INSTRUCTION:\n{system_instruction}\n\nUSER PAYLOAD:\n{user_prompt}"
-        prompt_type = "logistics" if "Reverse Logistics" in system_instruction else "campaign"
+        # Update this line to include the repair prompt type
+        prompt_type = "logistics" if "Reverse Logistics" in system_instruction else "repair" if "Service Agent" in system_instruction else "campaign"
 
         if self.groq_client:
             try:

@@ -115,3 +115,36 @@ async def circular_logistics_ai(request: Request, component_type: str, lang: str
     )
     
     return StreamingResponse(response_generator, media_type="text/plain")
+
+
+class RepairQuoteRequest(BaseModel):
+    component_id: str
+    issue_description: str
+    wear_level: str
+    shop_name: str      # <-- NEW
+    driver_name: str    # <-- NEW
+    language: str = "en"
+
+
+
+# Add the endpoint
+@router.post("/api/ai/repair-quote")
+async def generate_repair_quote(request: RepairQuoteRequest):
+    print(f"🛠️ Triggering AI Repair Quote for: {request.component_id}")
+    
+    # Bundle the incoming frontend data into the JSON payload
+    context_payload = json.dumps({
+        "component_id": request.component_id,
+        "issue_description": request.issue_description,
+        "wear_level": request.wear_level
+    })
+    
+    response_generator = orchestrator.run_repair_quote_generation(
+        json_payload=context_payload,
+        component_id=request.component_id,
+        shop_name=request.shop_name,
+        driver_name=request.driver_name,
+        lang=request.language
+    )
+    
+    return StreamingResponse(response_generator, media_type="text/plain")

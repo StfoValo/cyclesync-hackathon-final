@@ -102,17 +102,21 @@ class FleetTelemetryWidget(QWidget):
         elif active_view == 'suppliers':
             for sup in suppliers:
                 icon_color = "blue" if "Officina" in sup['type'] else "orange"
-                
-                # --- FIX 3: True Tire Icon ---
-                # 'life-ring' in FontAwesome 4 renders as a thick, segmented circle, 
-                # creating a perfect visual illusion of a top-down tire.
                 icon_type = "wrench" if "Officina" in sup['type'] else "life-ring"
+                
+                # Extract the name to a clean variable so it doesn't break the HTML quotes
+                shop_name = sup['name']
                 
                 html_popup = f"""
                 <div style="width: 220px; font-family: sans-serif; background-color: #2e2e2e; color: #E0E0E0; padding: 10px; border-radius: 8px; border: 1px solid {icon_color};">
-                    <h3 style="margin: 0 0 5px 0; color: white;">🛡️ {sup['name']}</h3>
+                    <h3 style="margin: 0 0 5px 0; color: white;">🛡️ {shop_name}</h3>
                     <div style="color: {icon_color}; font-weight: bold; margin-bottom: 10px;">{sup['type']} Convenzionata</div>
-                    <div style="font-size: 12px; color: #bbb;">Region: {sup['region']}</div>
+                    <div style="font-size: 12px; color: #bbb; margin-bottom: 12px;">Region: {sup['region']}</div>
+                    
+                    <button onclick="window.parent.confirmShopAndGenerateAI('{shop_name}')" 
+                            style="width: 100%; padding: 8px; background: #00E5FF; color: #0f172a; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: background 0.2s;">
+                        Invia Richiesta
+                    </button>
                 </div>
                 """
                 
@@ -121,10 +125,3 @@ class FleetTelemetryWidget(QWidget):
                     popup=folium.Popup(html_popup, max_width=250),
                     icon=folium.Icon(color=icon_color, icon=icon_type, prefix='fa')
                 ).add_to(fleet_map)
-
-        data = io.BytesIO()
-        fleet_map.save(data, close_file=False)
-        html_content = data.getvalue().decode()
-        
-        base_url = QUrl.fromLocalFile(os.path.abspath(os.getcwd()) + os.sep)
-        self.web_view.setHtml(html_content, baseUrl=base_url)
