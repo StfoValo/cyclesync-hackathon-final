@@ -14,14 +14,22 @@ sys.path.insert(0, current_dir)
 
 from routers.insurer_api import router as insurer_router
 from routers.ai_api import router as ai_router 
+# 1. ADD THIS IMPORT:
+from routers.vehicle_api import router as vehicle_router 
 
 app = FastAPI()
 
 app.include_router(insurer_router)
 app.include_router(ai_router)
+# 2. ADD THIS INCLUSION:
+app.include_router(vehicle_router) 
 
 static_dir = os.path.join(current_dir, "static")
 os.makedirs(static_dir, exist_ok=True)
+
+# THE FIX: Mount the parent storage folder for ultra-fast direct media access
+storage_dir = os.path.abspath(os.path.join(current_dir, "..", "storage"))
+app.mount("/storage", StaticFiles(directory=storage_dir), name="storage")
 
 # --- Clean Frontpage Routing ---
 @app.get("/")

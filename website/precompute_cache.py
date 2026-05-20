@@ -7,26 +7,39 @@ sys.path.append(project_root)
 sys.path.append(os.path.join(project_root, 'cycle_sync_app'))
 
 from website.cache_manager import init_db, set_cache
+# 1. ADD THIS IMPORT
+from models.data_manager.database_manager import DatabaseManager 
 from models.insurer_models.actuarial_model import ActuarialModel
 from models.insurer_models.fleet_model import FleetModel
+from models.driver_models.driver_model import DriverModel
 
 def run_precomputation():
     print("Initializing UI Cache Database...")
     init_db()
 
+    # 2. ADD THIS INITIALIZATION LINE
+    print("Initializing Core Enterprise Database...")
+    DatabaseManager.initialize_database()
+
     print("Loading models...")
     actuarial_model = ActuarialModel()
     fleet_model = FleetModel()
+    driver_model = DriverModel()
 
     # ==========================================
-    # FIX: FORCE A NEW DATA SIMULATION FIRST!
+    # FORCE A NEW DATA SIMULATION FIRST!
     # ==========================================
     print("🚗 Simulating 8.8 Million Telemetry records across all 20 regions...")
+    
+    # ... (Keep the rest of your file exactly the same) ...
     success = fleet_model.simulate_regional_fleet(account_id=0)
     if not success:
         print("❌ CRITICAL ERROR: Could not run simulation. Make sure car_models exist in veritwin.db!")
         return
     print("✅ Simulation complete! Database populated with all 20 regions.")
+
+    print("🧑‍🚀 Seeding demo driver (Andrea Moretti)...")
+    driver_model.seed_demo_driver()
 
     # ==========================================
     # NOW WE CACHE THE FRESH DATA
@@ -56,14 +69,6 @@ def run_precomputation():
     print("Precomputing fleet regional KPIs...")
     regional_kpis = fleet_model.get_regional_kpis(0)
     set_cache('fleet_regional_kpis', regional_kpis)
-
-    print("Precomputing fleet regional KPIs...")
-    regional_kpis = fleet_model.get_regional_kpis(0)
-    set_cache('fleet_regional_kpis', regional_kpis)
-
-    print("Precomputing BEV regional analytics...")
-    bev_analytics = fleet_model.get_bev_regional_analytics(account_id=0)
-    set_cache('bev_regional_analytics', bev_analytics)
 
     print("🎉 Precomputation completed successfully! The UI will now load instantly.")
 

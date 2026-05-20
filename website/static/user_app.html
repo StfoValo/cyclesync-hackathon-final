@@ -8,18 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: { 400: '#5cffff', 500: '#00E5FF', 600: '#00b8cc' },
-                        darkbg: '#050a11',
-                        cardbg: '#0f1725'
-                    }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 400: '#5cffff', 500: '#00E5FF', 600: '#00b8cc' }, darkbg: '#050a11', cardbg: '#0f1725' } } } }
     </script>
     <style>
         body {
@@ -49,7 +38,6 @@
             scrollbar-width: none;
         }
 
-        /* Smooth View Transitions */
         .app-view {
             display: none;
             animation: fadeIn 0.3s ease;
@@ -70,13 +58,44 @@
                 transform: translateY(0);
             }
         }
+
+        .vehicle-chip {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .vehicle-chip:hover {
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        .vehicle-chip.active {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(0, 229, 255, 0.05));
+            border-color: rgba(0, 229, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+        }
     </style>
 </head>
 
 <body class="h-[100dvh] w-screen flex flex-col overflow-hidden relative pb-[80px]">
-    <script src="/static/js/i18n.js?v=3"></script>
+    <script src="/static/js/i18n.js?v=7"></script>
 
-
+    <!-- Language Toggle -->
+    <div class="flex justify-end px-5 pt-3 pb-0 max-w-lg mx-auto w-full shrink-0">
+        <div class="flex items-center gap-1 bg-slate-800/60 rounded-full p-0.5 border border-white/5">
+            <button id="lang-en-app"
+                onclick="window.setLanguage('en'); window.rerenderDriverApp && window.rerenderDriverApp();"
+                class="px-3 py-1.5 rounded-full text-[10px] font-bold transition-all text-slate-400 hover:text-white bg-transparent shadow-none">EN</button>
+            <button id="lang-it-app"
+                onclick="window.setLanguage('it'); window.rerenderDriverApp && window.rerenderDriverApp();"
+                class="px-3 py-1.5 rounded-full text-[10px] font-bold transition-all bg-brand-500 text-slate-900 shadow-[0_0_10px_rgba(0,229,255,0.4)]">IT</button>
+        </div>
+    </div>
 
     <div id="view-home"
         class="app-view active flex-col h-full overflow-y-auto hide-scrollbar px-5 pt-6 pb-6 mx-auto max-w-lg w-full">
@@ -84,346 +103,249 @@
         <header class="flex items-center justify-between mb-8">
             <div>
                 <p class="text-slate-400 text-sm font-medium mb-1">VeriTwin Home</p>
-                <h1 data-i18n="driver-hello" class="text-2xl font-bold tracking-tight">Ciao, Andrea</h1>
+                <h1 id="driver-greeting" class="text-2xl font-bold tracking-tight" data-i18n="driver-loading">
+                    Caricamento...</h1>
             </div>
             <div class="flex items-center gap-3">
-                <div class="flex bg-slate-800/80 backdrop-blur-md rounded-full p-0.5 border border-white/10 shadow-lg">
-                    <button onclick="window.setLanguage('en')" id="lang-en-app"
-                        class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-all bg-brand-500 text-slate-900 shadow-[0_0_10px_rgba(0,229,255,0.4)]">EN</button>
-                    <button onclick="window.setLanguage('it')" id="lang-it-app"
-                        class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-all text-slate-400 hover:text-white">IT</button>
-                </div>
-
                 <a href="/dashboard"
-                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-600 text-slate-300 hover:text-white hover:border-brand-400 transition-all shadow-lg group">
-                    <span class="text-sm group-hover:scale-110 transition-transform">🏢</span>
-                    <span class="text-[10px] font-bold tracking-wide uppercase">Portal</span>
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-600 text-slate-300 hover:text-white transition-all shadow-lg group">
+                    <span class="text-sm">🏢</span>
+                    <span class="text-[10px] font-bold tracking-wide uppercase" data-i18n="driver-portal">Portal</span>
                 </a>
             </div>
         </header>
 
-        <div class="flex gap-3 overflow-x-auto hide-scrollbar mb-8 -mx-5 px-5">
-            <button
-                class="bg-brand-600 hover:bg-brand-500 text-black font-semibold px-5 py-2.5 rounded-full whitespace-nowrap transition-colors flex items-center gap-2 shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
-                <span data-i18n="driver-sos">Soccorso Rapido</span>
-            </button>
-            <button data-i18n="driver-parking"
-                class="bg-slate-800 border border-white/10 text-white font-medium px-5 py-2.5 rounded-full whitespace-nowrap shrink-0">Parcheggi</button>
-            <button data-i18n="driver-charging"
-                class="bg-slate-800 border border-white/10 text-white font-medium px-5 py-2.5 rounded-full whitespace-nowrap shrink-0">Ricarica
-                EV</button>
-        </div>
-
-        <div onclick="switchView('view-alert')"
-            class="glass-card p-5 mb-6 border border-brand-500/40 relative overflow-hidden group cursor-pointer shadow-[0_0_20px_rgba(0,229,255,0.05)]">
-            <div class="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-110 transition-transform">
-                <svg class="w-16 h-16 text-brand-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-                </svg>
-            </div>
-            <div class="flex items-center gap-2 mb-3">
-                <span class="flex h-2.5 w-2.5 relative">
-                    <span
-                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-500"></span>
-                </span>
-                <span data-i18n="driver-action-req"
-                    class="text-xs font-bold text-brand-400 uppercase tracking-wider">Azione Richiesta</span>
-            </div>
-            <h3 data-i18n="driver-maint-rec" class="text-lg font-bold text-white mb-1">Manutenzione Consigliata</h3>
-            <p data-i18n="driver-maint-desc" class="text-sm text-slate-400 mb-4 max-w-[80%]">Rilevata usura anomala
-                freni. Intervieni per mantenere lo sconto telematica.</p>
-            <span
-                class="inline-flex items-center text-sm font-semibold text-white bg-white/10 px-3 py-1.5 rounded-lg group-hover:bg-brand-500 group-hover:text-black transition-colors">
-                <span data-i18n="driver-view-details">Vedi dettagli &rarr;</span>
-            </span>
-        </div>
+        <div id="vehicle-strip-container" class="flex gap-3 overflow-x-auto hide-scrollbar mb-8 -mx-5 px-5"></div>
+        <div id="top-alert-container"></div>
 
         <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="glass-card p-4 flex flex-col justify-between min-h-[120px]">
-                <div>
-                    <p data-i18n="driver-active-veh" class="text-xs text-slate-400 mb-1">Veicolo Attivo</p>
-                    <h4 data-i18n="driver-your-suv" class="font-bold text-base leading-tight">Il tuo SUV</h4>
-                </div>
-                <div>
-                    <div class="flex items-end gap-1 mb-1">
-                        <span class="text-2xl font-black text-emerald-400">92</span>
-                        <span class="text-xs text-slate-500 pb-1">/100</span>
-                    </div>
-                    <p data-i18n="driver-vsi-score"
-                        class="text-[10px] font-bold text-emerald-500 uppercase tracking-wide">VSI Score: Ottimo</p>
+            <div class="glass-card p-4 flex flex-col justify-start min-h-[160px] relative overflow-hidden group">
+                <img id="active-vehicle-photo" src="" alt="Car" onerror="this.classList.add('hidden')"
+                    class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-90 transition-opacity duration-500 hidden" />
+                <div class="absolute inset-0 bg-gradient-to-b from-[#0f1725]/90 via-[#0f1725]/30 to-transparent"></div>
+                <div class="relative z-10">
+                    <p class="text-[10px] font-bold text-slate-300 mb-0.5 uppercase tracking-wider"
+                        data-i18n="driver-veicolo-attivo">Veicolo Attivo</p>
+                    <h4 id="active-vehicle-name" class="font-bold text-[15px] leading-tight text-white drop-shadow-lg">
+                        --</h4>
                 </div>
             </div>
 
-            <div class="glass-card p-4 flex flex-col justify-between min-h-[120px]">
-                <div>
-                    <p data-i18n="driver-policy-disc" class="text-xs text-slate-400 mb-1">Sconto Polizza</p>
-                    <h4 data-i18n="driver-telematics" class="font-bold text-base leading-tight">Telematica</h4>
-                </div>
-                <div>
-                    <div class="flex items-center gap-1 mb-1">
-                        <span class="text-2xl font-black text-brand-400">-14</span>
-                        <span class="text-lg font-bold text-brand-400">%</span>
+            <div class="flex flex-col gap-4">
+                <div class="glass-card p-4 flex flex-col justify-center flex-1 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 opacity-5">
+                        <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
                     </div>
-                    <div class="flex items-end gap-1 h-6 mt-2">
-                        <div class="w-1/5 bg-white/10 h-[40%] rounded-t-sm"></div>
-                        <div class="w-1/5 bg-white/10 h-[60%] rounded-t-sm"></div>
-                        <div class="w-1/5 bg-white/10 h-[50%] rounded-t-sm"></div>
-                        <div class="w-1/5 bg-white/10 h-[80%] rounded-t-sm"></div>
-                        <div class="w-1/5 bg-brand-500 h-full rounded-t-sm shadow-[0_0_8px_rgba(0,229,255,0.5)]"></div>
+                    <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-wide mb-1 relative z-10">VSI
+                        Score</p>
+                    <div class="flex items-baseline gap-1 relative z-10">
+                        <span id="active-vehicle-vsi" class="text-3xl font-black text-white drop-shadow-md">--</span>
+                        <span class="text-xs text-slate-500 font-bold">/100</span>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 flex flex-col justify-center flex-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1"
+                        data-i18n="driver-sconto-telematica">Sconto Telematica</p>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-xl font-black text-brand-400">-14</span>
+                        <span class="text-sm font-bold text-brand-400">%</span>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <button onclick="window.triggerSOS()"
+                class="bg-red-600 hover:bg-red-500 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.3)] flex justify-center items-center gap-2 transition-colors">
+                <span class="text-lg">✨</span> <span>SOS</span>
+            </button>
+            <button onclick="window.switchView('view-map')"
+                class="bg-[#1e293b] hover:bg-slate-700 text-brand-400 font-bold py-3.5 rounded-xl border border-white/5 flex justify-center items-center gap-2 transition-colors">
+                <span class="text-lg">🗺️</span> <span class="text-white" data-i18n="driver-nav-network">Network</span>
+            </button>
         </div>
 
         <div class="mb-6">
-            <h3 data-i18n="driver-health-title"
-                class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Stato Componenti</h3>
-            <div class="glass-card p-4 flex flex-col gap-4">
-
-                <div>
-                    <div class="flex justify-between items-end mb-1">
-                        <span data-i18n="driver-brakes" class="text-sm font-semibold text-white">Pastiglie Freni</span>
-                        <span data-i18n="driver-brakes-warn"
-                            class="text-[10px] font-bold text-brand-400 uppercase">Controllo richiesto</span>
-                    </div>
-                    <div class="w-full bg-slate-800 rounded-full h-2">
-                        <div class="bg-brand-400 h-2 rounded-full shadow-[0_0_10px_rgba(0,229,255,0.5)]"
-                            style="width: 25%"></div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="flex justify-between items-end mb-1">
-                        <span data-i18n="driver-tires" class="text-sm font-semibold text-white">Pneumatici</span>
-                        <span data-i18n="driver-tires-ok"
-                            class="text-[10px] font-bold text-emerald-500 uppercase">Ottimale</span>
-                    </div>
-                    <div class="w-full bg-slate-800 rounded-full h-2">
-                        <div class="bg-emerald-500 h-2 rounded-full" style="width: 82%"></div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="flex justify-between items-end mb-1">
-                        <span data-i18n="driver-battery" class="text-sm font-semibold text-white">Stato Batteria
-                            EV</span>
-                        <span data-i18n="driver-battery-ok" class="text-[10px] font-bold text-emerald-500 uppercase">In
-                            salute</span>
-                    </div>
-                    <div class="w-full bg-slate-800 rounded-full h-2">
-                        <div class="bg-emerald-500 h-2 rounded-full" style="width: 95%"></div>
-                    </div>
-                </div>
-
+            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1"
+                data-i18n="driver-stato-componenti">Stato Componenti</h3>
+            <div id="component-health-container">
             </div>
         </div>
-
-        <div class="mb-4">
-            <h3 data-i18n="driver-eco-title"
-                class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Impatto Eco</h3>
-            <div class="glass-card p-4 flex justify-around items-center border border-emerald-500/20 bg-emerald-500/5">
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-emerald-400">124</p>
-                    <p data-i18n="driver-co2-saved"
-                        class="text-[10px] text-emerald-500 uppercase font-bold tracking-wide">CO2 Risparmiata (kg)</p>
-                </div>
-                <div class="w-px h-10 bg-white/10"></div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-emerald-400">5.2</p>
-                    <p data-i18n="driver-trees" class="text-[10px] text-emerald-500 uppercase font-bold tracking-wide">
-                        Alberi Equivalenti</p>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-
-    <div id="view-alert" class="app-view flex-col h-full overflow-y-auto px-5 pb-8 pt-4">
+    <div id="view-alert" class="app-view flex-col h-full overflow-y-auto px-5 pb-8 pt-4 mx-auto max-w-lg w-full">
         <header class="flex items-center justify-between mb-8 shrink-0">
-            <button onclick="switchView('view-home')"
+            <button onclick="window.switchView('view-home')"
                 class="text-white p-2 -ml-2 hover:text-brand-400 transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
             </button>
-            <h1 data-i18n="driver-alert-details" class="text-[15px] font-semibold tracking-wide text-slate-200">Dettagli
-                Avviso</h1>
+            <h1 class="text-[15px] font-semibold tracking-wide text-slate-200" data-i18n="driver-dettagli-avvisi">
+                Dettagli Avvisi</h1>
             <div class="w-6"></div>
         </header>
-
-        <div class="flex justify-center mt-2 mb-8">
-            <div class="w-28 h-28 rounded-full glow-ring flex items-center justify-center relative">
-                <div class="absolute inset-0 rounded-full border border-brand-500/20 scale-110"></div>
-                <div class="absolute inset-0 rounded-full border border-brand-500/10 scale-125"></div>
-                <svg class="w-10 h-10 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-                    </path>
-                </svg>
-                <div class="absolute top-6 right-6 w-3 h-3 bg-red-500 border-2 border-darkbg rounded-full"></div>
-            </div>
-        </div>
-
-        <div class="text-center mb-8">
-            <h2 data-i18n="driver-maint-rec" class="text-2xl font-bold mb-3 tracking-tight">Manutenzione consigliata
-            </h2>
-            <p data-i18n="driver-alert-desc" class="text-slate-400 text-[15px] leading-relaxed px-2">Abbiamo rilevato
-                un'usura anomala delle pastiglie
-                dei freni. Intervieni per guidare in sicurezza e ottenere un vantaggio sulla tua polizza.</p>
-        </div>
-
-        <div class="glass-card flex flex-col overflow-hidden mb-8">
-            <div class="flex items-start gap-4 p-4 border-b border-white/5">
-                <div class="mt-0.5 opacity-90"><svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7">
-                        </path>
-                    </svg></div>
-                <div>
-                    <h4 data-i18n="driver-discount-active" class="font-semibold text-[15px] mb-0.5 text-white">Sconto
-                        polizza attivabile</h4>
-                    <p class="text-sm text-slate-400"><span data-i18n="driver-discount-after">Dopo l'intervento
-                            riceverai</span> <span class="text-brand-400 font-semibold">-2.7%</span></p>
-                </div>
-            </div>
-            <div class="flex items-start gap-4 p-4 border-b border-white/5">
-                <div class="mt-0.5 opacity-90"><svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                        </path>
-                    </svg></div>
-                <div>
-                    <h4 data-i18n="driver-risk-red" class="font-semibold text-[15px] mb-0.5 text-white">Riduzione
-                        rischio sinistri</h4>
-                    <p class="text-sm text-slate-400"><span data-i18n="driver-up-to">Fino a</span> <span
-                            class="text-brand-400 font-semibold">-30.8%</span>
-                        <span data-i18n="driver-act-now">intervenendo ora</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-3 mt-auto">
-            <button onclick="switchView('view-map')"
-                class="w-full bg-brand-500 hover:bg-brand-400 text-black font-semibold py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors">
-                <span data-i18n="driver-find-shop">Trova officina convenzionata</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-            </button>
-            <button onclick="switchView('view-home')" data-i18n="driver-ignore"
-                class="w-full bg-transparent border border-white/20 text-slate-300 font-semibold py-3.5 rounded-xl hover:bg-white/5 transition-colors">
-                Ignora per ora
-            </button>
-        </div>
+        <div id="alerts-list-container" class="flex flex-col gap-3"></div>
     </div>
-
 
     <div id="view-map" class="app-view flex-col h-full bg-slate-900">
         <header class="flex items-center justify-between px-4 py-4 shrink-0 bg-darkbg z-10 border-b border-white/5">
-            <h1 data-i18n="driver-network" class="text-[17px] font-semibold tracking-wide text-white">Rete Convenzionata
-            </h1>
-            <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                </path>
-            </svg>
+            <h1 class="text-[17px] font-semibold tracking-wide text-white" data-i18n="driver-rete-convenzionata">Rete
+                Convenzionata</h1>
         </header>
         <div class="flex-1 w-full relative">
             <iframe src="/api/fleet/map?view=suppliers" style="width: 100%; height: 100%; border: none;"></iframe>
-            <div class="absolute bottom-0 w-full h-12 bg-gradient-to-t from-darkbg to-transparent pointer-events-none">
-            </div>
         </div>
     </div>
 
-
     <nav
-        class="fixed bottom-0 w-full h-[80px] bg-[#0a111a]/90 backdrop-blur-xl border-t border-white/5 flex justify-around items-center px-2 pb-4 pt-2 z-50">
-
-        <button onclick="switchView('view-home')" id="nav-home"
+        class="fixed bottom-0 w-full max-w-lg mx-auto right-0 left-0 h-[80px] bg-[#0a111a]/90 backdrop-blur-xl border-t border-white/5 flex justify-around items-center px-2 pb-4 pt-2 z-50 rounded-t-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <button onclick="window.switchView('view-home')" id="nav-home"
             class="nav-btn flex flex-col items-center gap-1 w-16 text-brand-400">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
-            <span data-i18n="driver-nav-home" class="text-[10px] font-medium">Home</span>
+            <span class="text-[10px] font-medium" data-i18n="driver-nav-home">Home</span>
         </button>
-
-        <button onclick="switchView('view-map')" id="nav-map"
+        <button onclick="window.switchView('view-map')" id="nav-map"
             class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
                 </path>
             </svg>
-            <span data-i18n="driver-nav-network" class="text-[10px] font-medium">Network</span>
+            <span class="text-[10px] font-medium" data-i18n="driver-nav-network">Network</span>
         </button>
-
-        <button onclick="switchView('view-alert')" id="nav-alert"
+        <button onclick="window.switchView('view-alert')" id="nav-alert"
             class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors relative">
-            <div class="absolute top-0 right-3 w-2 h-2 bg-red-500 rounded-full border border-[#0a111a]"></div>
+            <div id="nav-alert-badge"
+                class="hidden absolute top-0 right-3 w-2 h-2 bg-red-500 rounded-full border border-[#0a111a]"></div>
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
                 </path>
             </svg>
-            <span data-i18n="driver-nav-alerts" class="text-[10px] font-medium">Avvisi</span>
-        </button>
-
-        <button
-            class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
-            <span data-i18n="driver-nav-profile" class="text-[10px] font-medium">Profilo</span>
+            <span class="text-[10px] font-medium" data-i18n="driver-nav-alerts">Avvisi</span>
         </button>
     </nav>
 
-    <script>
-        function switchView(targetId) {
-            // Hide all views
-            document.querySelectorAll('.app-view').forEach(view => {
-                view.classList.remove('active');
-            });
-            // Show target
-            document.getElementById(targetId).classList.add('active');
+    <script type="module">
+        import { renderComponentGrid } from '/static/js/driver/home_view.js?v=5';
+        import { renderAlertsGrid } from '/static/js/driver/alerts_view.js?v=5';
 
-            // Reset all nav icons to gray
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-brand-400');
-                btn.classList.add('text-slate-500');
-            });
+        const DEMO_DRIVER_ID = 1;
+        // compNames now handled by i18n in the render modules
+        let currentVehicles = [];
 
-            // Color the active nav icon
-            if (targetId === 'view-home') {
-                document.getElementById('nav-home').classList.add('text-brand-400');
-                document.getElementById('nav-home').classList.remove('text-slate-500');
-            } else if (targetId === 'view-map') {
-                document.getElementById('nav-map').classList.add('text-brand-400');
-                document.getElementById('nav-map').classList.remove('text-slate-500');
-            } else if (targetId === 'view-alert') {
-                document.getElementById('nav-alert').classList.add('text-brand-400');
-                document.getElementById('nav-alert').classList.remove('text-slate-500');
-            }
+        window.initApp = async function () {
+            try {
+                const response = await fetch(`/api/driver/${DEMO_DRIVER_ID}`);
+                const data = await response.json();
+
+                if (data.error) { document.getElementById('driver-greeting').innerText = "Errore Database"; return; }
+
+                window._driverName = data.display_name;
+                const lang = localStorage.getItem('veritwin_lang') || 'it';
+                const hello = (window.translations[lang] && window.translations[lang]['driver-hello']) || `Ciao, ${data.display_name}`;
+                document.getElementById('driver-greeting').innerText = hello.replace(/,\s*\w+/, `, ${data.display_name}`);
+                currentVehicles = data.vehicles;
+
+                if (data.vehicles && data.vehicles.length > 0) {
+                    const activeVin = data.pinned_vin || data.vehicles[0].vin;
+                    renderVehicleStrip(data.vehicles, activeVin);
+                    window.switchVehicle(activeVin);
+                }
+            } catch (err) { console.error("Pipeline Error:", err); }
         }
 
-        // FIX: Force translation sync slightly after the DOM loads to avoid race conditions
-        setTimeout(() => {
-            if (window.setLanguage) {
-                const savedLang = localStorage.getItem('veritwin_lang') || 'en';
-                window.setLanguage(savedLang);
+        function renderVehicleStrip(vehicles, activeVin) {
+            const container = document.getElementById('vehicle-strip-container');
+            if (!container || vehicles.length <= 1) { container.innerHTML = ''; return; }
+
+            container.innerHTML = vehicles.map(v => `
+                <div class="vehicle-chip ${v.vin === activeVin ? 'active' : ''}"
+                     onclick="window.switchVehicle('${v.vin}')">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${v.manufacturer}</p>
+                    <p class="text-sm font-bold text-white">${v.model}</p>
+                </div>
+            `).join('');
+        }
+
+        window.switchVehicle = function (vin) {
+            const activeVehicle = currentVehicles.find(v => v.vin === vin);
+            if (activeVehicle) {
+                document.getElementById('active-vehicle-name').innerText = `${activeVehicle.manufacturer} ${activeVehicle.model}`;
+                document.getElementById('active-vehicle-vsi').innerText = activeVehicle.vsi_score;
+
+                const photoImg = document.getElementById('active-vehicle-photo');
+                if (photoImg && activeVehicle.photo_url) {
+                    photoImg.src = activeVehicle.photo_url;
+                    photoImg.classList.remove('hidden');
+                } else if (photoImg) {
+                    photoImg.classList.add('hidden');
+                }
+
+                renderVehicleStrip(currentVehicles, vin);
+                loadVehicleTelemetry(vin);
             }
-        }, 50);
+        };
+
+        let _cachedComponents = null;
+
+        async function loadVehicleTelemetry(vin) {
+            try {
+                const response = await fetch(`/api/driver/vehicle/${vin}/component-life`);
+                const data = await response.json();
+                if (data.components) {
+                    _cachedComponents = data.components;
+                    renderComponentGrid(data.components);
+                    renderAlertsGrid(data.components);
+                }
+            } catch (err) { console.error("Pipeline Error:", err); }
+        }
+
+        // Re-render dynamic grids on language switch
+        window.rerenderDriverApp = function () {
+            if (_cachedComponents) {
+                renderComponentGrid(_cachedComponents);
+                renderAlertsGrid(_cachedComponents);
+            }
+            // Update greeting with new locale
+            if (window._driverName) {
+                const lang = localStorage.getItem('veritwin_lang') || 'it';
+                const hello = (window.translations[lang] && window.translations[lang]['driver-hello']) || `Ciao, ${window._driverName}`;
+                document.getElementById('driver-greeting').innerText = hello.replace(/,\s*\w+/, `, ${window._driverName}`);
+            }
+        };
+
+        window.getRepairQuote = function (componentKey) {
+            alert(`Generating repair quote for: ${componentKey}`);
+        };
+
+        window.switchView = function (targetId) {
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('text-brand-400'); btn.classList.add('text-slate-500'); });
+            const activeNav = targetId === 'view-home' ? 'nav-home' : (targetId === 'view-map' ? 'nav-map' : 'nav-alert');
+            const navEl = document.getElementById(activeNav);
+            navEl.classList.remove('text-slate-500');
+            navEl.classList.add('text-brand-400');
+        }
+
+        window.triggerSOS = function () {
+            alert("AI SOS Streaming interface initializing...");
+        }
+
+        // Restore active lang toggle state on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('veritwin_lang') || 'it';
+            window.setLanguage(savedLang);
+            window.initApp();
+        });
     </script>
 </body>
 
