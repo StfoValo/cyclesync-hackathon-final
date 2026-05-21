@@ -93,6 +93,7 @@
             background: rgba(15, 23, 37, 0.8);
             display: block;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             white-space: nowrap;
         }
 
@@ -458,15 +459,25 @@
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder("utf-8");
+
+                // 1. Create a safe memory variable to hold the raw markdown
+                let accumulatedMarkdown = "";
                 outputDiv.innerHTML = "";
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
-                    outputDiv.innerHTML += decoder.decode(value, { stream: true });
-                }
 
-                if (window.marked) outputDiv.innerHTML = marked.parse(outputDiv.innerHTML);
+                    // 2. Add the chunk to memory, keeping \n line breaks intact
+                    accumulatedMarkdown += decoder.decode(value, { stream: true });
+
+                    // 3. Parse from memory to HTML in real-time so the user sees it type!
+                    if (window.marked) {
+                        outputDiv.innerHTML = marked.parse(accumulatedMarkdown);
+                    } else {
+                        outputDiv.innerText = accumulatedMarkdown;
+                    }
+                }
 
                 // Clear the pending state once successful
                 window.pendingRepairComponent = null;
