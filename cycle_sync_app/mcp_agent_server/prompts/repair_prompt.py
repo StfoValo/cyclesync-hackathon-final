@@ -16,7 +16,7 @@ Calculate the rows for:
 3. Total Estimate
 
 CRITICAL REQUIREMENT 2 - THE EMAIL:
-Below the table, draft a short, professional email to the repair shop requesting an appointment and referencing the estimated costs. Include placeholders like [Nome Officina] for the shop name. Keep it concise, polite, and strictly business."""
+Below the table, draft a short, professional email to the repair shop requesting an appointment and referencing the estimated costs. Include placeholders like [Nome Officina] for the shop name. Keep it concise, polite, and strictly business (make sure to make the math very well)."""
 
 def get_repair_user_prompt(json_payload: str, shop_name: str, driver_name: str):
     data = json.loads(json_payload)

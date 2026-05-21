@@ -43,11 +43,11 @@ def get_demographic_deep_dive():
 def get_asset_risk_portfolio():
     return actuarial_model.get_asset_risk_portfolio()
 
+# 1. Add 'repair' to the function arguments
 @router.get("/api/fleet/map", response_class=HTMLResponse)
-def get_fleet_map(view: str = 'fleet'):
+def get_fleet_map(view: str = 'fleet', lang: str = 'it', repair: str = 'none'):
     regional_kpis = fleet_model.get_regional_kpis(0)
     
-    # FIX 1: Lock the map perfectly onto the center of Italy
     fleet_map = folium.Map(
         location=[41.8719, 12.5674], 
         zoom_start=6, 
@@ -59,6 +59,7 @@ def get_fleet_map(view: str = 'fleet'):
     fleet_map.get_root().header.add_child(folium.Element(css))
     
     if view == 'fleet':
+        # ... (Keep your existing fleet logic exactly the same) ...
         for r in regional_kpis:
             if r['center_lat'] is None or r['center_lon'] is None:
                 continue
@@ -85,7 +86,6 @@ def get_fleet_map(view: str = 'fleet'):
             </div>
             """
             
-            # FIX 2: Use sharp, intuitive map pointers instead of overlapping bubbles
             marker_color = "green" 
             if r['risk_high'] > r['risk_safe']:
                 marker_color = "red" 
@@ -100,22 +100,37 @@ def get_fleet_map(view: str = 'fleet'):
             
     elif view == 'suppliers':
         for sup in SERVICE_PROVIDERS:
-            # Extract the shop name to a clean variable first
             shop_name = sup['name']
             
             icon_color = "blue" if "Officina" in sup['type'] else "orange"
             icon_type = "wrench" if "Officina" in sup['type'] else "life-ring"
             
+            if lang == 'en':
+                sup_type_translated = "Affiliated Workshop" if "Officina" in sup['type'] else "Affiliated Tire Shop"
+                region_label = "Region"
+                btn_text = "Send Request"
+            else:
+                sup_type_translated = "Officina Convenzionata" if "Officina" in sup['type'] else "Gommista Convenzionato"
+                region_label = "Regione"
+                btn_text = "Invia Richiesta"
+            
+            # 🛠️ THE FIX: Render the button ONLY if a repair is active
+            if repair == 'active':
+                button_html = f"""
+                <button onclick="window.parent.confirmShopAndGenerateAI('{shop_name}')" 
+                        style="width: 100%; padding: 8px; background: #00E5FF; color: #0f172a; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: background 0.2s;">
+                    {btn_text}
+                </button>
+                """
+            else:
+                button_html = ""
+
             html_popup = f"""
             <div style="width: 220px; font-family: sans-serif; background-color: #2e2e2e; color: #E0E0E0; padding: 10px; border-radius: 8px; border: 1px solid {icon_color};">
                 <h3 style="margin: 0 0 5px 0; color: white;">🛡️ {shop_name}</h3>
-                <div style="color: {icon_color}; font-weight: bold; margin-bottom: 10px;">{sup['type']} Convenzionata</div>
-                <div style="font-size: 12px; color: #bbb; margin-bottom: 12px;">Region: {sup['region']}</div>
-                
-                <button onclick="window.parent.confirmShopAndGenerateAI('{shop_name}')" 
-                        style="width: 100%; padding: 8px; background: #00E5FF; color: #0f172a; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: background 0.2s;">
-                    Invia Richiesta
-                </button>
+                <div style="color: {icon_color}; font-weight: bold; margin-bottom: 10px;">{sup_type_translated}</div>
+                <div style="font-size: 12px; color: #bbb; margin-bottom: 12px;">{region_label}: {sup['region']}</div>
+                {button_html}
             </div>
             """
             
@@ -125,7 +140,6 @@ def get_fleet_map(view: str = 'fleet'):
                 icon=folium.Icon(color=icon_color, icon=icon_type, prefix='fa')
             ).add_to(fleet_map)
 
-        # Add this line right here! Make sure it is indented perfectly:
     return fleet_map.get_root().render()
 
 @router.get("/api/actuarial/esg")

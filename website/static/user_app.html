@@ -126,7 +126,7 @@
 </head>
 
 <body class="h-[100dvh] w-screen flex flex-col overflow-hidden relative pb-[80px]">
-    <script src="/static/js/i18n.js?v=7"></script>
+    <script src="/static/js/i18n.js?v=8"></script>
 
     <!-- Language Toggle -->
     <div class="flex justify-end px-5 pt-3 pb-0 max-w-lg mx-auto w-full shrink-0">
@@ -200,17 +200,6 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <button onclick="window.triggerSOS()"
-                class="bg-red-600 hover:bg-red-500 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.3)] flex justify-center items-center gap-2 transition-colors">
-                <span class="text-lg">✨</span> <span>SOS</span>
-            </button>
-            <button onclick="window.switchView('view-map')"
-                class="bg-[#1e293b] hover:bg-slate-700 text-brand-400 font-bold py-3.5 rounded-xl border border-white/5 flex justify-center items-center gap-2 transition-colors">
-                <span class="text-lg">🗺️</span> <span class="text-white" data-i18n="driver-nav-network">Network</span>
-            </button>
-        </div>
-
         <div class="mb-6">
             <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1"
                 data-i18n="driver-stato-componenti">Stato Componenti</h3>
@@ -235,13 +224,23 @@
         <div id="alerts-list-container" class="flex flex-col gap-3"></div>
     </div>
 
+    <div id="view-profile" class="app-view flex-col h-full overflow-y-auto px-5 pb-8 pt-4 mx-auto max-w-lg w-full">
+        <header class="flex items-center justify-between mb-6 shrink-0">
+            <h1 class="text-[17px] font-semibold tracking-wide text-white" data-i18n="driver-nav-gestione-header">
+                Gestione
+                Veicolo</h1>
+        </header>
+        <div id="profile-content-container" class="flex flex-col">
+        </div>
+    </div>
+
     <div id="view-map" class="app-view flex-col h-full bg-slate-900">
         <header class="flex items-center justify-between px-4 py-4 shrink-0 bg-darkbg z-10 border-b border-white/5">
             <h1 class="text-[17px] font-semibold tracking-wide text-white" data-i18n="driver-rete-convenzionata">Rete
                 Convenzionata</h1>
         </header>
         <div class="flex-1 w-full relative">
-            <iframe src="/api/fleet/map?view=suppliers" style="width: 100%; height: 100%; border: none;"></iframe>
+            <iframe id="map-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </div>
 
@@ -269,9 +268,9 @@
 
             <div class="mt-2 shrink-0">
                 <button
-                    onclick="document.getElementById('repair-modal').classList.add('hidden'); window.switchView('view-map');"
+                    onclick="const lang = localStorage.getItem('veritwin_lang') || 'it'; const msg = lang === 'it' ? 'Richiesta inviata con successo all\'officina!' : 'Request sent successfully to the workshop!'; document.getElementById('repair-modal').classList.add('hidden'); window.showToast(msg);"
                     class="w-full bg-[#1e293b] hover:bg-slate-700 text-brand-400 hover:text-brand-300 font-bold py-3.5 rounded-xl border border-white/10 shadow-lg transition-colors flex justify-center items-center gap-2">
-                    <span class="text-lg">🗺️</span> Trova Officina Convenzionata
+                    <span class="text-lg">✉️</span> <span data-i18n="driver-send-request">Invia Richiesta</span>
                 </button>
             </div>
         </div>
@@ -286,7 +285,7 @@
             </svg>
             <span class="text-[10px] font-medium" data-i18n="driver-nav-home">Home</span>
         </button>
-        <button onclick="window.switchView('view-map')" id="nav-map"
+        <button onclick="window.pendingRepairComponent = null; window.switchView('view-map')" id="nav-map"
             class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -295,6 +294,17 @@
             </svg>
             <span class="text-[10px] font-medium" data-i18n="driver-nav-network">Network</span>
         </button>
+
+        <button onclick="window.switchView('view-profile')" id="nav-profile"
+            class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                </path>
+            </svg>
+            <span class="text-[10px] font-medium" data-i18n="driver-nav-gestione">Gestione</span>
+        </button>
+
         <button onclick="window.switchView('view-alert')" id="nav-alert"
             class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors relative">
             <div id="nav-alert-badge"
@@ -311,10 +321,12 @@
     <script type="module">
         import { renderComponentGrid } from '/static/js/driver/home_view.js?v=5';
         import { renderAlertsGrid } from '/static/js/driver/alerts_view.js?v=5';
+        import { renderProfileView } from '/static/js/driver/profile_view.js?v=1';
 
         const DEMO_DRIVER_ID = 1;
         // compNames now handled by i18n in the render modules
         let currentVehicles = [];
+        window._activeVehicleCache = null;
 
         window.initApp = async function () {
             try {
@@ -353,6 +365,7 @@
         window.switchVehicle = function (vin) {
             const activeVehicle = currentVehicles.find(v => v.vin === vin);
             if (activeVehicle) {
+                window._activeVehicleCache = activeVehicle;
                 document.getElementById('active-vehicle-name').innerText = `${activeVehicle.manufacturer} ${activeVehicle.model}`;
                 document.getElementById('active-vehicle-vsi').innerText = activeVehicle.vsi_score;
 
@@ -365,6 +378,9 @@
                 }
 
                 renderVehicleStrip(currentVehicles, vin);
+
+                renderProfileView(activeVehicle);
+
                 loadVehicleTelemetry(vin);
             }
         };
@@ -389,11 +405,26 @@
                 renderComponentGrid(_cachedComponents);
                 renderAlertsGrid(_cachedComponents);
             }
+            if (window._activeVehicleCache) {
+                renderProfileView(window._activeVehicleCache);
+            }
             // Update greeting with new locale
             if (window._driverName) {
                 const lang = localStorage.getItem('veritwin_lang') || 'it';
                 const hello = (window.translations[lang] && window.translations[lang]['driver-hello']) || `Ciao, ${window._driverName}`;
                 document.getElementById('driver-greeting').innerText = hello.replace(/,\s*\w+/, `, ${window._driverName}`);
+            }
+            // Update map iframe if already initialized
+            const mapIframe = document.getElementById('map-iframe');
+            if (mapIframe) {
+                const currentSrc = mapIframe.getAttribute('src');
+                if (currentSrc) {
+                    const lang = localStorage.getItem('veritwin_lang') || 'it';
+                    const expectedSrc = `/api/fleet/map?view=suppliers&lang=${lang}`;
+                    if (currentSrc !== expectedSrc) {
+                        mapIframe.setAttribute('src', expectedSrc);
+                    }
+                }
             }
         };
 
@@ -491,12 +522,41 @@
         window.switchView = function (targetId) {
             document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
             document.getElementById(targetId).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('text-brand-400'); btn.classList.add('text-slate-500'); });
-            const activeNav = targetId === 'view-home' ? 'nav-home' : (targetId === 'view-map' ? 'nav-map' : 'nav-alert');
-            const navEl = document.getElementById(activeNav);
-            navEl.classList.remove('text-slate-500');
-            navEl.classList.add('text-brand-400');
-        }
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-brand-400');
+                btn.classList.add('text-slate-500');
+            });
+
+            // --- UPDATED ROUTER MAP FOR 4 TABS ---
+            const navMap = {
+                'view-home': 'nav-home',
+                'view-map': 'nav-map',
+                'view-profile': 'nav-profile',
+                'view-alert': 'nav-alert'
+            };
+
+            const activeNav = navMap[targetId];
+            if (activeNav) {
+                const navEl = document.getElementById(activeNav);
+                navEl.classList.remove('text-slate-500');
+                navEl.classList.add('text-brand-400');
+            }
+
+            if (targetId === 'view-map') {
+                const lang = localStorage.getItem('veritwin_lang') || 'it';
+                const iframe = document.getElementById('map-iframe');
+                if (iframe) {
+                    const currentSrc = iframe.getAttribute('src');
+                    const repairParam = window.pendingRepairComponent ? 'active' : 'none';
+                    const expectedSrc = `/api/fleet/map?view=suppliers&lang=${lang}&repair=${repairParam}`;
+
+                    if (currentSrc !== expectedSrc) {
+                        iframe.setAttribute('src', expectedSrc);
+                    }
+                }
+            }
+        };
 
         window.triggerSOS = function () {
             alert("AI SOS Streaming interface initializing...");
@@ -524,7 +584,6 @@
                 container.classList.add('opacity-0', 'translate-y-[-20px]');
             }, 3500);
         };
-
     </script>
 
     <div id="toast-container"

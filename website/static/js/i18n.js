@@ -323,7 +323,29 @@ window.translations = {
         "ai-q-demo-1": "Analyze claim frequencies by driver age and gender.",
         "ai-q-demo-2": "What is the correlation between vehicle category and behavioral risk?",
         "ai-q-asset-1": "Show me the component risk distribution across the fleet.",
-        "ai-q-asset-2": "Analyze the global VSI scores and project hardware failure costs."
+        "ai-q-asset-2": "Analyze the global VSI scores and project hardware failure costs.",
+
+        // Driver App Profile
+        "driver-id-veicolo": "Vehicle Identity",
+        "driver-plate": "Plate",
+        "driver-year": "Year",
+        "driver-vin": "VIN (Chassis)",
+        "driver-polizza": "VeriTwin Policy",
+        "driver-active": "Active",
+        "driver-expiry": "Coverage Expiry",
+        "driver-discount": "Applied Discount",
+        "driver-servizi": "Connected Services",
+        "driver-telepass": "European Telepass",
+        "driver-telepass-desc": "Device linked to plate",
+        "driver-roadside": "Roadside Assistance",
+        "driver-roadside-desc": "Included in policy",
+        "driver-tagliando": "Next Service",
+        "driver-maint-plan": "Based on official maintenance plan",
+        "driver-send-request": "Send Request",
+        "driver-nav-gestione": "Manage",
+        "driver-nav-gestione-header": "Vehicle Management",
+        "driver-active-masc": "Active",
+        "driver-expiry-date": "May 12, 2027"
     },
     it: {
         // Landing Page
@@ -645,7 +667,29 @@ window.translations = {
         "ai-q-demo-1": "Analizza le frequenze dei sinistri per età e sesso del conducente.",
         "ai-q-demo-2": "Qual è la correlazione tra categoria di veicolo e rischio comportamentale?",
         "ai-q-asset-1": "Mostra la distribuzione del rischio dei componenti nella flotta.",
-        "ai-q-asset-2": "Analizza i punteggi VSI globali e proietta i costi dei guasti hardware."
+        "ai-q-asset-2": "Analizza i punteggi VSI globali e proietta i costi dei guasti hardware.",
+
+        // Driver App Profile
+        "driver-id-veicolo": "Identità Veicolo",
+        "driver-plate": "Targa",
+        "driver-year": "Anno",
+        "driver-vin": "VIN (Telaio)",
+        "driver-polizza": "Polizza VeriTwin",
+        "driver-active": "Attiva",
+        "driver-expiry": "Scadenza Copertura",
+        "driver-discount": "Sconto Applicato",
+        "driver-servizi": "Servizi Connessi",
+        "driver-telepass": "Telepass Europeo",
+        "driver-telepass-desc": "Dispositivo associato alla targa",
+        "driver-roadside": "Soccorso Stradale",
+        "driver-roadside-desc": "Incluso nella polizza",
+        "driver-tagliando": "Prossimo Tagliando",
+        "driver-maint-plan": "Basato sul piano di manutenzione ufficiale",
+        "driver-send-request": "Invia Richiesta",
+        "driver-nav-gestione": "Gestione",
+        "driver-nav-gestione-header": "Gestione Veicolo",
+        "driver-active-masc": "Attivo",
+        "driver-expiry-date": "12 Maggio 2027"
     }
 };
 
