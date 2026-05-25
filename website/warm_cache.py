@@ -84,3 +84,50 @@ for region in TARGET_REGIONS:
         print("-" * 40)
 
 print("\n🎉 Pre-Warming Complete! The Executive Tab, AI Routing, and ESG engines are fully cached and pitch-ready!")
+
+# ==========================================
+# PHASE 3: WARM UP DRIVER APP REPAIR QUOTES
+# ==========================================
+print("⏳ WARMING PHASE 3: Driver App Repair Quotes...")
+
+# The specific alerts we want to cache for the demo
+DEMO_COMPONENTS = [
+    {
+        "component_id": "tire_RR",
+        "issue_description": "Battistrada residuo: 2.1mm",
+        "wear_level": "92.2",
+        "shop_name": "Pneus Master",
+        "driver_name": "Andrea"
+    },
+    {
+        "component_id": "brake_pad_rear",
+        "issue_description": "Sostituzione consigliata.",
+        "wear_level": "84.0",
+        "shop_name": "Pneus Master", 
+        "driver_name": "Andrea"
+    }
+]
+
+for lang in LANGUAGES:
+    for comp in DEMO_COMPONENTS:
+        print(f"   -> Hitting Repair Quote: {comp['component_id']} ({lang.upper()}) at {comp['shop_name']}")
+        
+        url = f"{BASE_URL}/api/ai/repair-quote"
+        payload = {
+            "component_id": comp["component_id"],
+            "issue_description": comp["issue_description"],
+            "wear_level": comp["wear_level"],
+            "shop_name": comp["shop_name"],
+            "driver_name": comp["driver_name"],
+            "language": lang
+        }
+        
+        try:
+            requests.post(url, json=payload, timeout=20)
+            print(f"   ✅ {comp['component_id']} Warmed.")
+        except Exception as e:
+            print(f"   ⚠️ Error: {e}")
+            
+        time.sleep(2) # Brief pause to respect rate limits
+
+print("-" * 40)
