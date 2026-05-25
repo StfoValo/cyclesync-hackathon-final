@@ -92,50 +92,60 @@ class CoreLLMClient:
             time.sleep(0.04)
 
     # ---------------------------------------------------------
-    # DYNAMIC CACHE MANAGER LOGIC
+    # DYNAMIC CACHE MANAGER LOGIC (IN-MEMORY RAM OPTIMIZED)
     # ---------------------------------------------------------
+    def _load_cache_to_memory(self):
+        """Loads the JSON into RAM exactly once to prevent Disk I/O bottlenecks."""
+        # Only read from the disk if the memory cache doesn't exist yet
+        if not hasattr(self, '_memory_cache') or self._memory_cache is None:
+            try:
+                if os.path.exists(self.cache_file_path):
+                    with open(self.cache_file_path, "r", encoding="utf-8") as f:
+                        self._memory_cache = json.load(f)
+                    print("[Shadow Cache] 🚀 Loaded fallback JSON into RAM.")
+                else:
+                    self._memory_cache = {"logistics": {}, "campaign": {}, "repair": {}}
+            except Exception as e:
+                print(f"[Shadow Cache] ⚠️ Error loading to memory: {e}")
+                self._memory_cache = {"logistics": {}, "campaign": {}, "repair": {}}
+
     def _save_regional_fallback(self, prompt_type: str, region: str, response_text: str):
-        """Silently saves successful LLM generations to a JSON file ONLY if it doesn't already exist."""
+        """Silently saves successful LLM generations to RAM and syncs to disk ONLY if new."""
+        self._load_cache_to_memory()
+        
         try:
-            fallbacks = {"logistics": {}, "campaign": {}}
-            if os.path.exists(self.cache_file_path):
-                with open(self.cache_file_path, "r", encoding="utf-8") as f:
-                    fallbacks = json.load(f)
-            
             # Ensure the structure exists
-            if prompt_type not in fallbacks:
-                fallbacks[prompt_type] = {}
+            if prompt_type not in self._memory_cache:
+                self._memory_cache[prompt_type] = {}
                 
-            # --- NEW: THE WRITE-LOCK BYPASS ---
-            if region in fallbacks[prompt_type]:
+            # --- THE WRITE-LOCK BYPASS (Checked instantly via RAM) ---
+            if region in self._memory_cache[prompt_type]:
                 print(f"[Shadow Cache] ⏭️ Cache already exists for {region} ({prompt_type}). Skipping disk write.")
-                return # Instantly exit the function, saving CPU and Disk I/O!
+                return 
                 
-            # If we get here, the region doesn't exist yet, so we save it.
-            fallbacks[prompt_type][region] = response_text
+            # 1. Save to lightning-fast RAM memory for immediate use
+            self._memory_cache[prompt_type][region] = response_text
             
+            # 2. Persist to disk as a backup for the next server restart
             with open(self.cache_file_path, "w", encoding="utf-8") as f:
-                json.dump(fallbacks, f, indent=4)
-            print(f"[Shadow Cache] ✅ Successfully saved new fallback response for {region} ({prompt_type}).")
+                json.dump(self._memory_cache, f, indent=4)
+            print(f"[Shadow Cache] ✅ Successfully saved new fallback response to Disk/RAM for {region} ({prompt_type}).")
             
         except Exception as e:
             print(f"[Shadow Cache Error] Could not save to JSON: {e}")
 
     def _get_regional_fallback(self, prompt_type: str, region: str) -> str:
-        """Reads the perfectly formatted regional response from the JSON file."""
+        """Reads the perfectly formatted regional response instantly from RAM (Zero Disk I/O)."""
         try:
-            if os.path.exists(self.cache_file_path):
-                with open(self.cache_file_path, "r", encoding="utf-8") as f:
-                    fallbacks = json.load(f)
+            self._load_cache_to_memory()
+            category = self._memory_cache.get(prompt_type, {})
+            
+            # Try to get exact region, if not, try to get a "default" one
+            if region in category:
+                return category[region]
+            elif "default" in category:
+                return category["default"]
                 
-                category = fallbacks.get(prompt_type, {})
-                
-                # Try to get exact region, if not, try to get a "default" one, if not, fallback string
-                if region in category:
-                    return category[region]
-                elif "default" in category:
-                    return category["default"]
-                    
             return "### ⚠️ SYSTEM OFFLINE\nCould not connect to AI services or retrieve local regional cache."
         except Exception as e:
             return f"### ⚠️ CACHE ERROR\n{str(e)}"
