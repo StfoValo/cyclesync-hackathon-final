@@ -43,9 +43,24 @@ def get_demographic_deep_dive():
 def get_asset_risk_portfolio():
     return actuarial_model.get_asset_risk_portfolio()
 
-# 1. Add 'repair' to the function arguments
+# Create a global dictionary in memory to hold the pre-rendered maps
+MAP_HTML_CACHE = {}
+
 @router.get("/api/fleet/map", response_class=HTMLResponse)
 def get_fleet_map(view: str = 'fleet', lang: str = 'it', repair: str = 'none'):
+    # 1. Create a unique signature for this specific map request
+    cache_key = f"{view}_{lang}_{repair}"
+
+    # 2. THE BYPASS: If we already generated this map, return it from RAM instantly!
+    if cache_key in MAP_HTML_CACHE:
+        return HTMLResponse(
+            content=MAP_HTML_CACHE[cache_key],
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
+
+    print(f"⚙️ First time rendering map for {cache_key}. Generating via Folium...")
+
+    # --- START OF HEAVY CPU PROCESSING ---
     regional_kpis = fleet_model.get_regional_kpis(0)
     
     fleet_map = folium.Map(
@@ -114,7 +129,6 @@ def get_fleet_map(view: str = 'fleet', lang: str = 'it', repair: str = 'none'):
                 region_label = "Regione"
                 btn_text = "Invia Richiesta"
             
-            # 🛠️ THE FIX: Render the button ONLY if a repair is active
             if repair == 'active':
                 button_html = f"""
                 <button onclick="window.parent.confirmShopAndGenerateAI('{shop_name}')" 
@@ -140,7 +154,15 @@ def get_fleet_map(view: str = 'fleet', lang: str = 'it', repair: str = 'none'):
                 icon=folium.Icon(color=icon_color, icon=icon_type, prefix='fa')
             ).add_to(fleet_map)
 
-    return fleet_map.get_root().render()
+    # 3. Save the final HTML string to our RAM dictionary
+    rendered_html = fleet_map.get_root().render()
+    MAP_HTML_CACHE[cache_key] = rendered_html
+
+    # 4. Return the HTML with Browser Cache Headers
+    return HTMLResponse(
+        content=rendered_html,
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
 
 @router.get("/api/actuarial/esg")
 async def get_esg_dashboard():
