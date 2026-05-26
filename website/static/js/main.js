@@ -1,16 +1,16 @@
-import { initTelemetry } from './views/telemetry.js?v=2';
-import { initActuarial } from './views/actuarial.js?v=2';
-import { initPredictiveAsset } from './views/predictive_asset.js?v=2';
-import { initAIStrategy } from './views/ai_strategy.js?v=2';
-import { initESG } from './views/esg.js?v=2';
-import { initAdjuster } from './views/adjuster.js?v=2';
+import { initTelemetry } from './views/telemetry.js?v=8';
+import { initActuarial } from './views/actuarial.js?v=3';
+import { initPredictiveAsset } from './views/predictive_asset.js?v=3';
+import { initAIStrategy } from './views/ai_strategy.js?v=3';
+import { initESG } from './views/esg.js?v=7';
+import { initAdjuster } from './views/adjuster.js?v=9';
 
 const viewModules = {
-    'telemetry-view': { path: '/static/partials/telemetry_tab.html', init: initTelemetry },
-    'executive-view': { path: '/static/partials/executive_tab.html', init: initActuarial },
-    'ai-view': { path: '/static/partials/ai_tab.html', init: initAIStrategy },
-    'esg-view': { path: '/static/partials/esg_tab.html', init: initESG },
-    'adjuster-view': { path: '/static/partials/adjuster_tab.html', init: initAdjuster }
+    'telemetry-view':  { path: '/static/partials/telemetry_tab.html',  init: initTelemetry },
+    'executive-view':  { path: '/static/partials/executive_tab.html',  init: initActuarial },
+    'ai-view':         { path: '/static/partials/ai_tab.html',         init: initAIStrategy },
+    'esg-view':        { path: '/static/partials/esg_tab.html?v=6',        init: initESG },
+    'adjuster-view':   { path: '/static/partials/adjuster_tab.html',   init: initAdjuster }
 };
 
 const loadedViews = new Set();
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const html = await response.text();
                 section.innerHTML = html;
 
-                // THE FIX: Instantly translate the newly injected HTML!
+                // Instantly translate the newly injected HTML
                 if (window.setLanguage) {
                     window.setLanguage(localStorage.getItem('veritwin_lang') || 'en');
                 }
@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     config.init();
                 }
 
+                // Re-initialize Lucide icons after dynamic content injection
+                if (window.lucide) setTimeout(() => lucide.createIcons(), 80);
 
             } catch (err) {
                 loadedViews.delete(targetId); // Revert if failed
@@ -82,5 +84,5 @@ document.addEventListener('DOMContentLoaded', () => {
         loadView(activeItem.getAttribute('data-target'));
     }
 
-    console.log("VeriTwin Frontend Shell Initialized.");
+    console.log("VeriTwin Frontend Shell Initialized v3.");
 });

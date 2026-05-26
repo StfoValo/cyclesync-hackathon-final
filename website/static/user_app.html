@@ -126,7 +126,7 @@
 </head>
 
 <body class="h-[100dvh] w-screen flex flex-col overflow-hidden relative pb-[80px]">
-    <script src="/static/js/i18n.js?v=8"></script>
+    <script src="/static/js/i18n.js?v=9"></script>
 
     <!-- Language Toggle -->
     <div class="flex justify-end px-5 pt-3 pb-0 max-w-lg mx-auto w-full shrink-0">
@@ -158,10 +158,21 @@
             </div>
         </header>
 
-        <div id="vehicle-strip-container" class="flex gap-3 overflow-x-auto hide-scrollbar mb-8 -mx-5 px-5"></div>
+        <div id="vehicle-strip-container" class="flex gap-3 overflow-x-auto hide-scrollbar mb-6 -mx-5 px-5"></div>
+
+        <!-- SOS + Network quick actions -->
+        <div class="flex gap-2 mb-5">
+            <button onclick="window.triggerSOS()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all flex-1 justify-center text-sm">
+                <span class="text-base">🚨</span> <span data-i18n="driver-sos">SOS</span>
+            </button>
+            <button onclick="window.switchView('view-map')" class="bg-slate-800 border border-white/10 text-white font-medium px-4 py-2.5 rounded-xl text-sm flex-1 flex items-center justify-center gap-1.5">
+                <span class="text-base">🗺️</span> <span data-i18n="driver-network">Network</span>
+            </button>
+        </div>
+
         <div id="top-alert-container"></div>
 
-        <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="grid grid-cols-2 gap-4 mb-5">
             <div class="glass-card p-4 flex flex-col justify-start min-h-[160px] relative overflow-hidden group">
                 <img id="active-vehicle-photo" src="" alt="Car" onerror="this.classList.add('hidden')"
                     class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-90 transition-opacity duration-500 hidden" />
@@ -169,42 +180,50 @@
                 <div class="relative z-10">
                     <p class="text-[10px] font-bold text-slate-300 mb-0.5 uppercase tracking-wider"
                         data-i18n="driver-veicolo-attivo">Veicolo Attivo</p>
-                    <h4 id="active-vehicle-name" class="font-bold text-[15px] leading-tight text-white drop-shadow-lg">
-                        --</h4>
+                    <h4 id="active-vehicle-name" class="font-bold text-[15px] leading-tight text-white drop-shadow-lg">--</h4>
+                    <p id="active-vehicle-odometer" class="text-[10px] text-slate-300/80 mt-1">—</p>
                 </div>
             </div>
 
             <div class="flex flex-col gap-4">
-                <div class="glass-card p-4 flex flex-col justify-center flex-1 relative overflow-hidden">
-                    <div class="absolute -right-4 -bottom-4 opacity-5">
-                        <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        </svg>
+                <!-- VSI ring + label -->
+                <div class="glass-card p-4 flex items-center gap-3 flex-1 relative overflow-hidden">
+                    <div class="w-14 h-14 rounded-full flex items-center justify-center relative shrink-0" id="vsi-ring" style="background:conic-gradient(#10b981 240deg, #1e293b 240deg)">
+                        <div class="w-11 h-11 rounded-full bg-cardbg flex flex-col items-center justify-center">
+                            <span id="active-vehicle-vsi" class="text-lg font-black text-white leading-none">--</span>
+                        </div>
                     </div>
-                    <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-wide mb-1 relative z-10">VSI
-                        Score</p>
-                    <div class="flex items-baseline gap-1 relative z-10">
-                        <span id="active-vehicle-vsi" class="text-3xl font-black text-white drop-shadow-md">--</span>
-                        <span class="text-xs text-slate-500 font-bold">/100</span>
+                    <div>
+                        <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-wide mb-0.5">VSI Score</p>
+                        <p id="vsi-label" class="text-[10px] font-bold text-emerald-400 uppercase">—</p>
+                        <p class="text-[10px] text-slate-500">Tap below for tips</p>
                     </div>
                 </div>
 
-                <div class="glass-card p-4 flex flex-col justify-center flex-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1"
-                        data-i18n="driver-sconto-telematica">Sconto Telematica</p>
-                    <div class="flex items-baseline gap-1">
-                        <span class="text-xl font-black text-brand-400">-14</span>
-                        <span class="text-sm font-bold text-brand-400">%</span>
-                    </div>
-                </div>
+                <!-- Tips button -->
+                <button onclick="document.getElementById('tips-section').classList.toggle('hidden')" class="glass-card p-4 flex flex-col justify-center flex-1 text-left">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1" data-i18n="driver-driving-tips">Driving Tips</p>
+                    <p class="text-sm font-bold text-brand-400 flex items-center gap-1.5"><span class="text-base">💡</span> Tap for tips</p>
+                </button>
             </div>
+        </div>
+
+        <!-- VSI Tips (expandable) -->
+        <div id="tips-section" class="hidden glass-card p-3 mb-5 border border-brand-500/20 bg-brand-500/5">
+            <p class="text-xs font-bold text-brand-400 mb-2 flex items-center gap-1.5"><span>🎯</span> <span data-i18n="driver-vsi-improvement-tips">VSI Improvement Tips</span></p>
+            <div id="vsi-tips"></div>
+        </div>
+
+        <!-- DTC Alerts (auto-shown when telemetry reports active DTCs) -->
+        <div id="dtc-section" class="hidden glass-card p-3 mb-5 border border-amber-500/20 bg-amber-500/5">
+            <p class="text-xs font-bold text-amber-400 mb-2 flex items-center gap-1.5"><span>⚠️</span> <span data-i18n="driver-dtc-header">Diagnostic Trouble Codes</span></p>
+            <div id="dtc-list"></div>
         </div>
 
         <div class="mb-6">
             <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1"
                 data-i18n="driver-stato-componenti">Stato Componenti</h3>
-            <div id="component-health-container">
-            </div>
+            <div id="component-health-container"></div>
         </div>
     </div>
 
@@ -227,8 +246,7 @@
     <div id="view-profile" class="app-view flex-col h-full overflow-y-auto px-5 pb-8 pt-4 mx-auto max-w-lg w-full">
         <header class="flex items-center justify-between mb-6 shrink-0">
             <h1 class="text-[17px] font-semibold tracking-wide text-white" data-i18n="driver-nav-gestione-header">
-                Gestione
-                Veicolo</h1>
+                Profilo</h1>
         </header>
         <div id="profile-content-container" class="flex flex-col">
         </div>
@@ -276,6 +294,28 @@
         </div>
     </div>
 
+    <!-- ═══════════════ SOS VIEW ═══════════════ -->
+    <div id="view-sos" class="app-view flex-col h-full overflow-y-auto hide-scrollbar px-5 pb-8 pt-4 mx-auto max-w-lg w-full bg-darkbg">
+        <header class="flex items-center justify-between mb-4 shrink-0">
+            <button onclick="window.switchView('view-home')" class="text-white p-2 -ml-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h1 class="text-sm font-bold text-rose-400 flex items-center gap-2"><span>🚨</span> <span data-i18n="driver-emergency-response">Emergency Response</span></h1>
+            <div class="w-5"></div>
+        </header>
+        <div class="glass-card p-3 mb-3 border border-rose-500/30 bg-rose-500/5">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+                <span class="text-xs font-bold text-rose-400" id="sos-status" data-i18n="driver-sos-connecting">Connecting to CycleSync Emergency AI…</span>
+            </div>
+        </div>
+        <div id="sos-output" class="glass-card p-4 text-sm text-slate-300 leading-relaxed min-h-[300px] overflow-y-auto border border-rose-500/10 prose prose-invert prose-headings:text-white prose-strong:text-brand-400"></div>
+        <div class="flex gap-2 mt-4">
+            <a href="tel:112" class="flex-1 bg-rose-600 text-white font-bold py-3 rounded-xl text-center text-sm flex items-center justify-center gap-1.5"><span>📞</span> <span data-i18n="driver-call-112">Call 112</span></a>
+            <button onclick="window.switchView('view-home')" class="flex-1 bg-slate-800 border border-white/10 text-white font-semibold py-3 rounded-xl text-sm" data-i18n="driver-close">Close</button>
+        </div>
+    </div>
+
     <nav
         class="fixed bottom-0 w-full max-w-lg mx-auto right-0 left-0 h-[80px] bg-[#0a111a]/90 backdrop-blur-xl border-t border-white/5 flex justify-around items-center px-2 pb-4 pt-2 z-50 rounded-t-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         <button onclick="window.switchView('view-home')" id="nav-home"
@@ -302,7 +342,7 @@
                     d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
                 </path>
             </svg>
-            <span class="text-[10px] font-medium" data-i18n="driver-nav-gestione">Gestione</span>
+            <span class="text-[10px] font-medium" data-i18n="driver-nav-gestione">Profilo</span>
         </button>
 
         <button onclick="window.switchView('view-alert')" id="nav-alert"
@@ -319,9 +359,9 @@
     </nav>
 
     <script type="module">
-        import { renderComponentGrid } from '/static/js/driver/home_view.js?v=5';
-        import { renderAlertsGrid } from '/static/js/driver/alerts_view.js?v=5';
-        import { renderProfileView } from '/static/js/driver/profile_view.js?v=1';
+        import { renderComponentGrid, renderVsiRing, renderVsiTips, renderDtcAlerts } from '/static/js/driver/home_view.js?v=6';
+        import { renderAlertsGrid } from '/static/js/driver/alerts_view.js?v=6';
+        import { renderProfileView } from '/static/js/driver/profile_view.js?v=2';
 
         const DEMO_DRIVER_ID = 1;
         // compNames now handled by i18n in the render modules
@@ -336,6 +376,8 @@
                 if (data.error) { document.getElementById('driver-greeting').innerText = "Errore Database"; return; }
 
                 window._driverName = data.display_name;
+                window._driverProfile = { display_name: data.display_name, email: data.email, phone: data.phone };
+                window._driverVehicles = data.vehicles || [];
                 const lang = localStorage.getItem('veritwin_lang') || 'it';
                 const hello = (window.translations[lang] && window.translations[lang]['driver-hello']) || `Ciao, ${data.display_name}`;
                 document.getElementById('driver-greeting').innerText = hello.replace(/,\s*\w+/, `, ${data.display_name}`);
@@ -391,11 +433,18 @@
             try {
                 const response = await fetch(`/api/driver/vehicle/${vin}/component-life`);
                 const data = await response.json();
+                if (data.error) return;
                 if (data.components) {
                     _cachedComponents = data.components;
                     renderComponentGrid(data.components);
                     renderAlertsGrid(data.components);
                 }
+                // Update VSI ring + odometer + tips + DTC from same payload.
+                renderVsiRing(data.vsi_score);
+                renderVsiTips(data.vsi_tips);
+                renderDtcAlerts(data.dtc_alerts);
+                const odoEl = document.getElementById('active-vehicle-odometer');
+                if (odoEl && data.odometer_km != null) odoEl.textContent = (data.odometer_km).toLocaleString() + ' km';
             } catch (err) { console.error("Pipeline Error:", err); }
         }
 
@@ -528,9 +577,10 @@
                 btn.classList.add('text-slate-500');
             });
 
-            // --- UPDATED ROUTER MAP FOR 4 TABS ---
+            // Bottom-nav highlight stays on Home while SOS is open.
             const navMap = {
                 'view-home': 'nav-home',
+                'view-sos':  'nav-home',
                 'view-map': 'nav-map',
                 'view-profile': 'nav-profile',
                 'view-alert': 'nav-alert'
@@ -558,8 +608,39 @@
             }
         };
 
-        window.triggerSOS = function () {
-            alert("AI SOS Streaming interface initializing...");
+        window.triggerSOS = async function () {
+            const activeVin = window._activeVehicleCache?.vin;
+            if (!activeVin) { window.showToast('Nessun veicolo attivo'); return; }
+            window.switchView('view-sos');
+
+            const output = document.getElementById('sos-output');
+            const statusEl = document.getElementById('sos-status');
+            if (!output) return;
+            output.innerHTML = '<div class="flex items-center justify-center h-32"><div class="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div></div>';
+            if (statusEl) statusEl.textContent = 'Analizzando la telemetria del veicolo…';
+
+            try {
+                const lang = localStorage.getItem('veritwin_lang') || 'it';
+                const res = await fetch(`/api/ai/sos/${activeVin}?lang=${lang}`);
+                if (!res.ok || !res.body) throw new Error('HTTP ' + res.status);
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                let full = '';
+                output.innerHTML = '<div id="sos-content"></div>';
+                const cd = document.getElementById('sos-content');
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    full += decoder.decode(value, { stream: true });
+                    if (cd) cd.innerHTML = (typeof marked !== 'undefined') ? marked.parse(full) : full;
+                    output.scrollTop = output.scrollHeight;
+                }
+                if (statusEl) statusEl.textContent = lang === 'it' ? 'Analisi completata — aiuto inviato' : 'Analysis complete — Help dispatched';
+            } catch (e) {
+                console.error(e);
+                output.innerHTML = '<p class="text-rose-400 p-4">Errore di connessione. Chiama il 112.</p>';
+                if (statusEl) statusEl.textContent = 'Errore';
+            }
         }
 
         // Restore active lang toggle state on load

@@ -1,691 +1,200 @@
 <style>
-    @keyframes scanline {
-        0% {
-            top: 0%;
-            opacity: 0;
-        }
-
-        10% {
-            opacity: 1;
-        }
-
-        90% {
-            opacity: 1;
-        }
-
-        100% {
-            top: 100%;
-            opacity: 0;
-        }
-    }
-
-    .scanner-line {
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: #f43f5e;
-        box-shadow: 0 0 15px #f43f5e, 0 0 30px #f43f5e;
-        animation: scanline 2.5s ease-in-out infinite;
-        z-index: 20;
-    }
-
-    .bounding-box {
-        position: absolute;
-        border: 2px solid #10b981;
-        background: rgba(16, 185, 129, 0.1);
-        box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        z-index: 10;
-        animation: pulse 2s infinite;
-    }
+    @keyframes scanline { 0% { top:0%; opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { top:100%; opacity:0; } }
+    .scanner-line { position:absolute; left:0; width:100%; height:3px; background:#f43f5e; box-shadow:0 0 15px #f43f5e,0 0 30px #f43f5e; animation:scanline 2.5s ease-in-out infinite; z-index:20; }
+    .fraud-gauge { background: conic-gradient(from 220deg, #10b981 0%, #facc15 50%, #f43f5e 100%); }
 </style>
 
 <header class="mb-6 md:mb-8">
     <div class="flex items-center gap-3 mb-1 md:mb-2">
-        <svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-            </path>
-        </svg>
-        <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">
-            <span data-i18n="adj-title">Anti-Fraud Adjuster Portal</span>
-        </h2>
+        <svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight"><span data-i18n="adj-title">Anti-Fraud Adjuster Portal</span></h2>
     </div>
-    <p class="text-sm md:text-base text-slate-400">
-        <span data-i18n="adj-subtitle">Digital Product Passport (DPP) & pre-crash telemetry investigation.</span>
-    </p>
+    <p class="text-sm md:text-base text-slate-400"><span data-i18n="adj-subtitle">Investigation management, telemetry analysis, and fraud detection.</span></p>
 </header>
 
-<div
-    class="glass-panel rounded-xl p-4 md:p-6 border border-white/5 shadow-lg mb-6 md:mb-8 max-w-4xl mx-auto flex flex-col md:flex-row gap-3">
-    <div class="flex-1 relative">
-        <select id="claim-selector"
-            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-rose-500 transition-colors text-sm md:text-base cursor-pointer appearance-none">
-            <option value="AB123CD" data-i18n="adj-opt-fraud">AB 123 CD - CASKO: Driver Negligence (Denial)</option>
-            <option value="EF456GH" data-i18n="adj-opt-good">EF 456 GH - CASKO: Virtuous Driver (Approval)</option>
-            <option value="XY789ZZ" data-i18n="adj-opt-defect">XY 789 ZZ - RCA: Gross Negligence (Rivalsa)</option>
-        </select>
-        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-        </div>
+<!-- ── INVESTIGATION LIST VIEW ────────────────────────────────────────── -->
+<div id="adjuster-list-view">
+    <!-- Status filter pills -->
+    <div class="flex flex-wrap gap-2 mb-4">
+        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-brand-600 text-white border border-brand-500/50" data-status="">All Cases</button>
+        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-rose-500/50 hover:text-rose-400 transition-colors" data-status="open">Open</button>
+        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-amber-500/50 hover:text-amber-400 transition-colors" data-status="under_review">Under Review</button>
+        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors" data-status="resolved">Resolved</button>
     </div>
-    <button
-        class="bg-rose-600 hover:bg-rose-500 text-white px-6 md:px-8 py-3 rounded-lg font-bold transition-colors shadow-[0_0_15px_rgba(225,29,72,0.4)] flex items-center justify-center gap-2 shrink-0">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-        <span data-i18n="adj-search">Search / Fetch Data</span>
+
+    <!-- Investigation cards -->
+    <div id="investigation-list" class="space-y-3">
+        <div class="text-center py-8 text-slate-500">Loading investigations...</div>
+    </div>
+</div>
+
+<!-- ── INVESTIGATION DETAIL VIEW ──────────────────────────────────────── -->
+<div id="adjuster-detail-view" class="hidden">
+    <!-- Back button -->
+    <button id="btn-back-to-list" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        <span>Back to Investigations</span>
     </button>
-</div>
 
-<div id="scenario-AB123CD" class="scenario-container flex flex-col gap-6 fade-in">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="glass-panel rounded-xl p-6 border border-white/5 relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-4 opacity-10"><span class="text-6xl">🚗</span></div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4"><span data-i18n="adj-id">Vehicle
-                    Identity</span></h3>
-            <div class="bg-black/40 border border-slate-700 rounded-lg p-3 text-center mb-4">
-                <span class="text-3xl font-black text-white tracking-[0.2em] font-mono">AB 123 CD</span>
-            </div>
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between items-center bg-slate-800/50 p-2 rounded border border-white/10 mb-2">
-                    <span class="text-slate-400 font-semibold"><span data-i18n="adj-pol-type">Policy Type:</span></span>
-                    <span class="font-bold text-brand-400"><span data-i18n="adj-pol-casko">CASKO
-                            (Comprehensive)</span></span>
+    <!-- Case Header -->
+    <div class="glass-panel rounded-t-xl p-5 md:p-6 border border-white/5 border-b-0 bg-gradient-to-r from-slate-900 via-rose-950/20 to-slate-900">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <span id="detail-case-number" class="text-lg font-bold text-white">—</span>
+                    <span id="detail-status-badge" class="text-xs px-2 py-0.5 rounded-full font-medium">—</span>
+                    <span id="detail-priority-badge" class="text-xs px-2 py-0.5 rounded-full font-medium">—</span>
                 </div>
-                <div class="flex justify-between"><span class="text-slate-400">Model:</span><span
-                        class="font-medium text-white">2021 Audi Q5</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">VIN:</span><span
-                        class="font-medium text-slate-300 font-mono">ZHW89234898234</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Driver:</span><span
-                        class="font-medium text-white">Marco Rossi</span></div>
-                <div class="flex justify-between items-center border-t border-white/10 pt-3 mt-3">
-                    <span class="text-slate-400">Crash VSI Score:</span>
-                    <span
-                        class="bg-rose-500/20 text-rose-400 border border-rose-500/50 px-2 py-1 rounded font-bold">42/100
-                        (CRITICAL)</span>
+                <div class="flex flex-wrap items-center gap-3">
+                    <span id="detail-vehicle" class="font-mono font-bold text-white text-sm bg-black/40 px-2 py-1 rounded border border-slate-700">—</span>
+                    <span id="detail-model" class="text-slate-400 text-sm">—</span>
+                    <span id="detail-date" class="text-slate-500 text-xs">—</span>
                 </div>
             </div>
-        </div>
-
-        <div class="glass-panel rounded-xl p-6 border border-white/5 lg:col-span-2">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6"><span
-                    data-i18n="adj-state">Pre-Crash Telemetry State</span></h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 h-full">
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-amber-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🛑</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-brakes">Brake Assembly</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-amber-500 mb-1">65%</div>
-                        <p class="text-xs text-amber-400 font-semibold uppercase"><span data-i18n="adj-warn">Warning
-                                Level</span></p>
-                    </div>
+            <div class="flex items-center gap-6">
+                <!-- Fraud Risk Gauge -->
+                <div class="text-center">
+                    <div id="detail-fraud-score" class="text-3xl font-black">—</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wider">Fraud Risk</div>
                 </div>
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-rose-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🛞</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-tires">Tire Tread</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-rose-500 mb-1">88%</div>
-                        <p class="text-xs text-rose-400 font-semibold uppercase"><span data-i18n="adj-critical">Critical
-                                Wear</span></p>
-                    </div>
+                <div class="text-center">
+                    <div id="detail-speed" class="text-2xl font-bold text-white">—</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wider">Impact Speed</div>
                 </div>
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-emerald-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🔋</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-batt">EV Battery</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-emerald-500 mb-1">92%</div>
-                        <p class="text-xs text-emerald-400 font-semibold uppercase"><span
-                                data-i18n="adj-ok">Healthy</span></p>
-                    </div>
+                <div class="text-center">
+                    <div id="detail-gforce" class="text-2xl font-bold text-white">—</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wider">Max G-Force</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
-        <div class="glass-panel rounded-xl p-6 border border-white/5">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6"><span
-                    data-i18n="adj-audit">Immutable Audit Trail</span></h3>
-            <div class="relative border-l-2 border-slate-700 ml-3 space-y-6">
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-3 h-3 bg-slate-400 rounded-full -left-[7px] top-1.5 border-2 border-[#0f172a]">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Oct 12, 2023 - 14:32</p>
-                    <p class="text-sm font-medium text-white"><span data-i18n="adj-event-1">VSI detects abnormal tire
-                            degradation.</span></p>
-                </div>
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-3 h-3 bg-brand-500 rounded-full -left-[7px] top-1.5 border-2 border-[#0f172a] shadow-[0_0_10px_rgba(0,229,255,0.8)]">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Oct 13, 2023 - 09:00</p>
-                    <p class="text-sm font-medium text-white"><span data-i18n="adj-event-2">Push notification sent to
-                            Driver App.</span></p>
-                </div>
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-3 h-3 bg-amber-500 rounded-full -left-[7px] top-1.5 border-2 border-[#0f172a]">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Oct 25, 2023 - 18:15</p>
-                    <p class="text-sm font-medium text-white"><span data-i18n="adj-event-3">Driver manually dismissed
-                            maintenance alert.</span></p>
-                </div>
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-4 h-4 bg-rose-500 rounded-full -left-[9px] top-1 border-2 border-[#0f172a] shadow-[0_0_10px_rgba(244,63,94,0.8)] animate-pulse">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Nov 02, 2023 - 08:45</p>
-                    <p class="text-sm font-bold text-rose-400"><span data-i18n="adj-event-4">Collision reported.
-                            Telemetry locked.</span></p>
-                </div>
-            </div>
-        </div>
-
-        <div
-            class="glass-panel rounded-xl p-6 border border-rose-500/50 shadow-[0_0_30px_rgba(225,29,72,0.1)] bg-gradient-to-br from-slate-900 to-rose-950/20 flex flex-col relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 opacity-5"><svg class="w-48 h-48 text-rose-500" fill="currentColor"
-                    viewBox="0 0 24 24">
-                    <path
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                    </path>
-                </svg></div>
-            <div class="flex items-center gap-3 mb-4 border-b border-rose-500/20 pb-4"><span class="text-2xl">🤖</span>
-                <h3 class="text-sm font-bold text-rose-400 uppercase tracking-widest"><span
-                        data-i18n="adj-ai-title">VeriTwin AI Adjudicator</span></h3>
-            </div>
-            <p class="text-slate-300 leading-relaxed text-sm md:text-base italic flex-1 relative z-10">"<span
-                    data-i18n="adj-ai-desc">CASKO claim denial recommended. Telemetry proves the vehicle was operating
-                    with tires below the 3mm contractual limit. The driver explicitly dismissed alerts prior to the
-                    crash. Under CASKO terms, driver negligence voids own-damage coverage.</span>"</p>
-            <div class="mt-6 flex gap-3 relative z-10">
-                <button
-                    class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded transition-colors text-sm"><span
-                        data-i18n="adj-btn-deny">Deny CASKO Claim</span></button>
-                <button
-                    class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded transition-colors text-sm border border-slate-600"><span
-                        data-i18n="adj-btn-investigate">Investigate Further</span></button>
-            </div>
-            <button onclick="document.getElementById('cycleVisionModal-AB123CD').classList.remove('hidden')"
-                class="mt-3 w-full bg-transparent border border-rose-500/50 hover:bg-rose-500/20 text-rose-400 font-bold py-2.5 rounded transition-colors text-sm flex items-center justify-center gap-2 relative z-10">
-                <span data-i18n="adj-btn-vision">👁️ Run VeriVision CNN Triage</span>
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="scenario-EF456GH" class="scenario-container hidden flex flex-col gap-6">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="glass-panel rounded-xl p-6 border border-white/5 relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-4 opacity-10"><span class="text-6xl">🚗</span></div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4"><span data-i18n="adj-id">Vehicle
-                    Identity</span></h3>
-            <div class="bg-black/40 border border-slate-700 rounded-lg p-3 text-center mb-4">
-                <span class="text-3xl font-black text-white tracking-[0.2em] font-mono">EF 456 GH</span>
-            </div>
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between items-center bg-slate-800/50 p-2 rounded border border-white/10 mb-2">
-                    <span class="text-slate-400 font-semibold"><span data-i18n="adj-pol-type">Policy Type:</span></span>
-                    <span class="font-bold text-brand-400"><span data-i18n="adj-pol-casko">CASKO
-                            (Comprehensive)</span></span>
-                </div>
-                <div class="flex justify-between"><span class="text-slate-400">Model:</span><span
-                        class="font-medium text-white">2022 Volvo XC40</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">VIN:</span><span
-                        class="font-medium text-slate-300 font-mono">YV1XZ9234898234</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Driver:</span><span
-                        class="font-medium text-white">Giulia Bianchi</span></div>
-                <div class="flex justify-between items-center border-t border-white/10 pt-3 mt-3">
-                    <span class="text-slate-400">Crash VSI Score:</span>
-                    <span
-                        class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-2 py-1 rounded font-bold"><span
-                            data-i18n="adj-good-score">85/100 (HEALTHY)</span></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="glass-panel rounded-xl p-6 border border-white/5 lg:col-span-2">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6"><span
-                    data-i18n="adj-state">Pre-Crash Telemetry State</span></h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 h-full">
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-emerald-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🛑</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-brakes">Brake Assembly</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-emerald-500 mb-1">30%</div>
-                        <p class="text-xs text-emerald-400 font-semibold uppercase"><span
-                                data-i18n="adj-ok">Healthy</span></p>
-                    </div>
-                </div>
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-emerald-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🛞</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-tires">Tire Tread</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-emerald-500 mb-1">40%</div>
-                        <p class="text-xs text-emerald-400 font-semibold uppercase"><span
-                                data-i18n="adj-ok">Healthy</span></p>
-                    </div>
-                </div>
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-emerald-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🔋</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-batt">EV Battery</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-emerald-500 mb-1">98%</div>
-                        <p class="text-xs text-emerald-400 font-semibold uppercase"><span
-                                data-i18n="adj-ok">Healthy</span></p>
-                    </div>
-                </div>
-            </div>
+    <!-- Detail Tabs -->
+    <div class="glass-panel border border-white/5 border-b-0">
+        <div class="flex border-b border-white/5 overflow-x-auto">
+            <button class="detail-tab px-5 py-3 text-sm font-medium text-white border-b-2 border-brand-500 whitespace-nowrap" data-tab="summary">Summary</button>
+            <button class="detail-tab px-5 py-3 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap" data-tab="telemetry">Telemetry</button>
+            <button class="detail-tab px-5 py-3 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap" data-tab="photos">Photos</button>
+            <button class="detail-tab px-5 py-3 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap" data-tab="ai-analysis">AI Analysis</button>
+            <button class="detail-tab px-5 py-3 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap" data-tab="components">Components</button>
+            <button class="detail-tab px-5 py-3 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap" data-tab="verdict">Verdict</button>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
-        <div class="glass-panel rounded-xl p-6 border border-white/5">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6"><span
-                    data-i18n="adj-audit">Immutable Audit Trail</span></h3>
-            <div class="relative border-l-2 border-slate-700 ml-3 space-y-6">
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-3 h-3 bg-slate-400 rounded-full -left-[7px] top-1.5 border-2 border-[#0f172a]">
+    <!-- Tab Content Panels -->
+    <div class="glass-panel rounded-b-xl p-5 md:p-6 border border-white/5">
+        <!-- SUMMARY TAB -->
+        <div id="tab-summary" class="detail-tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Incident Details</h4>
+                    <div class="space-y-3">
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5">
+                            <p class="text-xs text-slate-400 mb-1">Type</p>
+                            <p id="detail-incident-type" class="text-white font-medium">—</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5">
+                            <p class="text-xs text-slate-400 mb-1">Location</p>
+                            <p id="detail-location" class="text-white font-medium">—</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5">
+                            <p class="text-xs text-slate-400 mb-1">Description</p>
+                            <p id="detail-description" class="text-slate-300 text-sm leading-relaxed">—</p>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Nov 01, 2023 - 10:00</p>
-                    <p class="text-sm font-medium text-white"><span data-i18n="adj-good-event-1">Routine monthly VSI
-                            diagnostic completed.</span></p>
                 </div>
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-3 h-3 bg-emerald-500 rounded-full -left-[7px] top-1.5 border-2 border-[#0f172a]">
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Impact Data</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5 text-center">
+                            <p class="text-xs text-slate-400 mb-1">ABS Triggered</p>
+                            <p id="detail-abs" class="text-xl font-bold">—</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5 text-center">
+                            <p class="text-xs text-slate-400 mb-1">Airbag Deployed</p>
+                            <p id="detail-airbag" class="text-xl font-bold">—</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5 text-center">
+                            <p class="text-xs text-slate-400 mb-1">Lateral G-Force</p>
+                            <p id="detail-glateral" class="text-xl font-bold text-white">—</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5 text-center">
+                            <p class="text-xs text-slate-400 mb-1">Coolant Temp</p>
+                            <p id="detail-coolant" class="text-xl font-bold">—</p>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Nov 01, 2023 - 10:01</p>
-                    <p class="text-sm font-medium text-white"><span data-i18n="adj-good-event-2">All systems report
-                            nominal operation.</span></p>
-                </div>
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-4 h-4 bg-emerald-500 rounded-full -left-[9px] top-1 border-2 border-[#0f172a] shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Nov 15, 2023 - 14:22</p>
-                    <p class="text-sm font-bold text-emerald-400"><span data-i18n="adj-good-event-3">Collision reported.
-                            Telemetry locked.</span></p>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 mt-5">TPMS at Impact</h4>
+                    <div id="detail-tpms" class="grid grid-cols-4 gap-2"></div>
                 </div>
             </div>
         </div>
 
-        <div
-            class="glass-panel rounded-xl p-6 border border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.1)] bg-gradient-to-br from-slate-900 to-emerald-950/20 flex flex-col relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 opacity-5"><svg class="w-48 h-48 text-emerald-500" fill="currentColor"
-                    viewBox="0 0 24 24">
-                    <path
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                    </path>
-                </svg></div>
-            <div class="flex items-center gap-3 mb-4 border-b border-emerald-500/20 pb-4"><span
-                    class="text-2xl">🤖</span>
-                <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-widest"><span
-                        data-i18n="adj-ai-title">VeriTwin AI Adjudicator</span></h3>
-            </div>
-            <p class="text-slate-300 leading-relaxed text-sm md:text-base italic flex-1 relative z-10">"<span
-                    data-i18n="adj-good-ai">CASKO claim approval recommended. Telemetry confirms safe driving and
-                    excellent vehicle maintenance prior to the incident. No mechanical negligence detected.</span>"</p>
-            <div class="mt-6 flex gap-3 relative z-10">
-                <button
-                    class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded transition-colors text-sm"><span
-                        data-i18n="adj-btn-approve">Approve Claim</span></button>
-                <button
-                    class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded transition-colors text-sm border border-emerald-600"><span
-                        data-i18n="adj-btn-fasttrack">Fast-Track Payout</span></button>
-            </div>
-            <button onclick="document.getElementById('cycleVisionModal-EF456GH').classList.remove('hidden')"
-                class="mt-3 w-full bg-transparent border border-emerald-500/50 hover:bg-emerald-500/20 text-emerald-400 font-bold py-2.5 rounded transition-colors text-sm flex items-center justify-center gap-2 relative z-10">
-                <span data-i18n="adj-btn-vision">👁️ Run VeriVision CNN Triage</span>
-            </button>
+        <!-- TELEMETRY TAB -->
+        <div id="tab-telemetry" class="detail-tab-content hidden">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Vehicle Telemetry at Time of Incident</h4>
+            <div id="detail-telemetry-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
         </div>
-    </div>
-</div>
 
-<div id="scenario-XY789ZZ" class="scenario-container hidden flex flex-col gap-6">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="glass-panel rounded-xl p-6 border border-white/5 relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-4 opacity-10"><span class="text-6xl">🚗</span></div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4"><span data-i18n="adj-id">Vehicle
-                    Identity</span></h3>
-            <div class="bg-black/40 border border-slate-700 rounded-lg p-3 text-center mb-4">
-                <span class="text-3xl font-black text-white tracking-[0.2em] font-mono">XY 789 ZZ</span>
-            </div>
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between items-center bg-slate-800/50 p-2 rounded border border-white/10 mb-2">
-                    <span class="text-slate-400 font-semibold"><span data-i18n="adj-pol-type">Policy Type:</span></span>
-                    <span class="font-bold text-purple-400"><span data-i18n="adj-pol-rca">RCA (Third-Party
-                            Liability)</span></span>
+        <!-- AI ANALYSIS TAB -->
+        <div id="tab-ai-analysis" class="detail-tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">AI Fraud Analysis</h4>
+                    <div id="detail-ai-fraud" class="bg-slate-800/50 rounded-lg p-5 border border-white/5 mb-4">
+                        <p class="text-slate-300 text-sm leading-relaxed italic">AI analysis pending...</p>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">AI Damage Assessment</h4>
+                    <div id="detail-ai-damage" class="bg-slate-800/50 rounded-lg p-5 border border-white/5">
+                        <p class="text-slate-300 text-sm leading-relaxed italic">Damage assessment pending...</p>
+                    </div>
                 </div>
-                <div class="flex justify-between"><span class="text-slate-400">Model:</span><span
-                        class="font-medium text-white">2023 Tesla Model Y</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">VIN:</span><span
-                        class="font-medium text-slate-300 font-mono">5YJYG9234898234</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Driver:</span><span
-                        class="font-medium text-white">Luca Romano</span></div>
-                <div class="flex justify-between items-center border-t border-white/10 pt-3 mt-3">
-                    <span class="text-slate-400">Crash VSI Score:</span>
-                    <span
-                        class="bg-rose-500/20 text-rose-400 border border-rose-500/50 px-2 py-1 rounded font-bold"><span
-                            data-i18n="adj-defect-score">12/100 (CRITICAL)</span></span>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Estimated Repair Cost</h4>
+                    <div class="bg-slate-800/50 rounded-lg p-5 border border-white/5 text-center mb-4">
+                        <div id="detail-repair-cost" class="text-4xl font-black text-brand-400">—</div>
+                        <div class="text-xs text-slate-400 mt-1">AI Estimated Total</div>
+                    </div>
+                    <button id="btn-run-ai-analysis" class="w-full bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white px-6 py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 shadow-lg">
+                        <span>Run AI Fraud & Damage Analysis</span>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="glass-panel rounded-xl p-6 border border-white/5 lg:col-span-2">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6"><span
-                    data-i18n="adj-state">Pre-Crash Telemetry State</span></h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 h-full">
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-rose-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🛑</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-brakes">Brake Assembly</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-rose-500 mb-1 animate-pulse">15%</div>
-                        <p class="text-xs text-rose-400 font-semibold uppercase"><span data-i18n="adj-critical">Critical
-                                Wear</span></p>
-                    </div>
-                </div>
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-amber-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🛞</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-tires">Tire Tread</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-amber-500 mb-1">55%</div>
-                        <p class="text-xs text-amber-400 font-semibold uppercase"><span data-i18n="adj-warn">Warning
-                                Level</span></p>
-                    </div>
-                </div>
-                <div class="bg-slate-800/50 rounded-lg p-4 border border-emerald-500/30 flex flex-col justify-between">
-                    <div><span class="text-2xl mb-2 block">🔋</span>
-                        <h4 class="font-bold text-white"><span data-i18n="adj-batt">EV Battery</span></h4>
-                    </div>
-                    <div class="mt-4">
-                        <div class="text-3xl font-black text-emerald-500 mb-1">82%</div>
-                        <p class="text-xs text-emerald-400 font-semibold uppercase"><span
-                                data-i18n="adj-defect-batt">Healthy</span></p>
-                    </div>
-                </div>
+        <!-- PHOTOS TAB -->
+        <div id="tab-photos" class="detail-tab-content hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Damage Documentation</h4>
+                <label class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors cursor-pointer flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Upload Photo
+                    <input type="file" id="photo-upload-input" accept="image/*" class="hidden" multiple>
+                </label>
             </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
-        <div class="glass-panel rounded-xl p-6 border border-white/5">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6"><span
-                    data-i18n="adj-audit">Immutable Audit Trail</span></h3>
-            <div class="relative border-l-2 border-slate-700 ml-3 space-y-6">
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-3 h-3 bg-rose-500 rounded-full -left-[7px] top-1.5 border-2 border-[#0f172a]">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Dec 10, 2023 - 08:00</p>
-                    <p class="text-sm font-medium text-rose-400"><span data-i18n="adj-defect-event-1">Critical brake
-                            failure imminent. VSI score drops below 20.</span></p>
-                </div>
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-3 h-3 bg-brand-500 rounded-full -left-[7px] top-1.5 border-2 border-[#0f172a] shadow-[0_0_10px_rgba(0,229,255,0.8)]">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Dec 12, 2023 - 16:40</p>
-                    <p class="text-sm font-medium text-white"><span data-i18n="adj-defect-event-2">Final automated
-                            warning sent to driver.</span></p>
-                </div>
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-3 h-3 bg-amber-500 rounded-full -left-[7px] top-1.5 border-2 border-[#0f172a]">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Dec 15, 2023 - 16:41</p>
-                    <p class="text-sm font-medium text-white"><span data-i18n="adj-defect-event-3">Driver ignores
-                            warning. Continues driving.</span></p>
-                </div>
-                <div class="relative pl-6">
-                    <div
-                        class="absolute w-4 h-4 bg-rose-500 rounded-full -left-[9px] top-1 border-2 border-[#0f172a] shadow-[0_0_10px_rgba(244,63,94,0.8)] animate-pulse">
-                    </div>
-                    <p class="text-xs text-slate-500 mb-0.5">Dec 22, 2023 - 16:42</p>
-                    <p class="text-sm font-bold text-white"><span data-i18n="adj-defect-event-4">Severe rear-end
-                            collision reported. Telemetry locked.</span></p>
-                </div>
+            <div id="detail-photos-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="text-slate-500 text-sm col-span-3">Loading photos...</div>
             </div>
         </div>
 
-        <div
-            class="glass-panel rounded-xl p-6 border border-purple-500/50 shadow-[0_0_30px_rgba(168,85,247,0.1)] bg-gradient-to-br from-slate-900 to-purple-950/20 flex flex-col relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 opacity-5"><svg class="w-48 h-48 text-purple-500" fill="currentColor"
-                    viewBox="0 0 24 24">
-                    <path
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                    </path>
-                </svg></div>
-            <div class="flex items-center gap-3 mb-4 border-b border-purple-500/20 pb-4"><span
-                    class="text-2xl">🤖</span>
-                <h3 class="text-sm font-bold text-purple-400 uppercase tracking-widest"><span
-                        data-i18n="adj-ai-title">VeriTwin AI Adjudicator</span></h3>
-            </div>
-            <p class="text-slate-300 leading-relaxed text-sm md:text-base italic flex-1 relative z-10">"<span
-                    data-i18n="adj-defect-ai">Third-party payout authorized under mandatory RCA law. However, telemetry
-                    proves gross negligence (15% brake capacity ignored for 2 weeks). Initiate 'Rivalsa' (Subrogation)
-                    to recover full claim costs from the policyholder.</span>"</p>
-            <div class="mt-6 flex gap-3 relative z-10">
-                <button
-                    class="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded transition-colors text-sm"><span
-                        data-i18n="adj-btn-subrogate">Initiate Rivalsa against Driver</span></button>
-            </div>
-            <button onclick="document.getElementById('cycleVisionModal-XY789ZZ').classList.remove('hidden')"
-                class="mt-3 w-full bg-transparent border border-purple-500/50 hover:bg-purple-500/20 text-purple-400 font-bold py-2.5 rounded transition-colors text-sm flex items-center justify-center gap-2 relative z-10">
-                <span data-i18n="adj-btn-vision">👁️ Run VeriVision CNN Triage</span>
-            </button>
+        <!-- COMPONENTS TAB -->
+        <div id="tab-components" class="detail-tab-content hidden">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Vehicle Components at Time of Incident</h4>
+            <div id="detail-components-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
         </div>
-    </div>
-</div>
 
-<div id="cycleVisionModal-AB123CD"
-    class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md fade-in">
-    <div
-        class="bg-slate-900 border border-rose-500/50 rounded-2xl w-full max-w-5xl max-h-[90vh] shadow-[0_0_50px_rgba(225,29,72,0.2)] overflow-hidden flex flex-col md:flex-row">
-        <div
-            class="w-full md:w-1/2 relative bg-[#0a0a0a] min-h-[30vh] md:min-h-0 flex items-center justify-center overflow-hidden">
-            <img src="/static/img/radiator.jpg" alt="Car Radiator" class="w-full h-full object-cover opacity-80">
-            <div class="absolute inset-0 bg-rose-900/20 mix-blend-overlay"></div>
-            <div class="bounding-box top-[15%] left-[10%] w-[80%] h-[70%] flex items-start justify-start p-2">
-                <span class="bg-emerald-500 text-black text-[10px] font-bold px-2 py-0.5 rounded shadow">RADIATOR:
-                    INTACT (99%)</span>
-            </div>
-            <div class="scanner-line"></div>
-            <div class="absolute inset-0 border border-rose-500/30 m-4 md:m-6 pointer-events-none">
-                <div class="absolute top-0 left-1/2 w-px h-4 bg-rose-500"></div>
-                <div class="absolute bottom-0 left-1/2 w-px h-4 bg-rose-500"></div>
-                <div class="absolute left-0 top-1/2 w-4 h-px bg-rose-500"></div>
-                <div class="absolute right-0 top-1/2 w-4 h-px bg-rose-500"></div>
-            </div>
-        </div>
-        <div
-            class="w-full md:w-1/2 p-6 md:p-8 flex flex-col bg-gradient-to-br from-slate-900 to-rose-950/30 overflow-y-auto">
-            <div class="flex items-center justify-between mb-6 border-b border-white/10 pb-4 shrink-0">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><span class="text-rose-500">👁️</span>
-                    <span data-i18n="cv-title">VeriVision CNN Triage</span>
-                </h2>
-                <button onclick="document.getElementById('cycleVisionModal-AB123CD').classList.add('hidden')"
-                    class="text-slate-400 hover:text-white transition-colors"><svg class="w-6 h-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg></button>
-            </div>
-            <div class="flex flex-col gap-6 flex-1">
-                <div class="glass-panel p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-mech-claim">Mechanic Request:</span></p>
-                    <p class="text-lg font-bold text-rose-400 font-mono"><span data-i18n="cv-mech-val">Front Radiator
-                            Assembly - €14,000</span></p>
+        <!-- VERDICT TAB -->
+        <div id="tab-verdict" class="detail-tab-content hidden">
+            <div class="max-w-2xl mx-auto text-center">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Adjuster Verdict</h4>
+                <div id="detail-verdict-content" class="bg-slate-800/50 rounded-xl p-8 border border-white/5">
+                    <p class="text-slate-400 text-sm">No verdict issued yet. Run AI analysis first, then issue a verdict.</p>
                 </div>
-                <div class="glass-panel p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-ai-analysis">AI Visual Analysis:</span></p>
-                    <p class="text-lg font-bold text-emerald-400"><span data-i18n="cv-ai-val">0% Structural Damage.
-                            Component intact.</span></p>
-                </div>
-                <div class="shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-fraud-risk">Fraud Probability:</span></p>
-                    <p
-                        class="text-4xl font-black text-rose-500 drop-shadow-[0_0_10px_rgba(244,63,94,0.5)] animate-pulse">
-                        <span data-i18n="cv-fraud-val">98% (CRITICAL)</span>
-                    </p>
-                </div>
-                <div class="mt-4 pt-4 border-t border-rose-500/20 shrink-0">
-                    <p class="text-sm text-slate-300 leading-relaxed italic border-l-2 border-rose-500 pl-3"><span
-                            data-i18n="cv-desc">⚠️ FRAUD ALERT...</span></p>
+                <div class="flex justify-center gap-3 mt-6">
+                    <button class="verdict-btn bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="approved">Approve Claim</button>
+                    <button class="verdict-btn bg-amber-600 hover:bg-amber-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="partial">Partial Approval</button>
+                    <button class="verdict-btn bg-rose-600 hover:bg-rose-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="denied">Deny Claim</button>
                 </div>
             </div>
-            <button onclick="document.getElementById('cycleVisionModal-AB123CD').classList.add('hidden')"
-                class="mt-6 w-full shrink-0 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-lg border border-slate-600"><span
-                    data-i18n="cv-close">Close Scan</span></button>
-        </div>
-    </div>
-</div>
-
-<div id="cycleVisionModal-EF456GH"
-    class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md fade-in">
-    <div
-        class="bg-slate-900 border border-emerald-500/50 rounded-2xl w-full max-w-5xl max-h-[90vh] shadow-[0_0_50px_rgba(16,185,129,0.2)] overflow-hidden flex flex-col md:flex-row">
-        <div
-            class="w-full md:w-1/2 relative bg-[#0a0a0a] min-h-[30vh] md:min-h-0 flex items-center justify-center overflow-hidden">
-            <img src="/static/img/bumper.png" alt="Car Bumper" class="w-full h-full object-cover opacity-80">
-            <div class="absolute inset-0 bg-emerald-900/20 mix-blend-overlay"></div>
-            <div
-                class="bounding-box border-rose-500 bg-rose-500/10 shadow-[0_0_10px_rgba(244,63,94,0.5)] top-[30%] left-[20%] w-[60%] h-[40%] flex items-start justify-start p-2">
-                <span class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">IMPACT
-                    DETECTED</span>
-            </div>
-            <div class="scanner-line bg-emerald-400 shadow-[0_0_15px_#34d399]"></div>
-            <div class="absolute inset-0 border border-emerald-500/30 m-4 md:m-6 pointer-events-none">
-                <div class="absolute top-0 left-1/2 w-px h-4 bg-emerald-500"></div>
-                <div class="absolute bottom-0 left-1/2 w-px h-4 bg-emerald-500"></div>
-                <div class="absolute left-0 top-1/2 w-4 h-px bg-emerald-500"></div>
-                <div class="absolute right-0 top-1/2 w-4 h-px bg-emerald-500"></div>
-            </div>
-        </div>
-        <div
-            class="w-full md:w-1/2 p-6 md:p-8 flex flex-col bg-gradient-to-br from-slate-900 to-emerald-950/30 overflow-y-auto">
-            <div class="flex items-center justify-between mb-6 border-b border-white/10 pb-4 shrink-0">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><span
-                        class="text-emerald-500">👁️</span> <span data-i18n="cv-title">VeriVision CNN Triage</span>
-                </h2>
-                <button onclick="document.getElementById('cycleVisionModal-EF456GH').classList.add('hidden')"
-                    class="text-slate-400 hover:text-white transition-colors"><svg class="w-6 h-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg></button>
-            </div>
-            <div class="flex flex-col gap-6 flex-1">
-                <div class="glass-panel p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-mech-claim">Mechanic Request:</span></p>
-                    <p class="text-lg font-bold text-white font-mono"><span data-i18n="cv-good-mech-claim">Front Bumper
-                            Replacement - €1,200</span></p>
-                </div>
-                <div class="glass-panel p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-ai-analysis">AI Visual Analysis:</span></p>
-                    <p class="text-lg font-bold text-emerald-400"><span data-i18n="cv-good-ai-val">Damage profile
-                            matches telemetry impact data.</span></p>
-                </div>
-                <div class="shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-fraud-risk">Fraud Probability:</span></p>
-                    <p class="text-4xl font-black text-emerald-500 drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]"><span
-                            data-i18n="cv-good-fraud-val">4% (SAFE)</span></p>
-                </div>
-                <div class="mt-4 pt-4 border-t border-emerald-500/20 shrink-0">
-                    <p class="text-sm text-slate-300 leading-relaxed italic border-l-2 border-emerald-500 pl-3"><span
-                            data-i18n="cv-good-desc">✅ VERIFIED: Visual evidence matches...</span></p>
-                </div>
-            </div>
-            <button onclick="document.getElementById('cycleVisionModal-EF456GH').classList.add('hidden')"
-                class="mt-6 w-full shrink-0 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-lg border border-slate-600"><span
-                    data-i18n="cv-close">Close Scan</span></button>
-        </div>
-    </div>
-</div>
-
-<div id="cycleVisionModal-XY789ZZ"
-    class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md fade-in">
-    <div
-        class="bg-slate-900 border border-purple-500/50 rounded-2xl w-full max-w-5xl max-h-[90vh] shadow-[0_0_50px_rgba(168,85,247,0.2)] overflow-hidden flex flex-col md:flex-row">
-        <div
-            class="w-full md:w-1/2 relative bg-[#0a0a0a] min-h-[30vh] md:min-h-0 flex items-center justify-center overflow-hidden">
-            <img src="/static/img/brakes.jpg" alt="Worn Brakes"
-                class="w-full h-full object-cover opacity-80 grayscale-[30%]">
-            <div class="absolute inset-0 bg-purple-900/20 mix-blend-overlay"></div>
-            <div
-                class="bounding-box border-rose-500 bg-rose-500/10 shadow-[0_0_10px_rgba(244,63,94,0.5)] top-[20%] left-[25%] w-[50%] h-[60%] flex items-start justify-start p-2 rounded-full">
-                <span
-                    class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">CRITICAL
-                    WEAR: 0% PAD</span>
-            </div>
-            <div class="scanner-line bg-purple-400 shadow-[0_0_15px_#c084fc]"></div>
-            <div class="absolute inset-0 border border-purple-500/30 m-4 md:m-6 pointer-events-none">
-                <div class="absolute top-0 left-1/2 w-px h-4 bg-purple-500"></div>
-                <div class="absolute bottom-0 left-1/2 w-px h-4 bg-purple-500"></div>
-                <div class="absolute left-0 top-1/2 w-4 h-px bg-purple-500"></div>
-                <div class="absolute right-0 top-1/2 w-4 h-px bg-purple-500"></div>
-            </div>
-        </div>
-        <div
-            class="w-full md:w-1/2 p-6 md:p-8 flex flex-col bg-gradient-to-br from-slate-900 to-purple-950/30 overflow-y-auto">
-            <div class="flex items-center justify-between mb-6 border-b border-white/10 pb-4 shrink-0">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><span
-                        class="text-purple-500">👁️</span> <span data-i18n="cv-title">VeriVision CNN Triage</span></h2>
-                <button onclick="document.getElementById('cycleVisionModal-XY789ZZ').classList.add('hidden')"
-                    class="text-slate-400 hover:text-white transition-colors"><svg class="w-6 h-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg></button>
-            </div>
-            <div class="flex flex-col gap-6 flex-1">
-                <div class="glass-panel p-4 rounded-xl border border-purple-500/20 bg-purple-500/5 shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-mech-claim">Mechanic Request:</span></p>
-                    <p class="text-lg font-bold text-purple-400 font-mono"><span data-i18n="cv-defect-mech-claim">Brake
-                            Failure Claim - €8,500 (Third-Party)</span></p>
-                </div>
-                <div class="glass-panel p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-ai-analysis">AI Visual Analysis:</span></p>
-                    <p class="text-lg font-bold text-rose-400"><span data-i18n="cv-defect-ai-val">0% Friction material.
-                            Severe rotor scoring.</span></p>
-                </div>
-                <div class="shrink-0">
-                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1"><span
-                            data-i18n="cv-fraud-risk">Fraud Probability:</span></p>
-                    <p
-                        class="text-4xl font-black text-rose-500 drop-shadow-[0_0_10px_rgba(244,63,94,0.5)] animate-pulse">
-                        <span data-i18n="cv-defect-fraud-val">95% (GROSS NEGLIGENCE)</span>
-                    </p>
-                </div>
-                <div class="mt-4 pt-4 border-t border-purple-500/20 shrink-0">
-                    <p class="text-sm text-slate-300 leading-relaxed italic border-l-2 border-purple-500 pl-3"><span
-                            data-i18n="cv-defect-desc">⚠️ RIVALSA ALERT...</span></p>
-                </div>
-            </div>
-            <button onclick="document.getElementById('cycleVisionModal-XY789ZZ').classList.add('hidden')"
-                class="mt-6 w-full shrink-0 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-lg border border-slate-600"><span
-                    data-i18n="cv-close">Close Scan</span></button>
         </div>
     </div>
 </div>

@@ -13,16 +13,55 @@ sys.path.insert(0, cycle_sync_app_dir)
 sys.path.insert(0, current_dir)
 
 from routers.insurer_api import router as insurer_router
-from routers.ai_api import router as ai_router 
+from routers.ai_api import router as ai_router
 # 1. ADD THIS IMPORT:
-from routers.vehicle_api import router as vehicle_router 
+from routers.vehicle_api import router as vehicle_router
+from models.data_manager.investigation_seeder import migrate_and_seed as _migrate_investigations
+from models.data_manager.esg_seeder import migrate_and_seed as _migrate_esg
+from models.data_manager.telemetry_seeder import migrate as _migrate_telemetry
+from models.data_manager.fleet_demo_seeder import migrate_and_seed as _migrate_fleet_demo
+from models.data_manager.incident_telemetry_seeder import migrate_and_seed as _migrate_incident_telemetry
 
 app = FastAPI()
+
+@app.on_event("startup")
+def _bootstrap_adjuster_schema():
+    """Ensure the Adjuster portal's columns + demo cases exist in cyclesync.db."""
+    _migrate_investigations()
+
+@app.on_event("startup")
+def _bootstrap_telemetry_schema():
+    """Extend vehicle_telemetry with blackbox + OBD-II + EV raw-signal columns."""
+    _migrate_telemetry()
+
+@app.on_event("startup")
+def _bootstrap_fleet_demo():
+    """Cull the fleet to 10 hand-tuned vehicles + populate realistic telemetry.
+
+    Runs AFTER the telemetry / investigation seeders so all columns and FK
+    targets exist. Idempotent via the `fleet_demo_v1` marker — drop the row
+    from `_seeder_state` to force a re-run.
+    """
+    _migrate_fleet_demo()
+
+@app.on_event("startup")
+def _bootstrap_esg_schema():
+    """Ensure the ESG inventory columns + telemetry-driven component seed.
+
+    Runs AFTER fleet_demo so the seeder operates on the 10 surviving vehicles
+    (and their live telemetry counters) rather than the 3 000-vehicle raw set.
+    """
+    _migrate_esg()
+
+@app.on_event("startup")
+def _bootstrap_incident_telemetry():
+    """Seed ±5 min telemetry samples around each investigation's impact moment."""
+    _migrate_incident_telemetry()
 
 app.include_router(insurer_router)
 app.include_router(ai_router)
 # 2. ADD THIS INCLUSION:
-app.include_router(vehicle_router) 
+app.include_router(vehicle_router)
 
 static_dir = os.path.join(current_dir, "static")
 os.makedirs(static_dir, exist_ok=True)

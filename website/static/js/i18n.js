@@ -342,8 +342,8 @@ window.translations = {
         "driver-tagliando": "Next Service",
         "driver-maint-plan": "Based on official maintenance plan",
         "driver-send-request": "Send Request",
-        "driver-nav-gestione": "Manage",
-        "driver-nav-gestione-header": "Vehicle Management",
+        "driver-nav-gestione": "Profile",
+        "driver-nav-gestione-header": "Profile",
         "driver-active-masc": "Active",
         "driver-expiry-date": "May 12, 2027"
     },
@@ -686,8 +686,8 @@ window.translations = {
         "driver-tagliando": "Prossimo Tagliando",
         "driver-maint-plan": "Basato sul piano di manutenzione ufficiale",
         "driver-send-request": "Invia Richiesta",
-        "driver-nav-gestione": "Gestione",
-        "driver-nav-gestione-header": "Gestione Veicolo",
+        "driver-nav-gestione": "Profilo",
+        "driver-nav-gestione-header": "Profilo",
         "driver-active-masc": "Attivo",
         "driver-expiry-date": "12 Maggio 2027"
     }
