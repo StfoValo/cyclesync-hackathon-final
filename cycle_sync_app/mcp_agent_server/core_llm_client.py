@@ -23,19 +23,18 @@ class CoreLLMClient:
         self.cache_file_path = os.path.join(os.path.dirname(__file__), "fallback_responses.json")
 
     def stream_inference(self, system_instruction: str, user_prompt: str, region: str = "default", lang: str = "en"):
-        # --- FIX 1: Enforce the language instruction directly on the LLM System Prompt ---
         language_command = "Italian" if lang == "it" else "English"
         system_instruction += f"\n\nCRITICAL INSTRUCTION: You MUST generate your entire response in {language_command}."
         
-        # --- FIX 2: Make the Cache key language-aware (e.g., Abruzzo_it) ---
+        # The key becomes "tire_RR_it" or "brake_pad_rear_en"
         cache_key = f"{region}_{lang}"
         
         full_prompt = f"SYSTEM INSTRUCTION:\n{system_instruction}\n\nUSER PAYLOAD:\n{user_prompt}"
-        prompt_type = "logistics" if "Reverse Logistics" in system_instruction else "campaign"
+        prompt_type = "logistics" if "Reverse Logistics" in system_instruction else "repair" if "Service Agent" in system_instruction else "campaign"
 
         if self.groq_client:
             try:
-                print(f"[LLM Router] Attempting Tier 1: Groq Fallback for {region} ({lang}) (8.0s timeout)...")
+                print(f"[LLM Router] Attempting Tier 1: Groq Fallback for {cache_key} (8.0s timeout)...")
                 completion = self.groq_client.chat.completions.create(
                     model="llama-3.1-8b-instant",
                     messages=[
@@ -53,7 +52,6 @@ class CoreLLMClient:
                         full_text_accumulator += content
                         yield content
                 
-                # Save using the language-aware cache key
                 self._save_regional_fallback(prompt_type, cache_key, full_text_accumulator)
                 return 
                 
@@ -61,7 +59,7 @@ class CoreLLMClient:
                 print(f"[LLM Router] ⚠️ Groq failed: {str(e)}")
         
         try:
-            print(f"[LLM Router] Attempting Tier 2: Gemini for {region} ({lang}) (10.0s timeout)...")
+            print(f"[LLM Router] Attempting Tier 2: Gemini for {cache_key} (10.0s timeout)...")
             response = self.gemini_model.generate_content(
                 full_prompt, stream=True, request_options={"timeout": 10.0} 
             )
@@ -72,7 +70,6 @@ class CoreLLMClient:
                     full_text_accumulator += chunk.text
                     yield chunk.text
             
-            # Save using the language-aware cache key
             self._save_regional_fallback(prompt_type, cache_key, full_text_accumulator)
             return 
             
@@ -82,7 +79,6 @@ class CoreLLMClient:
         print(f"[LLM Router] 🛑 Engaging Tier 3 Local Cache for {cache_key}...")
         time.sleep(0.8) 
         
-        # Retrieve using the language-aware cache key
         cached_response = self._get_regional_fallback(prompt_type, cache_key)
             
         words = cached_response.split(" ")
@@ -91,50 +87,55 @@ class CoreLLMClient:
             time.sleep(0.04)
 
     # ---------------------------------------------------------
-    # DYNAMIC CACHE MANAGER LOGIC
+    # DYNAMIC CACHE MANAGER LOGIC (IN-MEMORY RAM OPTIMIZED)
     # ---------------------------------------------------------
+    def _load_cache_to_memory(self):
+        """Loads the JSON into RAM exactly once to prevent Disk I/O bottlenecks."""
+        if not hasattr(self, '_memory_cache') or self._memory_cache is None:
+            try:
+                if os.path.exists(self.cache_file_path):
+                    with open(self.cache_file_path, "r", encoding="utf-8") as f:
+                        self._memory_cache = json.load(f)
+                    print("[Shadow Cache] 🚀 Loaded fallback JSON into RAM.")
+                else:
+                    self._memory_cache = {"logistics": {}, "campaign": {}, "repair": {}}
+            except Exception as e:
+                print(f"[Shadow Cache] ⚠️ Error loading to memory: {e}")
+                self._memory_cache = {"logistics": {}, "campaign": {}, "repair": {}}
+
     def _save_regional_fallback(self, prompt_type: str, region: str, response_text: str):
-        """Silently saves successful LLM generations to a JSON file ONLY if it doesn't already exist."""
+        """Silently saves successful LLM generations to RAM and syncs to disk ONLY if new."""
+        self._load_cache_to_memory()
+        
         try:
-            fallbacks = {"logistics": {}, "campaign": {}}
-            if os.path.exists(self.cache_file_path):
-                with open(self.cache_file_path, "r", encoding="utf-8") as f:
-                    fallbacks = json.load(f)
-            
-            # Ensure the structure exists
-            if prompt_type not in fallbacks:
-                fallbacks[prompt_type] = {}
+            if prompt_type not in self._memory_cache:
+                self._memory_cache[prompt_type] = {}
                 
-            # --- NEW: THE WRITE-LOCK BYPASS ---
-            if region in fallbacks[prompt_type]:
+            # Bypass disk write if it already exists
+            if region in self._memory_cache[prompt_type]:
                 print(f"[Shadow Cache] ⏭️ Cache already exists for {region} ({prompt_type}). Skipping disk write.")
-                return # Instantly exit the function, saving CPU and Disk I/O!
+                return 
                 
-            # If we get here, the region doesn't exist yet, so we save it.
-            fallbacks[prompt_type][region] = response_text
+            self._memory_cache[prompt_type][region] = response_text
             
             with open(self.cache_file_path, "w", encoding="utf-8") as f:
-                json.dump(fallbacks, f, indent=4)
-            print(f"[Shadow Cache] ✅ Successfully saved new fallback response for {region} ({prompt_type}).")
+                json.dump(self._memory_cache, f, indent=4)
+            print(f"[Shadow Cache] ✅ Successfully saved new fallback response to Disk/RAM for {region} ({prompt_type}).")
             
         except Exception as e:
             print(f"[Shadow Cache Error] Could not save to JSON: {e}")
 
     def _get_regional_fallback(self, prompt_type: str, region: str) -> str:
-        """Reads the perfectly formatted regional response from the JSON file."""
+        """Reads the perfectly formatted regional response instantly from RAM (Zero Disk I/O)."""
         try:
-            if os.path.exists(self.cache_file_path):
-                with open(self.cache_file_path, "r", encoding="utf-8") as f:
-                    fallbacks = json.load(f)
+            self._load_cache_to_memory()
+            category = self._memory_cache.get(prompt_type, {})
+            
+            if region in category:
+                return category[region]
+            elif "default" in category:
+                return category["default"]
                 
-                category = fallbacks.get(prompt_type, {})
-                
-                # Try to get exact region, if not, try to get a "default" one, if not, fallback string
-                if region in category:
-                    return category[region]
-                elif "default" in category:
-                    return category["default"]
-                    
-            return "### ⚠️ SYSTEM OFFLINE\nCould not connect to AI services or retrieve local regional cache."
+            return "### ⚠️ OFFLINE\nImpossibile generare il preventivo al momento." if "_it" in region else "### ⚠️ OFFLINE\nCould not generate quote at this time."
         except Exception as e:
             return f"### ⚠️ CACHE ERROR\n{str(e)}"

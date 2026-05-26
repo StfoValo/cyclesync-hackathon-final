@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VeriTwin | Driver App</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 400: '#5cffff', 500: '#00E5FF', 600: '#00b8cc' }, darkbg: '#050a11', cardbg: '#0f1725' } } } }
@@ -79,11 +80,53 @@
             border-color: rgba(0, 229, 255, 0.5);
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
         }
+
+        /* AI Modal Table Styling */
+        #ai-email-output table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+            text-align: left;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            background: rgba(15, 23, 37, 0.8);
+            display: block;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+        }
+
+        #ai-email-output th {
+            background-color: rgba(0, 229, 255, 0.1);
+            color: #5cffff;
+            padding: 0.875rem 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        #ai-email-output td {
+            padding: 0.875rem 1rem;
+            color: #e2e8f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #ai-email-output tbody tr:last-child td {
+            border-bottom: none;
+            font-weight: 700;
+            color: #5cffff;
+        }
+
+        #ai-email-output tbody tr:hover {
+            background-color: rgba(0, 229, 255, 0.05);
+        }
     </style>
 </head>
 
 <body class="h-[100dvh] w-screen flex flex-col overflow-hidden relative pb-[80px]">
-    <script src="/static/js/i18n.js?v=7"></script>
+    <script src="/static/js/i18n.js?v=8"></script>
 
     <!-- Language Toggle -->
     <div class="flex justify-end px-5 pt-3 pb-0 max-w-lg mx-auto w-full shrink-0">
@@ -157,17 +200,6 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <button onclick="window.triggerSOS()"
-                class="bg-red-600 hover:bg-red-500 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.3)] flex justify-center items-center gap-2 transition-colors">
-                <span class="text-lg">✨</span> <span>SOS</span>
-            </button>
-            <button onclick="window.switchView('view-map')"
-                class="bg-[#1e293b] hover:bg-slate-700 text-brand-400 font-bold py-3.5 rounded-xl border border-white/5 flex justify-center items-center gap-2 transition-colors">
-                <span class="text-lg">🗺️</span> <span class="text-white" data-i18n="driver-nav-network">Network</span>
-            </button>
-        </div>
-
         <div class="mb-6">
             <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1"
                 data-i18n="driver-stato-componenti">Stato Componenti</h3>
@@ -192,13 +224,55 @@
         <div id="alerts-list-container" class="flex flex-col gap-3"></div>
     </div>
 
+    <div id="view-profile" class="app-view flex-col h-full overflow-y-auto px-5 pb-8 pt-4 mx-auto max-w-lg w-full">
+        <header class="flex items-center justify-between mb-6 shrink-0">
+            <h1 class="text-[17px] font-semibold tracking-wide text-white" data-i18n="driver-nav-gestione-header">
+                Gestione
+                Veicolo</h1>
+        </header>
+        <div id="profile-content-container" class="flex flex-col">
+        </div>
+    </div>
+
     <div id="view-map" class="app-view flex-col h-full bg-slate-900">
         <header class="flex items-center justify-between px-4 py-4 shrink-0 bg-darkbg z-10 border-b border-white/5">
             <h1 class="text-[17px] font-semibold tracking-wide text-white" data-i18n="driver-rete-convenzionata">Rete
                 Convenzionata</h1>
         </header>
         <div class="flex-1 w-full relative">
-            <iframe src="/api/fleet/map?view=suppliers" style="width: 100%; height: 100%; border: none;"></iframe>
+            <iframe id="map-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+    </div>
+
+    <div id="repair-modal"
+        class="fixed inset-0 z-[100] hidden flex items-end justify-center bg-black/60 backdrop-blur-sm transition-opacity">
+        <div
+            class="bg-[#0a111a] w-full max-w-lg rounded-t-3xl border-t border-brand-500/30 p-6 shadow-[0_-20px_50px_rgba(0,229,255,0.15)] flex flex-col max-h-[85vh]">
+
+            <div class="flex justify-between items-center mb-5 shrink-0">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <span class="text-xl">✨</span> AI Service Agent
+                </h3>
+                <button onclick="document.getElementById('repair-modal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-brand-400 transition-colors bg-slate-800 p-1.5 rounded-full">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="ai-email-output"
+                class="text-sm text-slate-300 overflow-y-auto hide-scrollbar prose prose-invert prose-p:leading-relaxed prose-a:text-brand-400 flex-1 mb-4">
+            </div>
+
+            <div class="mt-2 shrink-0">
+                <button
+                    onclick="const lang = localStorage.getItem('veritwin_lang') || 'it'; const msg = lang === 'it' ? 'Richiesta inviata con successo all\'officina!' : 'Request sent successfully to the workshop!'; document.getElementById('repair-modal').classList.add('hidden'); window.showToast(msg);"
+                    class="w-full bg-[#1e293b] hover:bg-slate-700 text-brand-400 hover:text-brand-300 font-bold py-3.5 rounded-xl border border-white/10 shadow-lg transition-colors flex justify-center items-center gap-2">
+                    <span class="text-lg">✉️</span> <span data-i18n="driver-send-request">Invia Richiesta</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -211,7 +285,7 @@
             </svg>
             <span class="text-[10px] font-medium" data-i18n="driver-nav-home">Home</span>
         </button>
-        <button onclick="window.switchView('view-map')" id="nav-map"
+        <button onclick="window.pendingRepairComponent = null; window.switchView('view-map')" id="nav-map"
             class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -220,6 +294,17 @@
             </svg>
             <span class="text-[10px] font-medium" data-i18n="driver-nav-network">Network</span>
         </button>
+
+        <button onclick="window.switchView('view-profile')" id="nav-profile"
+            class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                </path>
+            </svg>
+            <span class="text-[10px] font-medium" data-i18n="driver-nav-gestione">Gestione</span>
+        </button>
+
         <button onclick="window.switchView('view-alert')" id="nav-alert"
             class="nav-btn flex flex-col items-center gap-1 w-16 text-slate-500 hover:text-slate-300 transition-colors relative">
             <div id="nav-alert-badge"
@@ -236,10 +321,12 @@
     <script type="module">
         import { renderComponentGrid } from '/static/js/driver/home_view.js?v=5';
         import { renderAlertsGrid } from '/static/js/driver/alerts_view.js?v=5';
+        import { renderProfileView } from '/static/js/driver/profile_view.js?v=1';
 
         const DEMO_DRIVER_ID = 1;
         // compNames now handled by i18n in the render modules
         let currentVehicles = [];
+        window._activeVehicleCache = null;
 
         window.initApp = async function () {
             try {
@@ -278,6 +365,7 @@
         window.switchVehicle = function (vin) {
             const activeVehicle = currentVehicles.find(v => v.vin === vin);
             if (activeVehicle) {
+                window._activeVehicleCache = activeVehicle;
                 document.getElementById('active-vehicle-name').innerText = `${activeVehicle.manufacturer} ${activeVehicle.model}`;
                 document.getElementById('active-vehicle-vsi').innerText = activeVehicle.vsi_score;
 
@@ -290,6 +378,9 @@
                 }
 
                 renderVehicleStrip(currentVehicles, vin);
+
+                renderProfileView(activeVehicle);
+
                 loadVehicleTelemetry(vin);
             }
         };
@@ -314,27 +405,158 @@
                 renderComponentGrid(_cachedComponents);
                 renderAlertsGrid(_cachedComponents);
             }
+            if (window._activeVehicleCache) {
+                renderProfileView(window._activeVehicleCache);
+            }
             // Update greeting with new locale
             if (window._driverName) {
                 const lang = localStorage.getItem('veritwin_lang') || 'it';
                 const hello = (window.translations[lang] && window.translations[lang]['driver-hello']) || `Ciao, ${window._driverName}`;
                 document.getElementById('driver-greeting').innerText = hello.replace(/,\s*\w+/, `, ${window._driverName}`);
             }
+            // Update map iframe if already initialized
+            const mapIframe = document.getElementById('map-iframe');
+            if (mapIframe) {
+                const currentSrc = mapIframe.getAttribute('src');
+                if (currentSrc) {
+                    const lang = localStorage.getItem('veritwin_lang') || 'it';
+                    const expectedSrc = `/api/fleet/map?view=suppliers&lang=${lang}`;
+                    if (currentSrc !== expectedSrc) {
+                        mapIframe.setAttribute('src', expectedSrc);
+                    }
+                }
+            }
         };
 
+        // 1. A global variable to remember what we are trying to fix
+        window.pendingRepairComponent = null;
+
+        // 2. The NEW First Step: Save state and go to the map
         window.getRepairQuote = function (componentKey) {
-            alert(`Generating repair quote for: ${componentKey}`);
+            window.pendingRepairComponent = componentKey;
+            window.switchView('view-map');
+
+            // Fire the smooth, non-blocking toast notification instead of the native alert
+            const lang = localStorage.getItem('veritwin_lang') || 'it';
+            const msg = lang === 'it'
+                ? "Seleziona un'officina sulla mappa per inviare la richiesta."
+                : "Select a repair shop on the map to send the request.";
+
+            window.showToast(msg);
+        };
+
+        // 3. The NEW Second Step: Triggered AFTER the user clicks a shop on the map
+        window.confirmShopAndGenerateAI = async function (shopName) {
+            if (!window.pendingRepairComponent) {
+                console.warn("No component selected for repair.");
+                return;
+            }
+
+            const issue = _cachedComponents.find(c => `${c.category}_${c.position}` === window.pendingRepairComponent);
+            if (!issue) return;
+
+            const issueText = issue.consequence;
+            const wearPercentage = (100 - issue.health_pct).toFixed(1);
+            const lang = localStorage.getItem('veritwin_lang') || 'it';
+
+            // Get the driver's name (we set this during initApp)
+            const driverName = window._driverName || "Driver";
+
+            const modal = document.getElementById('repair-modal');
+            const outputDiv = document.getElementById('ai-email-output');
+
+            modal.classList.remove('hidden');
+            outputDiv.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-10 text-brand-400 animate-pulse">
+                    <span class="text-4xl mb-3 block">🤖</span>
+                    <p class="font-medium text-center">Analisi telemetria in corso...<br>Contattando ${shopName}...</p>
+                </div>`;
+
+            try {
+                const response = await fetch('/api/ai/repair-quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        component_id: window.pendingRepairComponent,
+                        issue_description: issueText,
+                        wear_level: wearPercentage,
+                        shop_name: shopName,       // <-- Sending the new variable
+                        driver_name: driverName,   // <-- Sending the new variable
+                        language: lang
+                    })
+                });
+
+                if (!response.body) throw new Error("Nessuna risposta");
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+
+                // 1. Create a safe memory variable to hold the raw markdown
+                let accumulatedMarkdown = "";
+                outputDiv.innerHTML = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    // 2. Add the chunk to memory, keeping \n line breaks intact
+                    accumulatedMarkdown += decoder.decode(value, { stream: true });
+
+                    // 3. Parse from memory to HTML in real-time so the user sees it type!
+                    if (window.marked) {
+                        outputDiv.innerHTML = marked.parse(accumulatedMarkdown);
+                    } else {
+                        outputDiv.innerText = accumulatedMarkdown;
+                    }
+                }
+
+                // Clear the pending state once successful
+                window.pendingRepairComponent = null;
+
+            } catch (error) {
+                console.error("Errore:", error);
+                outputDiv.innerHTML = `<div class="p-4 bg-red-900/30 border border-red-500/50 rounded-lg text-red-400 font-medium">Errore di connessione.</div>`;
+            }
         };
 
         window.switchView = function (targetId) {
             document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
             document.getElementById(targetId).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('text-brand-400'); btn.classList.add('text-slate-500'); });
-            const activeNav = targetId === 'view-home' ? 'nav-home' : (targetId === 'view-map' ? 'nav-map' : 'nav-alert');
-            const navEl = document.getElementById(activeNav);
-            navEl.classList.remove('text-slate-500');
-            navEl.classList.add('text-brand-400');
-        }
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-brand-400');
+                btn.classList.add('text-slate-500');
+            });
+
+            // --- UPDATED ROUTER MAP FOR 4 TABS ---
+            const navMap = {
+                'view-home': 'nav-home',
+                'view-map': 'nav-map',
+                'view-profile': 'nav-profile',
+                'view-alert': 'nav-alert'
+            };
+
+            const activeNav = navMap[targetId];
+            if (activeNav) {
+                const navEl = document.getElementById(activeNav);
+                navEl.classList.remove('text-slate-500');
+                navEl.classList.add('text-brand-400');
+            }
+
+            if (targetId === 'view-map') {
+                const lang = localStorage.getItem('veritwin_lang') || 'it';
+                const iframe = document.getElementById('map-iframe');
+                if (iframe) {
+                    const currentSrc = iframe.getAttribute('src');
+                    const repairParam = window.pendingRepairComponent ? 'active' : 'none';
+                    const expectedSrc = `/api/fleet/map?view=suppliers&lang=${lang}&repair=${repairParam}`;
+
+                    if (currentSrc !== expectedSrc) {
+                        iframe.setAttribute('src', expectedSrc);
+                    }
+                }
+            }
+        };
 
         window.triggerSOS = function () {
             alert("AI SOS Streaming interface initializing...");
@@ -346,7 +568,32 @@
             window.setLanguage(savedLang);
             window.initApp();
         });
+
+        // Helper function for non-blocking notifications
+        window.showToast = function (message) {
+            const container = document.getElementById('toast-container');
+            document.getElementById('toast-text').innerText = message;
+
+            // Slide in
+            container.classList.remove('opacity-0', 'translate-y-[-20px]');
+            container.classList.add('opacity-100', 'translate-y-0');
+
+            // Slide out after 3.5 seconds
+            setTimeout(() => {
+                container.classList.remove('opacity-100', 'translate-y-0');
+                container.classList.add('opacity-0', 'translate-y-[-20px]');
+            }, 3500);
+        };
     </script>
+
+    <div id="toast-container"
+        class="fixed top-6 left-0 right-0 z-[200] flex justify-center pointer-events-none opacity-0 translate-y-[-20px] transition-all duration-300">
+        <div
+            class="bg-brand-500 text-slate-900 font-bold px-5 py-2.5 rounded-full shadow-[0_5px_20px_rgba(0,229,255,0.4)] text-sm flex items-center gap-2 border border-brand-400">
+            <span class="text-lg">📍</span> <span id="toast-text">Notification</span>
+        </div>
+    </div>
+
 </body>
 
 </html>
