@@ -1,0 +1,34 @@
+# Render Blueprint — VeriTwin × CycleSync hackathon demo.
+#
+# After connecting this GitHub repo on https://dashboard.render.com:
+#   1. Render auto-detects this file and proposes the service.
+#   2. Click "Apply" — Render builds + deploys.
+#   3. Add the two API-key env vars under Service → Environment.
+#
+# Free tier notes:
+#   • The service sleeps after 15 min of inactivity. The next request
+#     wakes it (cold start ~30-60 s).
+#   • SQLite (cyclesync.db) lives on Render's ephemeral disk: it gets
+#     reset to the seeded baseline on every redeploy. The startup
+#     seeders are idempotent so this Just Works for a demo.
+
+services:
+  - type: web
+    name: cyclesync-veritwin
+    runtime: python
+    region: frankfurt
+    plan: free
+    branch: main
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python -m uvicorn website.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # API keys — set these in the Render dashboard ("sync: false"
+      # means Render will NOT store them in the blueprint history;
+      # you'll be prompted to enter them on first deploy).
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
