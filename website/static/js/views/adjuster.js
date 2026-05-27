@@ -70,9 +70,9 @@ function renderInvestigationList(investigations) {
         <div class="investigation-card glass-panel rounded-xl p-4 md:p-5 border border-white/5 hover:border-white/15 cursor-pointer transition-all hover:shadow-lg group" data-case="${inv.case_number}">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="font-bold text-white text-sm">${inv.case_number}</span>
-                        <span class="text-xs px-2 py-0.5 rounded-full border font-medium ${statusBadge}">${inv.status?.replace('_',' ')}</span>
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="font-bold text-white text-sm whitespace-nowrap">${inv.case_number}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full border font-medium whitespace-nowrap ${statusBadge}">${inv.status?.replace('_',' ')}</span>
                         <span class="text-xs px-2 py-0.5 rounded-full border font-medium ${priorityBadge}">${inv.priority}</span>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
