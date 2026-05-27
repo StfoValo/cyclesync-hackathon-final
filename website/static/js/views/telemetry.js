@@ -1,5 +1,5 @@
 import { initRegistry } from './registry.js?v=7';
-import { initVehiclePassport } from './vehicle_passport.js?v=8';
+import { initVehiclePassport } from './vehicle_passport.js?v=9';
 
 export function initTelemetry() {
     const mapFrame = document.getElementById('map-frame');

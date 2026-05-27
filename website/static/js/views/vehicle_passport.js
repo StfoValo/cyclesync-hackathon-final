@@ -189,11 +189,21 @@ function renderComponents(components) {
         groups[cat].push(c);
     });
 
-    const catLabels = { tire:'Tires', brake_pad:'Brakes', ev_battery:'Battery', brake_disc:'Discs' };
+    // Complete human-readable label table — every category the ESG seeder emits.
+    const catLabels = {
+        tire:              'Tires',
+        brake_pad:         'Brake Pads',
+        brake_disc:        'Brake Discs',
+        suspension_damper: 'Suspension',
+        aux_12v_battery:   '12V Battery',
+        engine_oil:        'Engine Oil',
+        dpf:               'DPF',
+        ev_battery:        'EV Battery',
+    };
 
     container.innerHTML = Object.entries(groups).map(([cat, items]) => {
-        const icon = componentIcon(cat, 'w-5 h-5');
-        const label = catLabels[cat] || cat;
+        const icon = componentIcon(cat, 'w-5 h-5 shrink-0');
+        const label = catLabels[cat] || cat.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase());
         const avgWear = Math.round(items.reduce((s,c) => s + (c.wear_percent||0), 0) / items.length);
         const healthPct = 100 - avgWear;
         const worst = items.reduce((w,c) => (c.wear_percent||0) > (w.wear_percent||0) ? c : w, items[0]);
@@ -202,14 +212,22 @@ function renderComponents(components) {
         const barColor = status === 'critical' ? 'bg-rose-500' : status === 'warning' ? 'bg-amber-500' : 'bg-emerald-500';
         const borderColor = status === 'critical' ? 'border-rose-500/30' : status === 'warning' ? 'border-amber-500/30' : 'border-emerald-500/30';
         const detail = items.map(c => `${c.position||''}: ${c.wear_percent||0}%`).join(', ');
+        const countLabel = items.length === 1 ? '1 part' : `${items.length} parts`;
 
-        return `<div class="bg-slate-800/50 rounded-lg p-4 border ${borderColor}" title="${detail}">
-            <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center gap-2 ${color}">${icon}<span class="font-semibold text-white text-sm">${label}</span></div>
-                <span class="text-xs font-bold ${color} uppercase">${status}</span>
+        // Layout: icon + label on row 1, status badge on its own row (right-aligned).
+        // This avoids the crammed icon/label/badge collision at narrow card widths.
+        return `<div class="bg-slate-800/50 rounded-lg p-3 md:p-4 border ${borderColor}" title="${detail}">
+            <div class="flex items-center gap-2 mb-1.5 ${color}">
+                ${icon}<span class="font-semibold text-white text-xs md:text-sm truncate">${label}</span>
             </div>
-            <div class="w-full bg-slate-700 rounded-full h-2 mb-2"><div class="${barColor} rounded-full h-2 transition-all duration-1000" style="width:${healthPct}%"></div></div>
-            <div class="flex justify-between text-xs"><span class="${color} font-bold">${healthPct}%</span><span class="text-slate-500 truncate ml-2">${items.length} components</span></div>
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold ${color} uppercase tracking-wider">${status}</span>
+                <span class="text-[10px] text-slate-500">${countLabel}</span>
+            </div>
+            <div class="w-full bg-slate-700 rounded-full h-2 mb-1.5">
+                <div class="${barColor} rounded-full h-2 transition-all duration-1000" style="width:${healthPct}%"></div>
+            </div>
+            <div class="text-[11px] ${color} font-bold">${healthPct}% <span class="text-slate-500 font-normal">health</span></div>
         </div>`;
     }).join('');
 }
