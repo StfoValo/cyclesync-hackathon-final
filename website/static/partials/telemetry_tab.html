@@ -39,72 +39,72 @@
             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             </div>
-            <input type="text" id="vehicle-search-input" placeholder="Search by plate, VIN, driver name, or model..."
+            <input type="text" id="vehicle-search-input" data-i18n-placeholder="reg-search-placeholder" placeholder="Search by plate, VIN, driver, or model…"
                 class="w-full pl-12 pr-4 py-3 bg-slate-800/60 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all text-sm" />
             <div id="vehicle-search-dropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-slate-800/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto"></div>
         </div>
         <button id="btn-search-vehicle" class="px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-medium transition-colors flex items-center gap-2 text-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            Inspect
+            <span data-i18n="reg-btn-inspect">Inspect</span>
         </button>
         <button id="btn-register-vehicle" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-medium transition-colors flex items-center gap-2 text-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Register
+            <span data-i18n="reg-btn-register">Register</span>
         </button>
     </div>
 
     <!-- Filters -->
     <div class="glass-panel rounded-xl p-4 mb-6 border border-white/5">
         <div class="flex flex-wrap gap-3 items-end">
-            <div class="flex-1 min-w-[140px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block">Manufacturer</label>
-                <select id="filter-manufacturer" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="">All Brands</option></select></div>
-            <div class="flex-1 min-w-[140px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block">Model</label>
-                <select id="filter-model" disabled class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="">All Models</option></select></div>
-            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block">Engine</label>
-                <select id="filter-powertrain" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="">All Types</option></select></div>
-            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block">Region</label>
-                <select id="filter-region" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="">All Regions</option></select></div>
-            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block">Body Type</label>
-                <select id="filter-bodytype" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="">All</option></select></div>
-            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block">Insurance</label>
+            <div class="flex-1 min-w-[140px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block" data-i18n="reg-filter-mfr">Manufacturer</label>
+                <select id="filter-manufacturer" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="" data-i18n="reg-opt-all-brands">All Brands</option></select></div>
+            <div class="flex-1 min-w-[140px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block" data-i18n="reg-filter-model">Model</label>
+                <select id="filter-model" disabled class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="" data-i18n="reg-opt-all-models">All Models</option></select></div>
+            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block" data-i18n="reg-filter-engine">Engine</label>
+                <select id="filter-powertrain" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="" data-i18n="reg-opt-all-types">All Types</option></select></div>
+            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block" data-i18n="reg-filter-region">Region</label>
+                <select id="filter-region" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="" data-i18n="reg-opt-all-regions">All Regions</option></select></div>
+            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block" data-i18n="reg-filter-bodytype">Body Type</label>
+                <select id="filter-bodytype" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"><option value="" data-i18n="reg-opt-all">All</option></select></div>
+            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block" data-i18n="reg-filter-insurance">Insurance</label>
                 <select id="filter-policy" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white">
-                    <option value="">All</option><option value="active">Active</option><option value="expired">Expired</option></select></div>
-            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block">Blackbox</label>
+                    <option value="" data-i18n="reg-opt-all">All</option><option value="active" data-i18n="reg-opt-active">Active</option><option value="expired" data-i18n="reg-opt-expired">Expired</option></select></div>
+            <div class="flex-1 min-w-[120px]"><label class="text-[10px] text-slate-400 uppercase font-bold mb-1 block" data-i18n="reg-filter-blackbox">Blackbox</label>
                 <select id="filter-blackbox" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white">
-                    <option value="">All</option><option value="1">Active</option><option value="0">None</option></select></div>
-            <div class="flex items-end"><button id="btn-clear-filters" class="text-xs text-slate-400 hover:text-white transition-colors py-2">× Clear</button></div>
+                    <option value="" data-i18n="reg-opt-all">All</option><option value="1" data-i18n="reg-opt-active">Active</option><option value="0" data-i18n="reg-opt-none">None</option></select></div>
+            <div class="flex items-end"><button id="btn-clear-filters" class="text-xs text-slate-400 hover:text-white transition-colors py-2" data-i18n="reg-clear">× Clear</button></div>
         </div>
     </div>
 
     <!-- Registry Table -->
-    <div class="glass-panel rounded-xl border border-white/5 overflow-x-auto">
-        <table class="w-full text-left">
+    <div class="glass-panel rounded-xl border border-white/5 overflow-x-auto hide-scrollbar">
+        <table class="w-full text-left min-w-[700px]">
             <thead>
                 <tr class="border-b border-white/5 text-xs text-slate-400 uppercase tracking-wider">
-                    <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="plate_number">Plate ↕</th>
-                    <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="model">Model ↕</th>
-                    <th class="px-4 py-3 hidden md:table-cell">Driver</th>
-                    <th class="px-4 py-3 hidden lg:table-cell">Region</th>
-                    <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="vsi_score">VSI ↕</th>
-                    <th class="px-4 py-3 hidden md:table-cell">Engine</th>
-                    <th class="px-4 py-3 hidden lg:table-cell">Insurance</th>
-                    <th class="px-4 py-3 hidden lg:table-cell text-center">Blackbox</th>
-                    <th class="px-4 py-3 hidden xl:table-cell cursor-pointer hover:text-white" data-sort="odometer">Odometer ↕</th>
+                    <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="plate_number"><span data-i18n="reg-th-plate">Plate</span> ↕</th>
+                    <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="model"><span data-i18n="reg-th-model">Model</span> ↕</th>
+                    <th class="px-4 py-3 hidden md:table-cell" data-i18n="reg-th-driver">Driver</th>
+                    <th class="px-4 py-3 hidden lg:table-cell" data-i18n="reg-th-region">Region</th>
+                    <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="vsi_score"><span data-i18n="reg-th-vsi">VSI</span> ↕</th>
+                    <th class="px-4 py-3 hidden md:table-cell" data-i18n="reg-th-engine">Engine</th>
+                    <th class="px-4 py-3 hidden lg:table-cell" data-i18n="reg-th-insurance">Insurance</th>
+                    <th class="px-4 py-3 hidden lg:table-cell text-center" data-i18n="reg-th-blackbox">Blackbox</th>
+                    <th class="px-4 py-3 hidden xl:table-cell cursor-pointer hover:text-white" data-sort="odometer"><span data-i18n="reg-th-odometer">Odometer</span> ↕</th>
                 </tr>
             </thead>
             <tbody id="registry-table-body">
-                <tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">Loading...</td></tr>
+                <tr><td colspan="9" class="px-4 py-8 text-center text-slate-500" data-i18n="reg-loading">Loading…</td></tr>
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
     <div class="flex items-center justify-between mt-4 text-sm">
-        <span id="registry-count" class="text-slate-400">0 vehicles</span>
+        <span id="registry-count" class="text-slate-400">0 <span data-i18n="reg-vehicles">vehicles</span></span>
         <div class="flex items-center gap-3">
-            <button id="btn-prev-page" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-white/10 text-xs disabled:opacity-30" disabled>← Prev</button>
-            <span id="registry-page-info" class="text-slate-400 text-xs">Page 1 of 1</span>
-            <button id="btn-next-page" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-white/10 text-xs disabled:opacity-30" disabled>Next →</button>
+            <button id="btn-prev-page" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-white/10 text-xs disabled:opacity-30" data-i18n="reg-prev" disabled>← Prev</button>
+            <span id="registry-page-info" class="text-slate-400 text-xs"><span data-i18n="reg-page">Page</span> 1 <span data-i18n="reg-of">of</span> 1</span>
+            <button id="btn-next-page" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-white/10 text-xs disabled:opacity-30" data-i18n="reg-next" disabled>Next →</button>
         </div>
     </div>
 </div>
@@ -114,7 +114,7 @@
     <div class="flex items-center justify-between mb-6">
         <button id="btn-close-passport" class="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Back to Registry
+            <span data-i18n="pass-back">Back to Registry</span>
         </button>
     </div>
 
@@ -131,20 +131,20 @@
                 <p id="passport-driver" class="text-sm text-slate-400 mt-1"></p>
             </div>
             <div class="text-right">
-                <p class="text-xs text-slate-400 mb-1">VSI Score</p>
+                <p class="text-xs text-slate-400 mb-1" data-i18n="pass-vsi">VSI Score</p>
                 <span id="passport-vsi" class="text-3xl font-black text-emerald-400">—</span>
             </div>
         </div>
 
         <!-- Components -->
         <div class="mb-6">
-            <h3 class="text-sm font-bold text-white mb-3 uppercase tracking-wider">Components Health</h3>
+            <h3 class="text-sm font-bold text-white mb-3 uppercase tracking-wider" data-i18n="pass-components">Components Health</h3>
             <div id="passport-components" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
         </div>
 
         <!-- Insurance -->
         <button class="accordion-trigger w-full flex items-center justify-between py-3 border-t border-white/5 text-sm font-bold text-white" data-target="accordion-insurance">
-            Insurance & Policy <svg class="w-4 h-4 accordion-chevron transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            <span data-i18n="pass-insurance">Insurance & Policy</span> <svg class="w-4 h-4 accordion-chevron transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
         <div id="accordion-insurance" class="hidden">
             <div class="flex items-center gap-2 mb-3"><span id="passport-insurance-badge" class="text-xs px-2 py-0.5 rounded-full">—</span></div>
@@ -153,7 +153,7 @@
 
         <!-- Telemetry -->
         <button class="accordion-trigger w-full flex items-center justify-between py-3 border-t border-white/5 text-sm font-bold text-white" data-target="accordion-telemetry">
-            Live Telemetry <svg class="w-4 h-4 accordion-chevron transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            <span data-i18n="pass-telemetry">Live Telemetry</span> <svg class="w-4 h-4 accordion-chevron transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
         <div id="accordion-telemetry" class="hidden">
             <div id="passport-telemetry-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
@@ -161,7 +161,7 @@
 
         <!-- Maintenance History -->
         <button class="accordion-trigger w-full flex items-center justify-between py-3 border-t border-white/5 text-sm font-bold text-white" data-target="accordion-history">
-            Maintenance History <svg class="w-4 h-4 accordion-chevron transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            <span data-i18n="pass-history">Maintenance History</span> <svg class="w-4 h-4 accordion-chevron transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
         <div id="accordion-history" class="hidden">
             <div id="passport-history-timeline" class="border-l-2 border-white/10 ml-2 pl-4 space-y-4"></div>

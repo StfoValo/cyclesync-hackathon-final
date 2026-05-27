@@ -16,15 +16,15 @@
 <div id="adjuster-list-view">
     <!-- Status filter pills -->
     <div class="flex flex-wrap gap-2 mb-4">
-        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-brand-600 text-white border border-brand-500/50" data-status="">All Cases</button>
-        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-rose-500/50 hover:text-rose-400 transition-colors" data-status="open">Open</button>
-        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-amber-500/50 hover:text-amber-400 transition-colors" data-status="under_review">Under Review</button>
-        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors" data-status="resolved">Resolved</button>
+        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-brand-600 text-white border border-brand-500/50" data-status="" data-i18n="adj-filter-all">All Cases</button>
+        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-rose-500/50 hover:text-rose-400 transition-colors" data-status="open" data-i18n="adj-filter-open">Open</button>
+        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-amber-500/50 hover:text-amber-400 transition-colors" data-status="under_review" data-i18n="adj-filter-review">Under Review</button>
+        <button class="adj-filter-btn px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors" data-status="resolved" data-i18n="adj-filter-resolved">Resolved</button>
     </div>
 
     <!-- Investigation cards -->
     <div id="investigation-list" class="space-y-3">
-        <div class="text-center py-8 text-slate-500">Loading investigations...</div>
+        <div class="text-center py-8 text-slate-500" data-i18n="adj-loading">Loading investigations…</div>
     </div>
 </div>
 
@@ -33,7 +33,7 @@
     <!-- Back button -->
     <button id="btn-back-to-list" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4 text-sm">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-        <span>Back to Investigations</span>
+        <span data-i18n="adj-back">Back to Investigations</span>
     </button>
 
     <!-- Case Header -->
@@ -55,15 +55,15 @@
                 <!-- Fraud Risk Gauge -->
                 <div class="text-center">
                     <div id="detail-fraud-score" class="text-3xl font-black">—</div>
-                    <div class="text-xs text-slate-400 uppercase tracking-wider">Fraud Risk</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wider" data-i18n="adj-fraud-risk">Fraud Risk</div>
                 </div>
                 <div class="text-center">
                     <div id="detail-speed" class="text-2xl font-bold text-white">—</div>
-                    <div class="text-xs text-slate-400 uppercase tracking-wider">Impact Speed</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wider" data-i18n="adj-impact-speed">Impact Speed</div>
                 </div>
                 <div class="text-center">
                     <div id="detail-gforce" class="text-2xl font-bold text-white">—</div>
-                    <div class="text-xs text-slate-400 uppercase tracking-wider">Max G-Force</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wider" data-i18n="adj-max-g">Max G-Force</div>
                 </div>
             </div>
         </div>
@@ -72,12 +72,12 @@
     <!-- Detail Tabs -->
     <div class="glass-panel border border-white/5 border-b-0">
         <div class="flex border-b border-white/5 overflow-x-auto hide-scrollbar">
-            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-white border-b-2 border-brand-500 whitespace-nowrap shrink-0" data-tab="summary">Summary</button>
-            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="telemetry">Telemetry</button>
-            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="photos">Photos</button>
-            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="ai-analysis">AI Analysis</button>
-            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="components">Components</button>
-            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="verdict">Verdict</button>
+            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-white border-b-2 border-brand-500 whitespace-nowrap shrink-0" data-tab="summary" data-i18n="adj-tab-summary">Summary</button>
+            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="telemetry" data-i18n="adj-tab-telemetry">Telemetry</button>
+            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="photos" data-i18n="adj-tab-photos">Photos</button>
+            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="ai-analysis" data-i18n="adj-tab-ai">AI Analysis</button>
+            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="components" data-i18n="adj-tab-components">Components</button>
+            <button class="detail-tab px-3 md:px-5 py-3 text-xs md:text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent whitespace-nowrap shrink-0" data-tab="verdict" data-i18n="adj-tab-verdict">Verdict</button>
         </div>
     </div>
 
@@ -87,43 +87,43 @@
         <div id="tab-summary" class="detail-tab-content">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Incident Details</h4>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" data-i18n="adj-sec-incident">Incident Details</h4>
                     <div class="space-y-3">
                         <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5">
-                            <p class="text-xs text-slate-400 mb-1">Type</p>
+                            <p class="text-xs text-slate-400 mb-1" data-i18n="adj-field-type">Type</p>
                             <p id="detail-incident-type" class="text-white font-medium">—</p>
                         </div>
                         <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5">
-                            <p class="text-xs text-slate-400 mb-1">Location</p>
+                            <p class="text-xs text-slate-400 mb-1" data-i18n="adj-field-location">Location</p>
                             <p id="detail-location" class="text-white font-medium">—</p>
                         </div>
                         <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5">
-                            <p class="text-xs text-slate-400 mb-1">Description</p>
+                            <p class="text-xs text-slate-400 mb-1" data-i18n="adj-field-description">Description</p>
                             <p id="detail-description" class="text-slate-300 text-sm leading-relaxed">—</p>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Impact Data</h4>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" data-i18n="adj-sec-impact">Impact Data</h4>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5 text-center">
-                            <p class="text-xs text-slate-400 mb-1">ABS Triggered</p>
+                            <p class="text-xs text-slate-400 mb-1" data-i18n="adj-field-abs">ABS Triggered</p>
                             <p id="detail-abs" class="text-xl font-bold">—</p>
                         </div>
                         <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5 text-center">
-                            <p class="text-xs text-slate-400 mb-1">Airbag Deployed</p>
+                            <p class="text-xs text-slate-400 mb-1" data-i18n="adj-field-airbag">Airbag Deployed</p>
                             <p id="detail-airbag" class="text-xl font-bold">—</p>
                         </div>
                         <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5 text-center">
-                            <p class="text-xs text-slate-400 mb-1">Lateral G-Force</p>
+                            <p class="text-xs text-slate-400 mb-1" data-i18n="adj-field-lateral-g">Lateral G-Force</p>
                             <p id="detail-glateral" class="text-xl font-bold text-white">—</p>
                         </div>
                         <div class="bg-slate-800/50 rounded-lg p-4 border border-white/5 text-center">
-                            <p class="text-xs text-slate-400 mb-1">Coolant Temp</p>
+                            <p class="text-xs text-slate-400 mb-1" data-i18n="adj-field-coolant">Coolant Temp</p>
                             <p id="detail-coolant" class="text-xl font-bold">—</p>
                         </div>
                     </div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 mt-5">TPMS at Impact</h4>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 mt-5" data-i18n="adj-sec-tpms">TPMS at Impact</h4>
                     <div id="detail-tpms" class="grid grid-cols-4 gap-2"></div>
                 </div>
             </div>
@@ -131,7 +131,7 @@
 
         <!-- TELEMETRY TAB -->
         <div id="tab-telemetry" class="detail-tab-content hidden">
-            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Vehicle Telemetry at Time of Incident</h4>
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" data-i18n="adj-sec-telemetry">Vehicle Telemetry at Time of Incident</h4>
             <div id="detail-telemetry-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
         </div>
 
@@ -139,23 +139,23 @@
         <div id="tab-ai-analysis" class="detail-tab-content hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">AI Fraud Analysis</h4>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" data-i18n="adj-sec-ai-fraud">AI Fraud Analysis</h4>
                     <div id="detail-ai-fraud" class="bg-slate-800/50 rounded-lg p-5 border border-white/5 mb-4">
-                        <p class="text-slate-300 text-sm leading-relaxed italic">AI analysis pending...</p>
+                        <p class="text-slate-300 text-sm leading-relaxed italic" data-i18n="adj-ai-pending">AI analysis pending…</p>
                     </div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">AI Damage Assessment</h4>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" data-i18n="adj-sec-ai-damage">AI Damage Assessment</h4>
                     <div id="detail-ai-damage" class="bg-slate-800/50 rounded-lg p-5 border border-white/5">
-                        <p class="text-slate-300 text-sm leading-relaxed italic">Damage assessment pending...</p>
+                        <p class="text-slate-300 text-sm leading-relaxed italic" data-i18n="adj-damage-pending">Damage assessment pending…</p>
                     </div>
                 </div>
                 <div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Estimated Repair Cost</h4>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" data-i18n="adj-sec-repair-cost">Estimated Repair Cost</h4>
                     <div class="bg-slate-800/50 rounded-lg p-5 border border-white/5 text-center mb-4">
                         <div id="detail-repair-cost" class="text-4xl font-black text-brand-400">—</div>
-                        <div class="text-xs text-slate-400 mt-1">AI Estimated Total</div>
+                        <div class="text-xs text-slate-400 mt-1" data-i18n="adj-est-total">AI Estimated Total</div>
                     </div>
                     <button id="btn-run-ai-analysis" class="w-full bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white px-6 py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 shadow-lg">
-                        <span>Run AI Fraud & Damage Analysis</span>
+                        <span data-i18n="adj-run-ai">Run AI Fraud & Damage Analysis</span>
                     </button>
                 </div>
             </div>
@@ -164,35 +164,35 @@
         <!-- PHOTOS TAB -->
         <div id="tab-photos" class="detail-tab-content hidden">
             <div class="flex items-center justify-between mb-4">
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Damage Documentation</h4>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n="adj-sec-damage-docs">Damage Documentation</h4>
                 <label class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors cursor-pointer flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    Upload Photo
+                    <span data-i18n="adj-upload-photo">Upload Photo</span>
                     <input type="file" id="photo-upload-input" accept="image/*" class="hidden" multiple>
                 </label>
             </div>
             <div id="detail-photos-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="text-slate-500 text-sm col-span-3">Loading photos...</div>
+                <div class="text-slate-500 text-sm col-span-3" data-i18n="adj-photos-loading">Loading photos…</div>
             </div>
         </div>
 
         <!-- COMPONENTS TAB -->
         <div id="tab-components" class="detail-tab-content hidden">
-            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Vehicle Components at Time of Incident</h4>
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" data-i18n="adj-sec-components">Vehicle Components at Time of Incident</h4>
             <div id="detail-components-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
         </div>
 
         <!-- VERDICT TAB -->
         <div id="tab-verdict" class="detail-tab-content hidden">
             <div class="max-w-2xl mx-auto text-center">
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Adjuster Verdict</h4>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4" data-i18n="adj-sec-verdict">Adjuster Verdict</h4>
                 <div id="detail-verdict-content" class="bg-slate-800/50 rounded-xl p-8 border border-white/5">
-                    <p class="text-slate-400 text-sm">No verdict issued yet. Run AI analysis first, then issue a verdict.</p>
+                    <p class="text-slate-400 text-sm" data-i18n="adj-no-verdict">No verdict issued yet. Run AI analysis first, then issue a verdict.</p>
                 </div>
-                <div class="flex justify-center gap-3 mt-6">
-                    <button class="verdict-btn bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="approved">Approve Claim</button>
-                    <button class="verdict-btn bg-amber-600 hover:bg-amber-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="partial">Partial Approval</button>
-                    <button class="verdict-btn bg-rose-600 hover:bg-rose-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="denied">Deny Claim</button>
+                <div class="flex flex-col sm:flex-row justify-center gap-3 mt-6">
+                    <button class="verdict-btn bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="approved" data-i18n="adj-btn-approve-claim">Approve Claim</button>
+                    <button class="verdict-btn bg-amber-600 hover:bg-amber-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="partial" data-i18n="adj-btn-partial">Partial Approval</button>
+                    <button class="verdict-btn bg-rose-600 hover:bg-rose-500 text-white px-6 py-3 rounded-lg font-bold transition-colors" data-verdict="denied" data-i18n="adj-btn-deny">Deny Claim</button>
                 </div>
             </div>
         </div>

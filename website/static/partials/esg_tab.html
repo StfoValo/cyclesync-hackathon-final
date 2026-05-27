@@ -5,10 +5,10 @@
 
 <!-- ── Sub-Tab Navigation ──────────────────────────────────────────────── -->
 <div class="flex border-b border-white/10 mb-6 gap-1 overflow-x-auto hide-scrollbar">
-    <button class="esg-subtab active px-3 md:px-5 py-2.5 text-xs md:text-sm font-bold text-white border-b-2 border-brand-500 transition-all rounded-t-lg whitespace-nowrap shrink-0" data-subtab="inventory">
+    <button class="esg-subtab active px-3 md:px-5 py-2.5 text-xs md:text-sm font-bold text-white border-b-2 border-brand-500 transition-all rounded-t-lg whitespace-nowrap shrink-0" data-subtab="inventory" data-i18n="esg-sub-inventory">
         Inventory & Ledger
     </button>
-    <button class="esg-subtab px-3 md:px-5 py-2.5 text-xs md:text-sm font-bold text-slate-400 border-b-2 border-transparent hover:text-white hover:border-white/30 transition-all rounded-t-lg whitespace-nowrap shrink-0" data-subtab="triage">
+    <button class="esg-subtab px-3 md:px-5 py-2.5 text-xs md:text-sm font-bold text-slate-400 border-b-2 border-transparent hover:text-white hover:border-white/30 transition-all rounded-t-lg whitespace-nowrap shrink-0" data-subtab="triage" data-i18n="esg-sub-triage">
         AI Triage & Recycling
     </button>
 </div>
@@ -23,42 +23,42 @@
         <h3 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4 border-b border-white/10 pb-2"><span data-i18n="esg-virt-sensor">Virtual Emissions Sensor</span></h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
             <div class="glass-panel rounded-xl p-4 border border-white/5 shadow-lg">
-                <p class="text-[10px] md:text-xs text-slate-400 mb-1 uppercase tracking-wider"><span data-i18n="esg-base-co2">Baseline CO₂</span></p>
+                <p class="text-[10px] md:text-xs text-slate-400 mb-1 uppercase tracking-wider" data-i18n="esg-base-co2">Baseline CO₂</p>
                 <p class="text-xl md:text-2xl font-bold text-slate-300" id="esg-kpi-baseline">--</p>
-                <p class="text-[10px] text-slate-500">tons</p>
+                <p class="text-[10px] text-slate-500" data-i18n="esg-tons">tons</p>
             </div>
             <div class="glass-panel rounded-xl p-4 border border-white/5 shadow-lg">
-                <p class="text-[10px] md:text-xs text-slate-400 mb-1 uppercase tracking-wider"><span data-i18n="esg-real-co2">Real CO₂</span></p>
+                <p class="text-[10px] md:text-xs text-slate-400 mb-1 uppercase tracking-wider" data-i18n="esg-real-co2">Real CO₂</p>
                 <p class="text-xl md:text-2xl font-bold text-slate-300" id="esg-kpi-real">--</p>
-                <p class="text-[10px] text-slate-500">tons (telematics)</p>
+                <p class="text-[10px] text-slate-500" data-i18n="esg-tons-tel">tons (telematics)</p>
             </div>
             <div class="glass-panel rounded-xl p-4 border border-emerald-500/30 shadow-lg bg-emerald-500/10">
-                <p class="text-[10px] md:text-xs text-emerald-300 mb-1 uppercase tracking-wider"><span data-i18n="esg-saved-co2">CO₂ Saved</span></p>
+                <p class="text-[10px] md:text-xs text-emerald-300 mb-1 uppercase tracking-wider" data-i18n="esg-saved-co2">CO₂ Saved</p>
                 <p class="text-xl md:text-2xl font-bold text-emerald-400" id="esg-kpi-saved">--</p>
-                <p class="text-[10px] text-emerald-500/70">tons</p>
+                <p class="text-[10px] text-emerald-500/70" data-i18n="esg-tons">tons</p>
             </div>
             <div class="glass-panel rounded-xl p-4 border border-brand-500/30 shadow-lg bg-brand-500/10">
-                <p class="text-[10px] md:text-xs text-brand-300 mb-1 uppercase tracking-wider">Total Components</p>
+                <p class="text-[10px] md:text-xs text-brand-300 mb-1 uppercase tracking-wider" data-i18n="esg-total-comps">Total Components</p>
                 <p class="text-xl md:text-2xl font-bold text-brand-400" id="esg-kpi-total-components">--</p>
-                <p class="text-[10px] text-brand-500/70">tracked</p>
+                <p class="text-[10px] text-brand-500/70" data-i18n="esg-total-comps-sub">tracked</p>
             </div>
             <div class="glass-panel rounded-xl p-4 border border-amber-500/30 shadow-lg bg-amber-500/10">
-                <p class="text-[10px] md:text-xs text-amber-300 mb-1 uppercase tracking-wider">Stocked / Ready</p>
+                <p class="text-[10px] md:text-xs text-amber-300 mb-1 uppercase tracking-wider" data-i18n="esg-kpi-stocked-h">Stocked / Ready</p>
                 <p class="text-xl md:text-2xl font-bold text-amber-400" id="esg-kpi-stocked">--</p>
-                <p class="text-[10px] text-amber-500/70">second-life</p>
+                <p class="text-[10px] text-amber-500/70" data-i18n="esg-stocked-sub">second-life</p>
             </div>
             <div class="glass-panel rounded-xl p-4 border border-emerald-500/30 shadow-lg bg-emerald-500/10">
-                <p class="text-[10px] md:text-xs text-emerald-300 mb-1 uppercase tracking-wider">Recovery Value</p>
+                <p class="text-[10px] md:text-xs text-emerald-300 mb-1 uppercase tracking-wider" data-i18n="esg-kpi-recovery">Recovery Value</p>
                 <p class="text-xl md:text-2xl font-bold text-emerald-400" id="esg-kpi-recovery-value">--</p>
-                <p class="text-[10px] text-emerald-500/70">EUR total</p>
+                <p class="text-[10px] text-emerald-500/70" data-i18n="esg-kpi-recovery-sub">EUR total</p>
             </div>
         </div>
     </div>
 
     <!-- ── Per-Category Recovery Cards (dynamic from /api/db/components/stats) ── -->
     <div class="mb-8 md:mb-10">
-        <h3 class="text-lg md:text-xl font-bold text-white mb-1 border-b border-white/10 pb-2"><span data-i18n="esg-ledger">Second Life Component Ledger</span></h3>
-        <p class="text-xs md:text-sm text-slate-400 mb-4 md:mb-6">Per-category breakdown of installed vs end-of-life stock, with realised CO₂ + recovery value.</p>
+        <h3 class="text-lg md:text-xl font-bold text-white mb-1 border-b border-white/10 pb-2" data-i18n="esg-ledger">Second Life Component Ledger</h3>
+        <p class="text-xs md:text-sm text-slate-400 mb-4 md:mb-6" data-i18n="esg-ledger-sub">Per-category breakdown of installed vs end-of-life stock, with realised CO₂ + recovery value.</p>
         <div id="esg-category-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             <div class="text-slate-500 text-sm col-span-full">Loading categories…</div>
         </div>
@@ -66,18 +66,18 @@
 
     <!-- ── Component Inventory Table ───────────────────────────────────── -->
     <div class="mb-8 md:mb-10">
-        <h3 class="text-lg md:text-xl font-bold text-white mb-1 border-b border-white/10 pb-2">Component Inventory & Second-Life Allocation</h3>
-        <p class="text-xs md:text-sm text-slate-400 mb-4 md:mb-6">Serial-number-level tracking of every component with AI-driven lifecycle pathway — backed by real-time database.</p>
+        <h3 class="text-lg md:text-xl font-bold text-white mb-1 border-b border-white/10 pb-2" data-i18n="esg-inv-title">Component Inventory & Second-Life Allocation</h3>
+        <p class="text-xs md:text-sm text-slate-400 mb-4 md:mb-6" data-i18n="esg-inv-sub">Serial-number-level tracking of every component with AI-driven lifecycle pathway — backed by real-time database.</p>
 
         <!-- View Toggle + Filters -->
         <div class="flex flex-wrap items-center gap-2 mb-4">
             <div class="flex bg-slate-800 rounded-lg border border-white/10 overflow-hidden mr-3">
-                <button class="esg-status-toggle px-4 py-2 text-xs font-bold text-white bg-brand-600 transition-all" data-status="">All</button>
-                <button class="esg-status-toggle px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition-all" data-status="installed">Installed</button>
-                <button class="esg-status-toggle px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition-all" data-status="stocked">Stocked</button>
+                <button class="esg-status-toggle px-4 py-2 text-xs font-bold text-white bg-brand-600 transition-all" data-status="" data-i18n="esg-toggle-all">All</button>
+                <button class="esg-status-toggle px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition-all" data-status="installed" data-i18n="esg-toggle-installed">Installed</button>
+                <button class="esg-status-toggle px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition-all" data-status="stocked" data-i18n="esg-toggle-stocked">Stocked</button>
             </div>
             <div id="component-filter-chips" class="flex flex-wrap items-center gap-2">
-                <button class="component-filter active bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-full transition-all" data-filter="">All Types</button>
+                <button class="component-filter active bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-full transition-all" data-filter="" data-i18n="esg-filter-all">All Types</button>
                 <!-- per-category chips injected by esg.js -->
             </div>
         </div>
@@ -88,33 +88,33 @@
                 <table class="w-full text-sm text-left min-w-[900px]">
                     <thead class="text-[10px] text-slate-400 uppercase tracking-wider bg-black/30 border-b border-white/5">
                         <tr>
-                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="serial_number">Serial # ↕</th>
-                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="category">Type ↕</th>
-                            <th class="px-4 py-3">Brand / Model</th>
-                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="wear_percent">Wear % ↕</th>
-                            <th class="px-4 py-3">Vehicle</th>
-                            <th class="px-4 py-3">Status</th>
-                            <th class="px-4 py-3">AI Recommendation</th>
-                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="recovery_value_eur">Value (€) ↕</th>
-                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="co2_saved_kg">CO₂ Saved ↕</th>
+                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="serial_number"><span data-i18n="esg-th-serial">Serial #</span> ↕</th>
+                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="category"><span data-i18n="esg-th-type">Type</span> ↕</th>
+                            <th class="px-4 py-3" data-i18n="esg-th-brand">Brand / Model</th>
+                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="wear_percent"><span data-i18n="esg-th-wear">Wear %</span> ↕</th>
+                            <th class="px-4 py-3" data-i18n="esg-th-vehicle">Vehicle</th>
+                            <th class="px-4 py-3" data-i18n="esg-th-status">Status</th>
+                            <th class="px-4 py-3" data-i18n="esg-th-ai">AI Recommendation</th>
+                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="recovery_value_eur"><span data-i18n="esg-th-value">Value (€)</span> ↕</th>
+                            <th class="px-4 py-3 cursor-pointer hover:text-white transition-colors" data-sort="co2_saved_kg"><span data-i18n="esg-th-co2">CO₂ Saved</span> ↕</th>
                         </tr>
                     </thead>
                     <tbody id="component-table-body" class="divide-y divide-white/5">
-                        <tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">Loading components...</td></tr>
+                        <tr><td colspan="9" class="px-4 py-8 text-center text-slate-500" data-i18n="reg-loading">Loading…</td></tr>
                     </tbody>
                 </table>
             </div>
             <div id="component-table-footer" class="bg-black/20 border-t border-white/5 px-4 py-3 flex flex-wrap items-center justify-between gap-4 text-xs">
                 <div class="flex gap-4 md:gap-8">
-                    <div class="text-slate-400">Showing <span id="comp-showing" class="font-bold text-white">—</span></div>
-                    <div class="text-slate-400">Total: <span id="comp-total-count" class="font-bold text-white">—</span> components</div>
-                    <div class="text-slate-400">Recovery Value: <span id="comp-total-value" class="font-bold text-emerald-400">—</span></div>
-                    <div class="text-slate-400">CO₂ Saved: <span id="comp-total-co2" class="font-bold text-emerald-400">—</span></div>
+                    <div class="text-slate-400"><span data-i18n="esg-showing">Showing</span> <span id="comp-showing" class="font-bold text-white">—</span></div>
+                    <div class="text-slate-400"><span data-i18n="esg-total">Total:</span> <span id="comp-total-count" class="font-bold text-white">—</span> <span data-i18n="esg-components">components</span></div>
+                    <div class="text-slate-400"><span data-i18n="esg-recovery-value">Recovery Value:</span> <span id="comp-total-value" class="font-bold text-emerald-400">—</span></div>
+                    <div class="text-slate-400"><span data-i18n="esg-co2-saved">CO₂ Saved:</span> <span id="comp-total-co2" class="font-bold text-emerald-400">—</span></div>
                 </div>
                 <div class="flex items-center gap-2" id="comp-pagination">
-                    <button id="comp-prev-page" class="px-3 py-1.5 rounded bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-xs font-medium" disabled>← Prev</button>
-                    <span id="comp-page-info" class="text-slate-400 text-xs">Page 1</span>
-                    <button id="comp-next-page" class="px-3 py-1.5 rounded bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-xs font-medium" disabled>Next →</button>
+                    <button id="comp-prev-page" class="px-3 py-1.5 rounded bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-xs font-medium" data-i18n="reg-prev" disabled>← Prev</button>
+                    <span id="comp-page-info" class="text-slate-400 text-xs"><span data-i18n="reg-page">Page</span> 1</span>
+                    <button id="comp-next-page" class="px-3 py-1.5 rounded bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-xs font-medium" data-i18n="reg-next" disabled>Next →</button>
                 </div>
             </div>
         </div>
@@ -128,8 +128,8 @@
 
     <!-- ── Batch Recycling Analysis ────────────────────────────────────── -->
     <div class="mb-8 md:mb-10">
-        <h3 class="text-lg md:text-xl font-bold text-white mb-1 border-b border-white/10 pb-2">AI Batch Recycling & Revenue Analysis</h3>
-        <p class="text-xs md:text-sm text-slate-400 mb-4 md:mb-6">Select a component category to run AI-powered batch analysis on your entire stocked inventory — with revenue projections and optimal recycling strategies.</p>
+        <h3 class="text-lg md:text-xl font-bold text-white mb-1 border-b border-white/10 pb-2" data-i18n="esg-batch-title">AI Batch Recycling & Revenue Analysis</h3>
+        <p class="text-xs md:text-sm text-slate-400 mb-4 md:mb-6" data-i18n="esg-batch-sub">Select a component category to run AI-powered batch analysis on your entire stocked inventory — with revenue projections and optimal recycling strategies.</p>
 
         <!-- Stock Summary Cards (dynamic from /api/db/components/stats) -->
         <div id="batch-stock-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
@@ -140,7 +140,7 @@
         <div class="flex flex-wrap items-center gap-3 mb-4">
             <select id="batch-category-select"
                 class="bg-slate-800 text-white border border-slate-600 rounded-lg px-4 py-2.5 text-sm focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
-                <option value="all">All Stocked Components</option>
+                <option value="all" data-i18n="esg-batch-allstock">All Stocked Components</option>
                 <!-- per-category options injected by esg.js -->
             </select>
             <button id="btn-batch-recycling"
@@ -148,7 +148,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                 </svg>
-                Run Batch Recycling Analysis
+                <span data-i18n="esg-batch-run">Run Batch Recycling Analysis</span>
             </button>
         </div>
 
@@ -156,7 +156,7 @@
         <div class="glass-panel rounded-xl border border-white/5 overflow-hidden">
             <div class="bg-black/30 border-b border-white/5 px-4 py-2 flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" id="batch-status-dot"></div>
-                <span class="text-xs text-slate-400 font-mono" id="batch-status-text">Ready — Select a category and run analysis</span>
+                <span class="text-xs text-slate-400 font-mono" id="batch-status-text" data-i18n="esg-batch-ready">Ready — Select a category and run analysis</span>
             </div>
             <div id="batch-recycling-output"
                 class="bg-[#0a0a0a] p-6 min-h-[400px] max-h-[600px] overflow-y-auto text-sm text-slate-300 leading-relaxed">

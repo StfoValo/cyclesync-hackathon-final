@@ -9,7 +9,7 @@ const viewModules = {
     'telemetry-view':  { path: '/static/partials/telemetry_tab.html',  init: initTelemetry },
     'executive-view':  { path: '/static/partials/executive_tab.html',  init: initActuarial },
     'ai-view':         { path: '/static/partials/ai_tab.html',         init: initAIStrategy },
-    'esg-view':        { path: '/static/partials/esg_tab.html?v=6',        init: initESG },
+    'esg-view':        { path: '/static/partials/esg_tab.html?v=7',        init: initESG },
     'adjuster-view':   { path: '/static/partials/adjuster_tab.html',   init: initAdjuster }
 };
 
