@@ -20,7 +20,18 @@ services:
     plan: free
     branch: main
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: python -m uvicorn website.main:app --host 0.0.0.0 --port $PORT
+    # `--workers 1`     → free tier has 0.1 CPU; a second worker just OOMs.
+    # `--loop uvloop`   → ~2× the event-loop throughput vs. asyncio default.
+    # `--http httptools`→ faster HTTP parser than the default h11.
+    # `--limit-concurrency 80` → graceful 503 instead of OOM at storm peak.
+    # `--timeout-keep-alive 30` → reuse TCP connections so a viewer hitting
+    #                              /api/db/* multiple times doesn't pay the
+    #                              TLS handshake each call.
+    startCommand: >-
+      python -m uvicorn website.main:app
+      --host 0.0.0.0 --port $PORT
+      --workers 1 --loop uvloop --http httptools
+      --limit-concurrency 80 --timeout-keep-alive 30 --no-server-header
     healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION

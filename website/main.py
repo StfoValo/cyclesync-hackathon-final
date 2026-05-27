@@ -1,8 +1,9 @@
 import os
 import sys
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse 
+from fastapi.responses import FileResponse
+from fastapi.middleware.gzip import GZipMiddleware
 
 # Setup path for models
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -23,6 +24,39 @@ from models.data_manager.fleet_demo_seeder import migrate_and_seed as _migrate_f
 from models.data_manager.incident_telemetry_seeder import migrate_and_seed as _migrate_incident_telemetry
 
 app = FastAPI()
+
+# ── Gzip compression for JSON/HTML payloads (minimum size 1 KB) ──────────
+# Big wins: /api/db/vehicles (10 KB+), /api/db/components (40 KB+) shrink
+# by ~70% over the wire so 50 concurrent fetchers don't saturate Render's
+# free-tier egress.
+app.add_middleware(GZipMiddleware, minimum_size=1024)
+
+
+# ── HTTP cache headers on read-only DB endpoints ─────────────────────────
+# Lets the browser (and any intermediate CDN) skip the round-trip for
+# repeated GETs during a demo, which is critical when 50 viewers are all
+# loading the dashboard at once.
+#   • /api/db/*         → 60 s public cache (seed data is idempotent)
+#   • /api/db/telemetry/categories → 5 min (almost immutable)
+#   • /api/db/investigations/*/telemetry-samples → 5 min (locked window)
+#   • /api/fleet/map    → already cached server-side; add browser cache too
+@app.middleware("http")
+async def _http_cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    if request.method != "GET":
+        return response
+    path = request.url.path
+    if path.startswith("/api/db/telemetry/categories"):
+        response.headers["Cache-Control"] = "public, max-age=300"
+    elif "/telemetry-samples" in path or "/photos" in path:
+        response.headers["Cache-Control"] = "public, max-age=300"
+    elif path.startswith("/api/db/") or path.startswith("/api/driver/"):
+        response.headers["Cache-Control"] = "public, max-age=60"
+    elif path.startswith("/api/actuarial/"):
+        response.headers["Cache-Control"] = "public, max-age=120"
+    elif path.startswith("/storage/") or path.startswith("/static/"):
+        response.headers["Cache-Control"] = "public, max-age=3600"
+    return response
 
 @app.on_event("startup")
 def _bootstrap_adjuster_schema():
