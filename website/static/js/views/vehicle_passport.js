@@ -2,7 +2,7 @@
  * Vehicle Digital Passport — works with new DB-backed API
  */
 import { manufacturerBadge, powertrainIcon, componentIcon, iconBlackboxActive } from '/static/js/icons.js?v=18';
-import { renderCategorizedTelemetry } from './telemetry_panel.js?v=4';
+import { renderCategorizedTelemetry } from './telemetry_panel.js?v=5';
 
 let currentPassportData = null;
 

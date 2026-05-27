@@ -26,6 +26,55 @@ export function loadTelemetryCategories() {
     return _categoriesPromise;
 }
 
+// Translation key per telemetry category (used by renderCategorizedTelemetry).
+const CATEGORY_I18N = {
+    gps:             'tel-cat-gps',
+    imu:             'tel-cat-imu',
+    crash_event:     'tel-cat-crash',
+    obd_engine:      'tel-cat-engine',
+    obd_fuel:        'tel-cat-fuel',
+    speed:           'tel-cat-speed',
+    emissions:       'tel-cat-emissions',
+    electrical_12v:  'tel-cat-12v',
+    brake:           'tel-cat-brake',
+    steering:        'tel-cat-steering',
+    transmission:    'tel-cat-transmission',
+    tpms:            'tel-cat-tpms',
+    ev_hybrid:       'tel-cat-evhybrid',
+    adas:            'tel-cat-adas',
+    behavior:        'tel-cat-behavior',
+    dtc:             'tel-cat-dtc',
+    trip:            'tel-cat-trip',
+    device:          'tel-cat-device',
+};
+
+// Translation keys for the columns we surface in Essential mode. Anything
+// not in this map falls back to the auto-prettified label from prettifyTelCol.
+const COL_I18N = {
+    accel_x_g:                'tel-col-accel-x',
+    gyro_roll_deg_s:          'tel-col-gyro-roll',
+    abs_active:               'tel-col-abs-active',
+    esc_active:               'tel-col-esc-active',
+    engine_rpm:               'tel-col-engine-rpm',
+    coolant_temp_c:           'tel-col-coolant-temp',
+    throttle_position_pct:    'tel-col-throttle',
+    fuel_level_pct:           'tel-col-fuel-level',
+    brake_pressure_bar:       'tel-col-brake-pressure',
+    transmission_fluid_temp_c:'tel-col-trans-fluid-temp',
+    tpms_fl_bar:              'tel-col-tpms-fl',
+    tpms_fr_bar:              'tel-col-tpms-fr',
+    tpms_rl_bar:              'tel-col-tpms-rl',
+    tpms_rr_bar:              'tel-col-tpms-rr',
+    motor_speed_rpm:          'tel-col-motor-rpm',
+    motor_temp_c:             'tel-col-motor-temp',
+    inverter_temp_c:          'tel-col-inverter-temp',
+    battery_pack_voltage_v:   'tel-col-battery-voltage',
+    battery_energy_kwh:       'tel-col-battery-energy',
+    estimated_range_km:       'tel-col-range',
+};
+
+const _t = (key, fallback) => (window.t ? window.t(key, fallback) : fallback);
+
 // ── Curated "Essential" subset per category ──────────────────────────────
 // '*'        → all columns of the category
 // []         → category hidden in Essential view
@@ -116,8 +165,8 @@ function _gpsMiniMap(telemetry) {
     const valid = typeof lat === 'number' && typeof lon === 'number' && !isNaN(lat) && !isNaN(lon);
     if (!valid) {
         return `<div class="col-span-2 sm:col-span-3 lg:col-span-4 bg-slate-800/50 rounded-lg p-6 border border-white/5 text-center">
-            <p class="text-[11px] text-slate-400 mb-1">📡 No GPS fix yet</p>
-            <p class="text-[10px] text-slate-500">Position will appear here once the blackbox reports lat/lon.</p>
+            <p class="text-[11px] text-slate-400 mb-1">📡 ${_t('tel-no-gps', 'No GPS fix yet')}</p>
+            <p class="text-[10px] text-slate-500">${_t('tel-no-gps-sub', 'Position will appear here once the blackbox reports lat/lon.')}</p>
         </div>`;
     }
     const d = 0.008;
@@ -130,7 +179,7 @@ function _gpsMiniMap(telemetry) {
                 class="w-full h-48 block" style="border:0" loading="lazy"></iframe>
         <div class="px-3 py-2 flex justify-between items-center bg-slate-900/50">
             <span class="text-[10px] font-mono text-slate-300">${lat.toFixed(5)}, ${lon.toFixed(5)}</span>
-            <span class="text-[10px] text-slate-500">Sat: ${sats} · Fix: ${fix}</span>
+            <span class="text-[10px] text-slate-500">${_t('tel-sat', 'Sat')}: ${sats} · ${_t('tel-fix', 'Fix')}: ${fix}</span>
         </div>
     </div>`;
 }
@@ -147,11 +196,28 @@ function _telCard(label, value, questionable = false) {
         </div>`;
 }
 
+function _categoryLabel(category) {
+    const key = CATEGORY_I18N[category.key];
+    return key ? _t(key, category.label) : category.label;
+}
+
+function _colLabel(col) {
+    const key = COL_I18N[col];
+    const pretty = prettifyTelCol(col);
+    if (key) {
+        const translated = _t(key, pretty.label);
+        return { label: translated, unit: pretty.unit };
+    }
+    return pretty;
+}
+
 function _telSection(category, telemetry, mode = 'extended') {
     const filter = mode === 'essential' ? (ESSENTIAL_FIELDS[category.key] ?? []) : '*';
 
     // Hide whole category in Essential mode if filter is an empty array.
     if (mode === 'essential' && Array.isArray(filter) && filter.length === 0) return '';
+
+    const catLabel = _categoryLabel(category);
 
     // Special-case: GPS mini-map.
     if (mode === 'essential' && filter[0] === '__map__') {
@@ -159,7 +225,7 @@ function _telSection(category, telemetry, mode = 'extended') {
             <div class="col-span-2 sm:col-span-4 mt-3 first:mt-0">
                 <div class="flex items-center gap-2 mb-2 pb-1.5 border-b border-white/5">
                     <span class="text-sm">${category.icon}</span>
-                    <h5 class="text-[11px] uppercase tracking-wider text-slate-300 font-bold">${category.label}</h5>
+                    <h5 class="text-[11px] uppercase tracking-wider text-slate-300 font-bold">${catLabel}</h5>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                     ${_gpsMiniMap(telemetry)}
@@ -177,17 +243,18 @@ function _telSection(category, telemetry, mode = 'extended') {
     if (!cols.length) return '';
 
     const cards = cols.map(col => {
-        const { label, unit } = prettifyTelCol(col);
+        const { label, unit } = _colLabel(col);
         const value = formatTelValue(telemetry?.[col], unit);
         return _telCard(label, value, QUESTIONABLE_COLS.has(col));
     }).join('');
 
+    const signalsLabel = _t('tel-signals', 'signals');
     return `
         <div class="col-span-2 sm:col-span-4 mt-3 first:mt-0">
             <div class="flex items-center gap-2 mb-2 pb-1.5 border-b border-white/5">
                 <span class="text-sm">${category.icon}</span>
-                <h5 class="text-[11px] uppercase tracking-wider text-slate-300 font-bold">${category.label}</h5>
-                <span class="text-[10px] text-slate-600 ml-auto">${cols.length}${mode === 'essential' && filter !== '*' ? ` / ${category.columns.length}` : ''} signals</span>
+                <h5 class="text-[11px] uppercase tracking-wider text-slate-300 font-bold">${catLabel}</h5>
+                <span class="text-[10px] text-slate-600 ml-auto">${cols.length}${mode === 'essential' && filter !== '*' ? ` / ${category.columns.length}` : ''} ${signalsLabel}</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 ${cards}
@@ -221,10 +288,14 @@ function _signalCount(cats, mode) {
  * @param {object}      [opts]
  * @param {string}      [opts.overviewHtml]   Optional HTML above the tab bar.
  */
+// Stash last-rendered context so we can re-render on languageChanged.
+const _lastRender = new WeakMap();
+
 export async function renderCategorizedTelemetry(gridEl, telemetry, opts = {}) {
     if (!gridEl) return;
+    _lastRender.set(gridEl, { telemetry, opts });
     if (!telemetry || !telemetry.vin) {
-        gridEl.innerHTML = '<div class="text-slate-500 text-sm col-span-2 sm:col-span-4">No telemetry data</div>';
+        gridEl.innerHTML = `<div class="text-slate-500 text-sm col-span-2 sm:col-span-4">${_t('tel-no-data', 'No telemetry data')}</div>`;
         return;
     }
     const cats = await loadTelemetryCategories();
@@ -239,11 +310,11 @@ export async function renderCategorizedTelemetry(gridEl, telemetry, opts = {}) {
             <div class="flex items-center gap-1 mb-3 border-b border-white/5">
                 <button data-tel-tab="essential"
                     class="tel-subtab px-4 py-1.5 text-xs font-bold text-brand-400 border-b-2 border-brand-500 transition-colors">
-                    Essential <span class="opacity-60">· ${essentialN}</span>
+                    ${_t('tel-essential', 'Essential')} <span class="opacity-60">· ${essentialN}</span>
                 </button>
                 <button data-tel-tab="extended"
                     class="tel-subtab px-4 py-1.5 text-xs font-bold text-slate-500 border-b-2 border-transparent hover:text-white transition-colors">
-                    Extended <span class="opacity-60">· ${extendedN}</span>
+                    ${_t('tel-extended', 'Extended')} <span class="opacity-60">· ${extendedN}</span>
                 </button>
             </div>
             <div data-tel-pane="essential" class="grid grid-cols-2 sm:grid-cols-4 gap-2">${essentialHtml}</div>
@@ -267,3 +338,19 @@ export async function renderCategorizedTelemetry(gridEl, telemetry, opts = {}) {
         });
     });
 }
+
+// ── Re-render on language change ─────────────────────────────────────────
+// Each grid element we've rendered into is tracked in _lastRender; when the
+// user toggles EN ⇄ IT we re-call renderCategorizedTelemetry with the same
+// telemetry + opts so section headers, field labels, "Essential/Extended",
+// and the GPS footer flip to the new locale.
+window.addEventListener('languageChanged', () => {
+    // WeakMap doesn't expose keys; we re-render anything still attached by
+    // looking up the well-known mount points used by Vehicle Passport and
+    // Adjuster — those are the only callers.
+    ['passport-telemetry-grid', 'adj-tel-outer'].forEach(id => {
+        const el = document.getElementById(id);
+        const ctx = el && _lastRender.get(el);
+        if (el && ctx) renderCategorizedTelemetry(el, ctx.telemetry, ctx.opts);
+    });
+});

@@ -3,9 +3,49 @@
  * Backed by /api/db/investigations endpoints
  */
 import { incidentIcon, componentIcon, iconBrakeDisc, manufacturerBadge } from '/static/js/icons.js?v=18';
-import { renderCategorizedTelemetry } from './telemetry_panel.js?v=4';
+import { renderCategorizedTelemetry } from './telemetry_panel.js?v=5';
 
 let currentInvestigation = null;
+
+// Map snake_case event_flag values from the incident seeder → i18n keys.
+const EVENT_TAG_I18N = {
+    normal:                       'evt-normal',
+    approach_intersection:        'evt-approach-intersection',
+    light_yellow:                 'evt-light-yellow',
+    light_red:                    'evt-light-red',
+    ldw_alert:                    'evt-ldw-alert',
+    IMPACT:                       'evt-impact',
+    IMPACT_SIDE:                  'evt-impact-side',
+    IMPACT_HEAD_ON:               'evt-impact-head-on',
+    airbag_deployed:              'evt-airbag-deployed',
+    multi_airbag_deployed:        'evt-multi-airbag',
+    vehicle_stopped:              'evt-vehicle-stopped',
+    ignition_off:                 'evt-ignition-off',
+    normal_cruise:                'evt-normal-cruise',
+    normal_congestion:            'evt-normal-congestion',
+    stopped_in_traffic:           'evt-stopped-in-traffic',
+    vehicle_shoved:               'evt-vehicle-shoved',
+    esc_stabilizing:              'evt-esc-stabilizing',
+    stationary:                   'evt-stationary',
+    tractor_in_view:              'evt-tractor-in-view',
+    closing_in:                   'evt-closing-in',
+    FCW_FORWARD_COLLISION_WARNING:'evt-fcw',
+    brake_applied_late:           'evt-brake-late',
+    approach_junction:            'evt-approach-junction',
+    right_of_way:                 'evt-right-of-way',
+    esc_intervention:             'evt-esc-intervention',
+    post_crash_stationary:        'evt-post-crash',
+    normal_cruise_wet_road:       'evt-normal-cruise-wet',
+    oncoming_traffic:             'evt-oncoming-traffic',
+    oncoming_drifted_left:        'evt-oncoming-drifted',
+    abs_engaged_emergency:        'evt-abs-engaged',
+    airbag_deployed_all:          'evt-multi-airbag',
+};
+function translateEventTag(tag) {
+    if (!tag) return '';
+    const key = EVENT_TAG_I18N[tag];
+    return key ? window.t(key, tag.replace(/_/g, ' ').toLowerCase()) : tag.replace(/_/g, ' ').toLowerCase();
+}
 
 export function initAdjuster() {
     loadInvestigationList();
@@ -276,8 +316,9 @@ async function renderDetailTelemetry(caseNumber, fallbackTel) {
                               : isAbs    ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
                               : 'bg-slate-700/40 border-white/10 text-slate-300';
                     const sign = e.sec_relative >= 0 ? '+' : '';
+                    const tagLabel = translateEventTag(e.tag);
                     return `<button data-seq="${seq}" class="adj-tel-event-btn text-[10px] px-2 py-1 rounded border ${cls} hover:brightness-125 transition-all font-mono">
-                        ${sign}${e.sec_relative}s · ${e.tag}
+                        ${sign}${e.sec_relative}s · ${tagLabel}
                     </button>`;
                 }).join('')}
             </div>` : ''}

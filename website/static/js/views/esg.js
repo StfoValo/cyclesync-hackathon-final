@@ -129,6 +129,23 @@ const COLOR_CLASSES = {
 };
 function colorOf(name) { return COLOR_CLASSES[name] || COLOR_CLASSES.slate; }
 
+// Map server-supplied category key → i18n translation key. Used in every
+// place we previously printed `c.label` so the UI follows the EN/IT toggle
+// even though the API response is always English.
+const CAT_LABEL_I18N = {
+    tire:              'pass-cat-tire',
+    brake_pad:         'pass-cat-brake-pad',
+    brake_disc:        'pass-cat-brake-disc',
+    suspension_damper: 'pass-cat-suspension',
+    aux_12v_battery:   'pass-cat-12v-battery',
+    engine_oil:        'pass-cat-engine-oil',
+    dpf:               'pass-cat-dpf',
+    ev_battery:        'pass-cat-ev-battery',
+};
+function catLabel(c) {
+    return CAT_LABEL_I18N[c.key] ? window.t(CAT_LABEL_I18N[c.key], c.label) : c.label;
+}
+
 function renderCategoryGrid(s) {
     const grid = document.getElementById('esg-category-grid');
     if (!grid || !s.categories) return;
@@ -139,7 +156,7 @@ function renderCategoryGrid(s) {
             <div class="glass-panel rounded-xl p-4 border ${col.border} ${col.bg} transition-all hover:scale-[1.02]">
                 <div class="flex items-center justify-between mb-2">
                     ${iconSvg}
-                    <span class="text-[10px] text-slate-400 uppercase tracking-wider">${c.label}</span>
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider">${catLabel(c)}</span>
                 </div>
                 <p class="text-2xl md:text-3xl font-bold ${col.text}">${c.total.toLocaleString()}</p>
                 <div class="text-[10px] text-slate-500 mt-1">
@@ -167,7 +184,7 @@ function renderFilterChips(s) {
         const chip = document.createElement('button');
         chip.className = `component-filter inline-flex items-center gap-1.5 bg-slate-800 text-slate-400 text-xs font-bold px-4 py-2 rounded-full border border-white/10 hover:${col.border} transition-all`;
         chip.dataset.filter = c.key;
-        chip.innerHTML = `${componentIcon(c.key, `w-3.5 h-3.5 ${col.text}`)} <span>${c.label}</span> <span class="ml-1 text-[10px] text-slate-500">${c.total}</span>`;
+        chip.innerHTML = `${componentIcon(c.key, `w-3.5 h-3.5 ${col.text}`)} <span>${catLabel(c)}</span> <span class="ml-1 text-[10px] text-slate-500">${c.total}</span>`;
         container.appendChild(chip);
     });
     // (Re)wire all chips — both the persistent "All" one and the new dynamic ones.
@@ -202,7 +219,7 @@ function renderBatchGrid(s) {
             const iconSvg = componentIcon(c.key, `w-5 h-5 ${col.text}`);
             return `
                 <div class="glass-panel rounded-xl p-4 border border-white/5 cursor-pointer hover:${col.border} transition-all batch-category-card" data-category="${c.key}">
-                    <div class="flex items-center gap-2 mb-1">${iconSvg}<p class="text-[10px] text-slate-400 uppercase tracking-wider">${c.label}</p></div>
+                    <div class="flex items-center gap-2 mb-1">${iconSvg}<p class="text-[10px] text-slate-400 uppercase tracking-wider">${catLabel(c)}</p></div>
                     <p class="text-xl font-bold ${col.text}">${(c.stocked || 0).toLocaleString()}</p>
                     <p class="text-[10px] text-slate-500">${window.t('esg-stocked', 'stocked')} · €${(c.value_eur || 0).toLocaleString()}</p>
                 </div>`;
@@ -225,7 +242,7 @@ function renderBatchSelectOptions(s) {
     sel.innerHTML = '<option value="all">All Stocked Components</option>' +
         s.categories
             .filter(c => c.stocked > 0)
-            .map(c => `<option value="${c.key}">${c.label} (${c.stocked})</option>`)
+            .map(c => `<option value="${c.key}">${catLabel(c)} (${c.stocked})</option>`)
             .join('');
 }
 
@@ -247,14 +264,44 @@ async function loadComponentTable() {
         updateFooter(data);
     } catch(e) {
         console.error(e);
-        if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-rose-400">Failed to load</td></tr>';
+        if (tbody) tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-rose-400">${window.t('esg-failed-load', 'Failed to load')}</td></tr>`;
     }
 }
 
 // Human-friendly label for any category key (falls back to slug-title-case).
 function categoryLabel(key) {
+    if (CAT_LABEL_I18N[key]) return window.t(CAT_LABEL_I18N[key]);
     const c = cachedStats?.categories?.find(c => c.key === key);
     return c?.label || (key || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+// Map AI-recommendation phrase from DB → i18n key. Falls back to original
+// phrase if we haven't catalogued it.
+const REC_PHRASE_I18N = [
+    [/Lead-Acid Recycling/i,             'inv-rec-lead-acid'],
+    [/Asphalt Recycling/i,               'inv-rec-asphalt'],
+    [/Energy Recovery/i,                 'inv-rec-energy'],
+    [/Scrap Metal Smelting/i,            'inv-rec-scrap'],
+    [/Friction Material/i,               'inv-rec-friction'],
+    [/Steel Foundry Reuse/i,             'inv-rec-steel'],
+    [/Steel & Oil Separation/i,          'inv-rec-steel-oil'],
+    [/Used-Oil Refining/i,               'inv-rec-oil-refine'],
+    [/Precious Metal Recovery/i,         'inv-rec-precious'],
+    [/Grid Storage/i,                    'inv-rec-grid'],
+    [/Black Mass Recycling/i,            'inv-rec-blackmass'],
+];
+function translateRec(phrase) {
+    if (!phrase || phrase === '—') return phrase;
+    for (const [re, key] of REC_PHRASE_I18N) {
+        if (re.test(phrase)) return window.t(key, phrase);
+    }
+    return phrase;
+}
+
+function translateStatus(status) {
+    if (status === 'installed') return window.t('inv-status-installed', status);
+    if (status === 'stocked')   return window.t('inv-status-stocked', status);
+    return status || '';
 }
 function categoryIconStr(key) {
     // Return a stylized SVG that matches the driver-app icons.
@@ -294,8 +341,8 @@ function renderTable(comps) {
             <td class="px-4 py-3"><span class="text-white text-xs">${c.brand||'—'}</span><span class="text-[10px] text-slate-500 block mt-0.5">${c.model_name||'—'}${hint?' · '+hint:''}</span></td>
             <td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-16 bg-slate-700 rounded-full h-1.5"><div class="${wC} rounded-full h-1.5" style="width:${w}%"></div></div><span class="text-xs font-bold ${wT}">${w}%</span></div></td>
             <td class="px-4 py-3"><span class="font-mono font-bold text-white text-xs bg-black/40 px-1.5 py-0.5 rounded border border-slate-700">${c.plate_number||'—'}</span></td>
-            <td class="px-4 py-3"><span class="text-[10px] font-bold px-2 py-1 rounded-full ${hC}">${c.status}</span></td>
-            <td class="px-4 py-3">${rec!=='—'?`<span class="text-[10px] font-bold px-2 py-1 rounded-full border ${recC}">${rec}</span>`:'<span class="text-slate-600 text-xs">—</span>'}</td>
+            <td class="px-4 py-3"><span class="text-[10px] font-bold px-2 py-1 rounded-full ${hC}">${translateStatus(c.status)}</span></td>
+            <td class="px-4 py-3">${rec!=='—'?`<span class="text-[10px] font-bold px-2 py-1 rounded-full border ${recC}">${translateRec(rec)}</span>`:'<span class="text-slate-600 text-xs">—</span>'}</td>
             <td class="px-4 py-3 text-xs font-bold ${c.recovery_value_eur?'text-emerald-400':'text-slate-600'}">${c.recovery_value_eur?'€'+c.recovery_value_eur.toLocaleString():'—'}</td>
             <td class="px-4 py-3 text-xs font-bold ${c.co2_saved_kg?'text-emerald-400':'text-slate-600'}">${c.co2_saved_kg?c.co2_saved_kg+' kg':'—'}</td>
         </tr>
