@@ -178,3 +178,12 @@ function setupRegisterModal() {
         } catch(err) { console.error('Registration failed:', err); }
     });
 }
+
+
+// Re-render the registry table when language toggles (some cells like
+// powertrain label or policy status may be translatable).
+window.addEventListener('languageChanged', () => {
+    if (typeof loadVehicles === 'function') {
+        try { loadVehicles(); } catch (_) { /* not initialized yet */ }
+    }
+});

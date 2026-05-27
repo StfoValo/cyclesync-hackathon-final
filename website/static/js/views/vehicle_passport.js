@@ -134,13 +134,18 @@ function renderPassport(data) {
     document.getElementById('passport-driver').textContent = `${id.driver || '—'}`;
 
     const ptEl = document.getElementById('passport-powertrain');
-    if (ptEl) ptEl.innerHTML = `<span class="inline-flex items-center gap-1.5">${powertrainIcon(id.powertrain, 'w-3.5 h-3.5')}<span class="text-xs">${({electric:'Electric',diesel:'Diesel',petrol:'Petrol',hybrid:'Hybrid',plug_in_hybrid:'PHEV',gpl:'GPL'})[id.powertrain] || id.powertrain || '—'}</span></span>`;
+    const PT_I18N = {
+        electric: 'pass-pt-electric', diesel: 'pass-pt-diesel', petrol: 'pass-pt-petrol',
+        hybrid: 'pass-pt-hybrid', plug_in_hybrid: 'pass-pt-phev', gpl: 'pass-pt-gpl',
+    };
+    const ptLabel = PT_I18N[id.powertrain] ? window.t(PT_I18N[id.powertrain]) : (id.powertrain || '—');
+    if (ptEl) ptEl.innerHTML = `<span class="inline-flex items-center gap-1.5">${powertrainIcon(id.powertrain, 'w-3.5 h-3.5')}<span class="text-xs">${ptLabel}</span></span>`;
 
     const bbBadge = document.getElementById('passport-blackbox');
     if (tel.has_blackbox) {
         bbBadge.classList.remove('hidden');
         bbBadge.className = 'inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30 font-medium';
-        bbBadge.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Blackbox Active`;
+        bbBadge.innerHTML = `<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${window.t('pass-blackbox-active', 'Blackbox Active')}`;
     } else { bbBadge.classList.add('hidden'); }
 
     // Manufacturer badge in the icon slot
@@ -163,11 +168,14 @@ function renderPassport(data) {
         (ins.policy_status === 'active' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30');
 
     const insGrid = document.getElementById('passport-insurance-grid');
-    insGrid.innerHTML = _cell('Policy Type', ins.policy_type) + _cell('Insurer', ins.insurer) +
-        _cell('Premium', ins.premium_eur ? `€${ins.premium_eur.toLocaleString()}` : '—') +
-        _cell('Telematics Discount', ins.telematics_discount ? `${ins.telematics_discount}%` : '—') +
-        _cell('Expiry', ins.policy_expiry) + _cell('Claims', `${ins.claims_count ?? 0}`) +
-        _cell('VIN', `<span class="font-mono text-xs">${data.vin || '—'}</span>`) +
+    insGrid.innerHTML =
+        _cell(window.t('pass-policy-type', 'Policy Type'), ins.policy_type) +
+        _cell(window.t('pass-insurer', 'Insurer'), ins.insurer) +
+        _cell(window.t('pass-premium', 'Premium'), ins.premium_eur ? `€${ins.premium_eur.toLocaleString()}` : '—') +
+        _cell(window.t('pass-tel-discount', 'Telematics Discount'), ins.telematics_discount ? `${ins.telematics_discount}%` : '—') +
+        _cell(window.t('pass-expiry', 'Expiry'), ins.policy_expiry) +
+        _cell(window.t('pass-claims', 'Claims'), `${ins.claims_count ?? 0}`) +
+        _cell(window.t('pass-vin', 'VIN'), `<span class="font-mono text-xs">${data.vin || '—'}</span>`) +
         _cell('Policy #', `<span class="font-mono text-xs">${ins.policy_number || '—'}</span>`);
 
     // Telemetry
@@ -179,7 +187,7 @@ function renderPassport(data) {
 
 function renderComponents(components) {
     const container = document.getElementById('passport-components');
-    if (!components.length) { container.innerHTML = '<div class="text-slate-500 text-sm col-span-4">No components data</div>'; return; }
+    if (!components.length) { container.innerHTML = `<div class="text-slate-500 text-sm col-span-4">${window.t('pass-no-comp', 'No components data')}</div>`; return; }
 
     // Group by category
     const groups = {};
@@ -189,48 +197,56 @@ function renderComponents(components) {
         groups[cat].push(c);
     });
 
-    // Complete human-readable label table — every category the ESG seeder emits.
-    const catLabels = {
-        tire:              'Tires',
-        brake_pad:         'Brake Pads',
-        brake_disc:        'Brake Discs',
-        suspension_damper: 'Suspension',
-        aux_12v_battery:   '12V Battery',
-        engine_oil:        'Engine Oil',
-        dpf:               'DPF',
-        ev_battery:        'EV Battery',
+    // Map category key → translation key in i18n.
+    const CAT_I18N = {
+        tire:              'pass-cat-tire',
+        brake_pad:         'pass-cat-brake-pad',
+        brake_disc:        'pass-cat-brake-disc',
+        suspension_damper: 'pass-cat-suspension',
+        aux_12v_battery:   'pass-cat-12v-battery',
+        engine_oil:        'pass-cat-engine-oil',
+        dpf:               'pass-cat-dpf',
+        ev_battery:        'pass-cat-ev-battery',
     };
 
     container.innerHTML = Object.entries(groups).map(([cat, items]) => {
         const icon = componentIcon(cat, 'w-5 h-5 shrink-0');
-        const label = catLabels[cat] || cat.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase());
+        const label = CAT_I18N[cat]
+            ? window.t(CAT_I18N[cat])
+            : cat.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase());
         const avgWear = Math.round(items.reduce((s,c) => s + (c.wear_percent||0), 0) / items.length);
         const healthPct = 100 - avgWear;
         const worst = items.reduce((w,c) => (c.wear_percent||0) > (w.wear_percent||0) ? c : w, items[0]);
         const status = worst.health_status || (avgWear > 80 ? 'critical' : avgWear > 60 ? 'warning' : 'healthy');
+        const statusLabel = window.t(`pass-status-${status}`, status);
         const color = status === 'critical' ? 'text-rose-400' : status === 'warning' ? 'text-amber-400' : 'text-emerald-400';
         const barColor = status === 'critical' ? 'bg-rose-500' : status === 'warning' ? 'bg-amber-500' : 'bg-emerald-500';
         const borderColor = status === 'critical' ? 'border-rose-500/30' : status === 'warning' ? 'border-amber-500/30' : 'border-emerald-500/30';
         const detail = items.map(c => `${c.position||''}: ${c.wear_percent||0}%`).join(', ');
-        const countLabel = items.length === 1 ? '1 part' : `${items.length} parts`;
+        const countLabel = items.length === 1
+            ? `1 ${window.t('pass-parts-1', 'part')}`
+            : `${items.length} ${window.t('pass-parts-n', 'parts')}`;
 
-        // Layout: icon + label on row 1, status badge on its own row (right-aligned).
-        // This avoids the crammed icon/label/badge collision at narrow card widths.
         return `<div class="bg-slate-800/50 rounded-lg p-3 md:p-4 border ${borderColor}" title="${detail}">
             <div class="flex items-center gap-2 mb-1.5 ${color}">
                 ${icon}<span class="font-semibold text-white text-xs md:text-sm truncate">${label}</span>
             </div>
             <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-bold ${color} uppercase tracking-wider">${status}</span>
+                <span class="text-[10px] font-bold ${color} uppercase tracking-wider">${statusLabel}</span>
                 <span class="text-[10px] text-slate-500">${countLabel}</span>
             </div>
             <div class="w-full bg-slate-700 rounded-full h-2 mb-1.5">
                 <div class="${barColor} rounded-full h-2 transition-all duration-1000" style="width:${healthPct}%"></div>
             </div>
-            <div class="text-[11px] ${color} font-bold">${healthPct}% <span class="text-slate-500 font-normal">health</span></div>
+            <div class="text-[11px] ${color} font-bold">${healthPct}% <span class="text-slate-500 font-normal">${window.t('pass-health', 'health')}</span></div>
         </div>`;
     }).join('');
 }
+
+// Re-render passport when the language toggles.
+window.addEventListener('languageChanged', () => {
+    if (currentPassportData) renderPassport(currentPassportData);
+});
 
 function renderTelemetry(tel) {
     const grid = document.getElementById('passport-telemetry-grid');
@@ -240,10 +256,10 @@ function renderTelemetry(tel) {
     // existing colour-coding so the dashboard look stays the same).
     const overviewHtml = (tel && tel.vin) ? `
         <div class="col-span-2 sm:col-span-4 grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
-            ${_cell('Odometer', tel.current_odometer_km ? `${tel.current_odometer_km.toLocaleString()} km` : '—')}
-            ${_cell('Driving Score', tel.driving_score != null ? `<span class="${tel.driving_score >= 70 ? 'text-emerald-400' : tel.driving_score >= 40 ? 'text-amber-400' : 'text-rose-400'} font-bold">${tel.driving_score}/100</span>` : '—')}
-            ${_cell('Last Sync', tel.last_sync_timestamp ? `<span class="font-mono text-xs">${new Date(tel.last_sync_timestamp).toLocaleString()}</span>` : '—')}
-            ${_cell('Avg Speed', tel.avg_speed_kmh ? `${tel.avg_speed_kmh} km/h` : '—')}
+            ${_cell(window.t('pass-odometer', 'Odometer'), tel.current_odometer_km ? `${tel.current_odometer_km.toLocaleString()} km` : '—')}
+            ${_cell(window.t('pass-driving-score', 'Driving Score'), tel.driving_score != null ? `<span class="${tel.driving_score >= 70 ? 'text-emerald-400' : tel.driving_score >= 40 ? 'text-amber-400' : 'text-rose-400'} font-bold">${tel.driving_score}/100</span>` : '—')}
+            ${_cell(window.t('pass-last-sync', 'Last Sync'), tel.last_sync_timestamp ? `<span class="font-mono text-xs">${new Date(tel.last_sync_timestamp).toLocaleString()}</span>` : '—')}
+            ${_cell(window.t('pass-avg-speed', 'Avg Speed'), tel.avg_speed_kmh ? `${tel.avg_speed_kmh} km/h` : '—')}
         </div>` : '';
 
     // Full categorised raw-signal panel below (all 126 columns × 18 sections).
@@ -252,7 +268,7 @@ function renderTelemetry(tel) {
 
 function renderMaintenance(events) {
     const container = document.getElementById('passport-history-timeline');
-    if (!events?.length) { container.innerHTML = '<div class="text-slate-500 text-sm pl-6">No maintenance records</div>'; return; }
+    if (!events?.length) { container.innerHTML = `<div class="text-slate-500 text-sm pl-6">${window.t('pass-no-history', 'No maintenance records')}</div>`; return; }
     container.innerHTML = events.map(h => {
         const colors = {critical:'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)] animate-pulse',alert:'bg-rose-500',warning:'bg-amber-500',notification:'bg-brand-500',info:'bg-slate-400',scheduled:'bg-slate-400'};
         const dotColor = colors[h.severity || h.event_type] || 'bg-slate-400';

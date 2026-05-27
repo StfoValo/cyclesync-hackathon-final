@@ -21,7 +21,7 @@ export function initAdjuster() {
 async function loadInvestigationList(statusFilter = '') {
     const container = document.getElementById('investigation-list');
     if (!container) return;
-    container.innerHTML = '<div class="text-center py-8 text-slate-500">Loading investigations...</div>';
+    container.innerHTML = `<div class="text-center py-8 text-slate-500">${window.t('adj-loading', 'Loading investigations…')}</div>`;
 
     try {
         const params = statusFilter ? `?status=${statusFilter}` : '';
@@ -29,14 +29,14 @@ async function loadInvestigationList(statusFilter = '') {
         const investigations = await resp.json();
         renderInvestigationList(investigations);
     } catch (e) {
-        container.innerHTML = '<div class="text-center py-8 text-rose-400">Failed to load investigations</div>';
+        container.innerHTML = `<div class="text-center py-8 text-rose-400">${window.t('adj-failed-load', 'Failed to load investigations')}</div>`;
     }
 }
 
 function renderInvestigationList(investigations) {
     const container = document.getElementById('investigation-list');
     if (!investigations?.length) {
-        container.innerHTML = '<div class="text-center py-8 text-slate-500">No investigations found</div>';
+        container.innerHTML = `<div class="text-center py-8 text-slate-500">${window.t('adj-no-investigations', 'No investigations found')}</div>`;
         return;
     }
 
@@ -52,19 +52,25 @@ function renderInvestigationList(investigations) {
             medium: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
             low: 'bg-slate-500/20 text-slate-400 border-slate-500/30'
         };
-        // Map type → icon + label
-        const typeConfig = {
-            collision:   { label: 'Collision',    cls: 'text-rose-400' },
-            rear_end:    { label: 'Rear-End',     cls: 'text-orange-400' },
-            side_impact: { label: 'Side Impact',  cls: 'text-amber-400' },
-            rollover:    { label: 'Rollover',     cls: 'text-purple-400' },
-            pedestrian:  { label: 'Pedestrian',   cls: 'text-blue-400' },
+        // Map type → icon + label (translated)
+        const TYPE_I18N = {
+            collision:   { key: 'adj-type-collision',   cls: 'text-rose-400' },
+            rear_end:    { key: 'adj-type-rearend',     cls: 'text-orange-400' },
+            side_impact: { key: 'adj-type-sideimpact',  cls: 'text-amber-400' },
+            rollover:    { key: 'adj-type-rollover',    cls: 'text-purple-400' },
+            pedestrian:  { key: 'adj-type-pedestrian',  cls: 'text-blue-400' },
         };
-        const tc = typeConfig[inv.incident_type] || { label: inv.incident_type, cls: 'text-slate-400' };
-        const typeHtml = `<span class="inline-flex items-center gap-1 ${tc.cls}">${incidentIcon(inv.incident_type, 'w-3.5 h-3.5')} ${tc.label}</span>`;
+        const tcMeta = TYPE_I18N[inv.incident_type] || { key: null, cls: 'text-slate-400' };
+        const tcLabel = tcMeta.key ? window.t(tcMeta.key, inv.incident_type) : inv.incident_type;
+        const typeHtml = `<span class="inline-flex items-center gap-1 ${tcMeta.cls}">${incidentIcon(inv.incident_type, 'w-3.5 h-3.5')} ${tcLabel}</span>`;
         const fraudColor = inv.fraud_risk_score >= 70 ? 'text-rose-400' : inv.fraud_risk_score >= 40 ? 'text-amber-400' : 'text-emerald-400';
         const statusBadge = statusColors[inv.status] || statusColors.open;
         const priorityBadge = priorityColors[inv.priority] || priorityColors.medium;
+        // Translated status + priority text.
+        const STATUS_I18N = { open: 'adj-status-open', under_review: 'adj-status-under-review', resolved: 'adj-status-resolved' };
+        const PRIO_I18N   = { critical: 'adj-prio-critical', high: 'adj-prio-high', medium: 'adj-prio-medium', low: 'adj-prio-low' };
+        const statusText  = STATUS_I18N[inv.status] ? window.t(STATUS_I18N[inv.status], inv.status?.replace('_',' ')) : (inv.status?.replace('_',' ') || '');
+        const prioText    = PRIO_I18N[inv.priority] ? window.t(PRIO_I18N[inv.priority], inv.priority) : (inv.priority || '');
 
         return `
         <div class="investigation-card glass-panel rounded-xl p-4 md:p-5 border border-white/5 hover:border-white/15 cursor-pointer transition-all hover:shadow-lg group" data-case="${inv.case_number}">
@@ -72,8 +78,8 @@ function renderInvestigationList(investigations) {
                 <div class="flex-1">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
                         <span class="font-bold text-white text-sm whitespace-nowrap">${inv.case_number}</span>
-                        <span class="text-xs px-2 py-0.5 rounded-full border font-medium whitespace-nowrap ${statusBadge}">${inv.status?.replace('_',' ')}</span>
-                        <span class="text-xs px-2 py-0.5 rounded-full border font-medium ${priorityBadge}">${inv.priority}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full border font-medium whitespace-nowrap ${statusBadge}">${statusText}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full border font-medium ${priorityBadge}">${prioText}</span>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                         <span class="font-mono font-bold text-white text-xs bg-black/40 px-2 py-1 rounded border border-slate-700">${inv.plate_number}</span>
@@ -89,15 +95,15 @@ function renderInvestigationList(investigations) {
                 <div class="flex items-center gap-5 shrink-0">
                     <div class="text-center">
                         <div class="text-xl font-black ${fraudColor}">${inv.fraud_risk_score}%</div>
-                        <div class="text-[10px] text-slate-500 uppercase">Fraud Risk</div>
+                        <div class="text-[10px] text-slate-500 uppercase">${window.t('adj-fraud-risk', 'Fraud Risk')}</div>
                     </div>
                     <div class="text-center">
                         <div class="text-lg font-bold text-white">${inv.speed_at_impact || '—'}<span class="text-xs text-slate-400 ml-1">km/h</span></div>
-                        <div class="text-[10px] text-slate-500 uppercase">Speed</div>
+                        <div class="text-[10px] text-slate-500 uppercase">${window.t('adj-impact-speed', 'Speed')}</div>
                     </div>
                     <div class="text-center">
                         <div class="text-lg font-bold text-white">${inv.g_force_max || '—'}<span class="text-xs text-slate-400 ml-1">G</span></div>
-                        <div class="text-[10px] text-slate-500 uppercase">G-Force</div>
+                        <div class="text-[10px] text-slate-500 uppercase">${window.t('adj-max-g', 'G-Force')}</div>
                     </div>
                     <svg class="w-5 h-5 text-slate-600 group-hover:text-brand-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
@@ -210,7 +216,7 @@ async function renderDetailTelemetry(caseNumber, fallbackTel) {
     const outerGrid = document.getElementById('detail-telemetry-grid');
     if (!outerGrid) return;
 
-    outerGrid.innerHTML = '<div class="col-span-2 md:col-span-4 text-center text-slate-500 py-6 text-sm">Loading locked telemetry window…</div>';
+    outerGrid.innerHTML = `<div class="col-span-2 md:col-span-4 text-center text-slate-500 py-6 text-sm">${window.t('adj-load-telemetry', 'Loading locked telemetry window…')}</div>`;
 
     // Try to fetch the ±5-min locked window first.
     let data = null;
@@ -239,8 +245,8 @@ async function renderDetailTelemetry(caseNumber, fallbackTel) {
                 <div class="flex items-center gap-2">
                     <span class="text-rose-400 text-lg">🔒</span>
                     <div>
-                        <div class="text-xs font-bold text-rose-300 uppercase tracking-wider">Locked Evidence Window</div>
-                        <div class="text-[10px] text-rose-300/70">±5 min around impact · 5 s resolution · ${samples.length} samples</div>
+                        <div class="text-xs font-bold text-rose-300 uppercase tracking-wider">${window.t('adj-locked-window-label', 'Locked Evidence Window')}</div>
+                        <div class="text-[10px] text-rose-300/70">${window.t('adj-locked-window-sub', '±5 min around impact · 5 s resolution')} · ${samples.length} ${window.t('adj-samples', 'samples')}</div>
                     </div>
                 </div>
                 <div class="text-right">
@@ -254,7 +260,7 @@ async function renderDetailTelemetry(caseNumber, fallbackTel) {
                     class="w-full accent-rose-500 cursor-pointer">
                 <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
                     <span>T −5:00</span><span>T −2:30</span>
-                    <span class="text-rose-400">T 0 · IMPACT</span>
+                    <span class="text-rose-400">T 0 · ${window.t('adj-impact', 'IMPACT')}</span>
                     <span>T +2:30</span><span>T +5:00</span>
                 </div>
             </div>
@@ -284,7 +290,7 @@ async function renderDetailTelemetry(caseNumber, fallbackTel) {
     const stamp     = document.getElementById('adj-tel-stamp');
 
     function fmtT(s) {
-        if (s === 0) return 'T = 0 · IMPACT';
+        if (s === 0) return `T = 0 · ${window.t('adj-impact', 'IMPACT')}`;
         const m = Math.floor(Math.abs(s) / 60);
         const r = Math.abs(s) % 60;
         const sign = s < 0 ? '−' : '+';
@@ -322,25 +328,37 @@ async function renderDetailTelemetry(caseNumber, fallbackTel) {
 
 function renderDetailComponents(components) {
     const grid = document.getElementById('detail-components-grid');
-    if (!components?.length) { grid.innerHTML = '<div class="text-slate-500">No component data</div>'; return; }
+    if (!components?.length) { grid.innerHTML = `<div class="text-slate-500">${window.t('adj-no-components', 'No component data')}</div>`; return; }
+
+    const CAT_I18N = {
+        tire:              'pass-cat-tire',
+        brake_pad:         'pass-cat-brake-pad',
+        brake_disc:        'pass-cat-brake-disc',
+        suspension_damper: 'pass-cat-suspension',
+        aux_12v_battery:   'pass-cat-12v-battery',
+        engine_oil:        'pass-cat-engine-oil',
+        dpf:               'pass-cat-dpf',
+        ev_battery:        'pass-cat-ev-battery',
+    };
 
     grid.innerHTML = components.map(c => {
         const wear = c.wear_percent || 0;
         const health = 100 - wear;
         const status = c.health_status || (wear > 80 ? 'critical' : wear > 60 ? 'warning' : 'healthy');
+        const statusLabel = window.t(`pass-status-${status}`, status);
         const color = status === 'critical' ? 'text-rose-400' : status === 'warning' ? 'text-amber-400' : 'text-emerald-400';
         const barColor = status === 'critical' ? 'bg-rose-500' : status === 'warning' ? 'bg-amber-500' : 'bg-emerald-500';
         const borderColor = status === 'critical' ? 'border-rose-500/30' : status === 'warning' ? 'border-amber-500/30' : 'border-emerald-500/30';
-        const catLabels = {tire:'Tire', brake_pad:'Brake Pad', ev_battery:'Battery', brake_disc:'Brake Disc'};
+        const catLabel = CAT_I18N[c.category] ? window.t(CAT_I18N[c.category], c.category) : c.category;
         const catIcon = componentIcon(c.category, 'w-4 h-4 inline-block mr-1');
 
         return `<div class="bg-slate-800/50 rounded-lg p-4 border ${borderColor}">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-white flex items-center gap-1.5">${catIcon} ${catLabels[c.category] || c.category} ${c.position ? `(${c.position})` : ''}</span>
-                <span class="text-xs font-bold ${color} uppercase">${status}</span>
+                <span class="text-sm font-medium text-white flex items-center gap-1.5">${catIcon} ${catLabel} ${c.position ? `(${c.position})` : ''}</span>
+                <span class="text-xs font-bold ${color} uppercase">${statusLabel}</span>
             </div>
             <div class="w-full bg-slate-700 rounded-full h-1.5 mb-2"><div class="${barColor} rounded-full h-1.5" style="width:${health}%"></div></div>
-            <div class="text-xs text-slate-400">${c.brand || ''} ${c.model_name || ''} · ${health}% health</div>
+            <div class="text-xs text-slate-400">${c.brand || ''} ${c.model_name || ''} · ${health}% ${window.t('pass-health', 'health')}</div>
         </div>`;
     }).join('');
 }
@@ -375,7 +393,11 @@ function setupVerdictButtons() {
     document.querySelectorAll('.verdict-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const verdict = btn.getAttribute('data-verdict');
-            const verdictLabels = {approved:'Claim Approved', partial:'Partially Approved', denied:'Claim Denied'};
+            const verdictLabels = {
+                approved: window.t('adj-verdict-approved', 'Claim Approved'),
+                partial:  window.t('adj-verdict-partial',  'Partially Approved'),
+                denied:   window.t('adj-verdict-denied',   'Claim Denied'),
+            };
             const verdictColors = {approved:'text-emerald-400', partial:'text-amber-400', denied:'text-rose-400'};
             const container = document.getElementById('detail-verdict-content');
             const verdictIcons = {
@@ -385,7 +407,7 @@ function setupVerdictButtons() {
             };
             container.innerHTML = `<div class="flex justify-center mb-4">${verdictIcons[verdict]}</div>
                 <p class="text-2xl font-bold ${verdictColors[verdict]} mb-2">${verdictLabels[verdict]}</p>
-                <p class="text-sm text-slate-400 mt-2">Verdict issued on ${new Date().toLocaleDateString()} for case ${currentInvestigation?.case_number || '—'}</p>`;
+                <p class="text-sm text-slate-400 mt-2">${window.t('adj-verdict-issued-on', 'Verdict issued on')} ${new Date().toLocaleDateString()} ${window.t('adj-for-case', 'for case')} ${currentInvestigation?.case_number || '—'}</p>`;
         });
     });
 }
@@ -399,17 +421,17 @@ async function loadPhotos(caseNumber) {
         const resp = await fetch(`/api/db/investigations/${encodeURIComponent(caseNumber)}/photos`);
         const photos = await resp.json();
         if (!photos?.length) {
-            grid.innerHTML = '<div class="text-slate-500 text-sm col-span-3">No photos uploaded yet. Use the Upload button to add damage documentation.</div>';
+            grid.innerHTML = `<div class="text-slate-500 text-sm col-span-3">${window.t('adj-no-photos', 'No damage photos uploaded yet.')}</div>`;
             return;
         }
         grid.innerHTML = photos.map(p => `
             <div class="group relative rounded-xl overflow-hidden border border-white/10 hover:border-brand-500/50 transition-all cursor-pointer">
-                <img src="/static/img/investigations/${p.filename}" alt="${p.caption || 'Damage photo'}"
+                <img src="/static/img/investigations/${p.filename}" alt="${p.caption || window.t('adj-photo-alt', 'Damage photo')}"
                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     onerror="this.src='data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 400 300&quot;><rect fill=&quot;%231e293b&quot; width=&quot;400&quot; height=&quot;300&quot;/><text x=&quot;200&quot; y=&quot;150&quot; fill=&quot;%2364748b&quot; text-anchor=&quot;middle&quot; font-size=&quot;14&quot;>Photo not found</text></svg>'">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-3 transform translate-y-full group-hover:translate-y-0 transition-transform">
-                    <p class="text-white text-xs font-medium">${p.caption || 'Damage photo'}</p>
+                    <p class="text-white text-xs font-medium">${p.caption || window.t('adj-photo-alt', 'Damage photo')}</p>
                     <p class="text-slate-400 text-[10px] mt-0.5">${p.photo_type} · ${new Date(p.uploaded_at).toLocaleDateString()}</p>
                 </div>
                 <div class="absolute top-2 right-2 bg-black/60 rounded-full px-2 py-0.5 text-[10px] text-slate-300 uppercase">${p.photo_type}</div>
@@ -517,3 +539,16 @@ function renderMarkdown(text) {
 
     return `<div class="text-slate-300 text-sm leading-relaxed prose-sm">${html}</div>`;
 }
+
+// Re-render dynamic lists when the language toggles so investigation cards,
+// status badges, type pills and verdict messages all flip to the new locale.
+window.addEventListener('languageChanged', () => {
+    // Re-render the visible list (or detail) from current state.
+    if (document.getElementById('adjuster-detail-view') &&
+        !document.getElementById('adjuster-detail-view').classList.contains('hidden') &&
+        currentInvestigation) {
+        renderInvestigationDetail(currentInvestigation);
+    } else {
+        loadInvestigationList(document.querySelector('.adj-filter-btn.bg-brand-600')?.dataset?.status || '');
+    }
+});

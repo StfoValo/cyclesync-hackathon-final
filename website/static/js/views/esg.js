@@ -54,7 +54,7 @@ function setupBatchRecycling() {
         const orig = btn.innerHTML;
         btn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Analyzing...';
         if (dot) { dot.classList.remove('bg-emerald-500'); dot.classList.add('bg-amber-500'); }
-        if (statusText) statusText.textContent = 'AI analysis in progress...';
+        if (statusText) statusText.textContent = window.t('esg-ai-progress', 'AI analysis in progress…');
         output.innerHTML = '<div id="batch-content"></div>';
 
         try {
@@ -79,11 +79,11 @@ function setupBatchRecycling() {
                 output.scrollTop = output.scrollHeight;
             }
             if (dot) { dot.classList.remove('bg-amber-500'); dot.classList.add('bg-emerald-500'); }
-            if (statusText) statusText.textContent = 'Analysis complete ✓';
+            if (statusText) statusText.textContent = window.t('esg-ai-complete', 'Analysis complete ✓');
         } catch(e) {
             console.error(e);
-            output.innerHTML = '<div class="text-rose-400 p-4">Analysis failed. Try again.</div>';
-            if (statusText) statusText.textContent = 'Error';
+            output.innerHTML = `<div class="text-rose-400 p-4">${window.t('esg-ai-failed', 'Analysis failed. Try again.')}</div>`;
+            if (statusText) statusText.textContent = window.t('esg-ai-error', 'Error');
         } finally {
             btn.disabled = false;
             btn.innerHTML = orig;
@@ -143,14 +143,14 @@ function renderCategoryGrid(s) {
                 </div>
                 <p class="text-2xl md:text-3xl font-bold ${col.text}">${c.total.toLocaleString()}</p>
                 <div class="text-[10px] text-slate-500 mt-1">
-                    <span class="text-white font-semibold">${c.installed}</span> installed ·
-                    <span class="text-white font-semibold">${c.stocked}</span> stocked
+                    <span class="text-white font-semibold">${c.installed}</span> ${window.t('esg-installed', 'installed')} ·
+                    <span class="text-white font-semibold">${c.stocked}</span> ${window.t('esg-stocked', 'stocked')}
                 </div>
                 <div class="text-[11px] mt-2 grid grid-cols-2 gap-1">
                     <div class="text-slate-400">€<span class="text-emerald-400 font-semibold">${c.value_eur.toLocaleString()}</span></div>
                     <div class="text-slate-400 text-right">CO₂ <span class="text-emerald-400 font-semibold">${c.co2_kg.toLocaleString()} kg</span></div>
                 </div>
-                <div class="text-[10px] text-slate-500 mt-1">Avg wear ${c.avg_wear}%</div>
+                <div class="text-[10px] text-slate-500 mt-1">${window.t('esg-avg-wear', 'Avg wear')} ${c.avg_wear}%</div>
             </div>`;
     }).join('');
 }
@@ -204,7 +204,7 @@ function renderBatchGrid(s) {
                 <div class="glass-panel rounded-xl p-4 border border-white/5 cursor-pointer hover:${col.border} transition-all batch-category-card" data-category="${c.key}">
                     <div class="flex items-center gap-2 mb-1">${iconSvg}<p class="text-[10px] text-slate-400 uppercase tracking-wider">${c.label}</p></div>
                     <p class="text-xl font-bold ${col.text}">${(c.stocked || 0).toLocaleString()}</p>
-                    <p class="text-[10px] text-slate-500">stocked · €${(c.value_eur || 0).toLocaleString()}</p>
+                    <p class="text-[10px] text-slate-500">${window.t('esg-stocked', 'stocked')} · €${(c.value_eur || 0).toLocaleString()}</p>
                 </div>`;
         }).join('');
     grid.innerHTML = allCard + catCards;
@@ -233,7 +233,7 @@ function renderBatchSelectOptions(s) {
 async function loadComponentTable() {
     const tbody = document.getElementById('component-table-body');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">Loading...</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">${window.t('reg-loading', 'Loading…')}</td></tr>`;
     try {
         let url = `/api/db/components?page=${currentPage}&per_page=${PER_PAGE}`;
         if (currentFilter) url += `&category=${encodeURIComponent(currentFilter)}`;
@@ -263,7 +263,7 @@ function categoryIconStr(key) {
 
 function renderTable(comps) {
     const tbody = document.getElementById('component-table-body');
-    if (!tbody || !comps.length) { if(tbody) tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">No components</td></tr>'; return; }
+    if (!tbody || !comps.length) { if(tbody) tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">${window.t('esg-no-components-table', 'No components')}</td></tr>`; return; }
     tbody.innerHTML = comps.map((c,i) => {
         const rec = c.ai_recommendation || '—';
         const isReuse = /Retread|Resell|Second-Life|Grid Storage|Reuse/i.test(rec);
@@ -301,9 +301,9 @@ function renderTable(comps) {
         </tr>
         <tr class="component-detail hidden bg-black/20" data-detail-index="${i}"><td colspan="9" class="px-6 py-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                <div><p class="text-slate-400 font-semibold uppercase tracking-wider mb-1">AI Reasoning</p><p class="text-slate-300">${c.ai_reasoning||'No AI analysis available.'}</p></div>
-                <div><p class="text-slate-400 font-semibold uppercase tracking-wider mb-1">Lifecycle</p><p class="text-slate-300">Installed: ${c.installed_date||'—'} ${c.installed_km?`at ${c.installed_km.toLocaleString()} km`:''}</p>${c.removed_date?`<p class="text-slate-300">Removed: ${c.removed_date}${c.removed_km?` at ${c.removed_km.toLocaleString()} km`:''}</p>`:''}${c.removal_reason?`<p class="text-slate-400 mt-1">Reason: <span class="text-slate-200">${c.removal_reason}</span></p>`:''}${c.destination_facility?`<p class="text-slate-300 mt-1">Facility: <span class="text-brand-400">${c.destination_facility}</span></p>`:''}</div>
-                <div><p class="text-slate-400 font-semibold uppercase tracking-wider mb-1">Specs</p>${c.specs?Object.entries(c.specs).map(([k,v])=>`<p class="text-slate-300">${k.replace(/_/g,' ')}: <span class="text-white font-medium">${v}</span></p>`).join(''):'<p class="text-slate-500">—</p>'}</div>
+                <div><p class="text-slate-400 font-semibold uppercase tracking-wider mb-1">${window.t('esg-ai-reasoning','AI Reasoning')}</p><p class="text-slate-300">${c.ai_reasoning||window.t('esg-no-ai-analysis','No AI analysis available.')}</p></div>
+                <div><p class="text-slate-400 font-semibold uppercase tracking-wider mb-1">${window.t('esg-lifecycle','Lifecycle')}</p><p class="text-slate-300">${window.t('esg-installed-on','Installed:')} ${c.installed_date||'—'} ${c.installed_km?`${window.t('esg-at','at')} ${c.installed_km.toLocaleString()} km`:''}</p>${c.removed_date?`<p class="text-slate-300">${window.t('esg-removed-on','Removed:')} ${c.removed_date}${c.removed_km?` ${window.t('esg-at','at')} ${c.removed_km.toLocaleString()} km`:''}</p>`:''}${c.removal_reason?`<p class="text-slate-400 mt-1">${window.t('esg-reason','Reason:')} <span class="text-slate-200">${c.removal_reason}</span></p>`:''}${c.destination_facility?`<p class="text-slate-300 mt-1">${window.t('esg-facility','Facility:')} <span class="text-brand-400">${c.destination_facility}</span></p>`:''}</div>
+                <div><p class="text-slate-400 font-semibold uppercase tracking-wider mb-1">${window.t('esg-specs','Specs')}</p>${c.specs?Object.entries(c.specs).map(([k,v])=>`<p class="text-slate-300">${k.replace(/_/g,' ')}: <span class="text-white font-medium">${v}</span></p>`).join(''):'<p class="text-slate-500">—</p>'}</div>
             </div>
         </td></tr>`;
     }).join('');
@@ -383,7 +383,8 @@ function setupReverseLogistics() {
 async function loadESGDashboard() {
     try {
         if(cachedEsgData){renderESG(cachedEsgData);return;}
-        setText('esg-kpi-baseline','Loading...');setText('esg-kpi-real','Loading...');setText('esg-kpi-saved','Loading...');
+        const _loading = window.t('reg-loading', 'Loading…');
+        setText('esg-kpi-baseline', _loading); setText('esg-kpi-real', _loading); setText('esg-kpi-saved', _loading);
         const res = await fetch('/api/actuarial/esg');
         if(!res.ok)throw new Error("HTTP "+res.status);
         cachedEsgData = await res.json();
@@ -398,3 +399,16 @@ function renderESG(data) {
     setText('esg-kpi-real',     em.real_telematics_co2_tons.toLocaleString(undefined,{maximumFractionDigits:0}));
     setText('esg-kpi-saved',    em.co2_saved_tons.toLocaleString(undefined,{maximumFractionDigits:0}));
 }
+
+
+// Re-render dynamic ESG content (category cards, filter chips, batch grid,
+// inventory table) when the language toggles so labels follow the new locale.
+window.addEventListener('languageChanged', () => {
+    if (cachedStats) {
+        renderCategoryGrid(cachedStats);
+        renderFilterChips(cachedStats);
+        renderBatchGrid(cachedStats);
+        renderBatchSelectOptions(cachedStats);
+    }
+    loadComponentTable();
+});
