@@ -1,4 +1,4 @@
-const getT = (key) => window.translations[localStorage.getItem('cyclesync_lang') || 'en'][key] || key;
+const getT = (key) => window.translations[localStorage.getItem('veritwin_lang') || 'en'][key] || key;
 
 export function initAIStrategy() {
     const btnAnalyze = document.getElementById('btn-analyze');
@@ -20,7 +20,7 @@ export function initAIStrategy() {
             document.getElementById('ai-kpi-roi').innerText = "---";
 
             try {
-                const lang = localStorage.getItem('cyclesync_lang') || 'en';
+                const lang = localStorage.getItem('veritwin_lang') || 'en';
                 const response = await fetch(`/api/ai/orchestrate/${encodeURIComponent(region)}?lang=${lang}`);
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder("utf-8");

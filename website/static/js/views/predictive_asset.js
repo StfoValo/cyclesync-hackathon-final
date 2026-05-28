@@ -21,7 +21,7 @@ export function initPredictiveAsset() {
     loadVSIDashboard();
 }
 
-const getT = (key) => window.translations[localStorage.getItem('cyclesync_lang') || 'en'][key] || key;
+const getT = (key) => window.translations[localStorage.getItem('veritwin_lang') || 'en'][key] || key;
 
 window.addEventListener('languageChanged', () => {
     if (vsiRegChart) { vsiRegChart.destroy(); vsiRegChart = null; }
