@@ -189,13 +189,15 @@ function renderInvestigationDetail(inv) {
     document.getElementById('detail-case-number').textContent = inv.case_number;
 
     const statusColors = {open:'bg-rose-500/20 text-rose-400 border border-rose-500/30', under_review:'bg-amber-500/20 text-amber-400 border border-amber-500/30', resolved:'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'};
+    const STATUS_I18N_D = { open: 'adj-status-open', under_review: 'adj-status-under-review', resolved: 'adj-status-resolved' };
     const sb = document.getElementById('detail-status-badge');
-    sb.textContent = inv.status?.replace('_',' ');
+    sb.textContent = STATUS_I18N_D[inv.status] ? window.t(STATUS_I18N_D[inv.status], inv.status?.replace('_',' ')) : (inv.status?.replace('_',' ') || '');
     sb.className = `text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[inv.status] || ''}`;
 
     const prioColors = {critical:'bg-rose-500/20 text-rose-400 border border-rose-500/30', high:'bg-orange-500/20 text-orange-400 border border-orange-500/30', medium:'bg-amber-500/20 text-amber-400 border border-amber-500/30'};
+    const PRIO_I18N_D = { critical: 'adj-prio-critical', high: 'adj-prio-high', medium: 'adj-prio-medium', low: 'adj-prio-low' };
     const pb = document.getElementById('detail-priority-badge');
-    pb.textContent = `${inv.priority}`;
+    pb.textContent = PRIO_I18N_D[inv.priority] ? window.t(PRIO_I18N_D[inv.priority], inv.priority) : (inv.priority || '');
     pb.className = `text-xs px-2 py-0.5 rounded-full font-medium ${prioColors[inv.priority] || ''}`;
 
     document.getElementById('detail-vehicle').textContent = inv.plate_number;
@@ -209,18 +211,21 @@ function renderInvestigationDetail(inv) {
     document.getElementById('detail-gforce').textContent = `${inv.g_force_max || '—'} G`;
 
     // Summary tab
-    const typeConfig = {
-        collision:   { label: 'Collision',   cls: 'text-rose-400' },
-        rear_end:    { label: 'Rear-End',    cls: 'text-orange-400' },
-        side_impact: { label: 'Side Impact', cls: 'text-amber-400' },
+    const TYPE_I18N_D = {
+        collision:   { key: 'adj-type-collision',   cls: 'text-rose-400' },
+        rear_end:    { key: 'adj-type-rearend',     cls: 'text-orange-400' },
+        side_impact: { key: 'adj-type-sideimpact',  cls: 'text-amber-400' },
+        rollover:    { key: 'adj-type-rollover',    cls: 'text-purple-400' },
+        pedestrian:  { key: 'adj-type-pedestrian',   cls: 'text-blue-400' },
     };
-    const tc = typeConfig[inv.incident_type] || { label: inv.incident_type, cls: 'text-slate-400' };
-    document.getElementById('detail-incident-type').innerHTML = `<span class="inline-flex items-center gap-1.5 ${tc.cls}">${incidentIcon(inv.incident_type, 'w-4 h-4')} ${tc.label}</span>`;
+    const tcD = TYPE_I18N_D[inv.incident_type] || { key: null, cls: 'text-slate-400' };
+    const tcLabel = tcD.key ? window.t(tcD.key, inv.incident_type) : inv.incident_type;
+    document.getElementById('detail-incident-type').innerHTML = `<span class="inline-flex items-center gap-1.5 ${tcD.cls}">${incidentIcon(inv.incident_type, 'w-4 h-4')} ${tcLabel}</span>`;
     document.getElementById('detail-location').textContent = inv.incident_location || '—';
     document.getElementById('detail-description').textContent = inv.incident_description || '—';
 
-    document.getElementById('detail-abs').innerHTML = inv.abs_triggered ? '<span class="text-rose-400 font-semibold">YES</span>' : '<span class="text-emerald-400">No</span>';
-    document.getElementById('detail-airbag').innerHTML = inv.airbag_deployed ? '<span class="text-rose-400 font-semibold">DEPLOYED</span>' : '<span class="text-emerald-400">Not deployed</span>';
+    document.getElementById('detail-abs').innerHTML = inv.abs_triggered ? `<span class="text-rose-400 font-semibold">${window.t('adj-yes', 'YES')}</span>` : `<span class="text-emerald-400">${window.t('adj-no', 'No')}</span>`;
+    document.getElementById('detail-airbag').innerHTML = inv.airbag_deployed ? `<span class="text-rose-400 font-semibold">${window.t('adj-airbag-yes', 'DEPLOYED')}</span>` : `<span class="text-emerald-400">${window.t('adj-airbag-no', 'Not deployed')}</span>`;
     document.getElementById('detail-glateral').textContent = `${inv.g_force_lateral || '—'} G`;
     const ct = inv.coolant_temp;
     document.getElementById('detail-coolant').innerHTML = ct ? `<span class="${ct > 95 ? 'text-rose-400' : 'text-emerald-400'}">${ct}°C</span>` : '—';
@@ -521,10 +526,10 @@ async function runAIAnalysis() {
 
     // Disable button during analysis
     btn.disabled = true;
-    btn.innerHTML = '<div class="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div> <span>Analyzing...</span>';
+    btn.innerHTML = `<div class="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div> <span>${window.t('adj-ai-progress', 'Analyzing...')}</span>`;
 
     // Reset containers
-    fraudContainer.innerHTML = '<p class="text-slate-300 text-sm italic animate-pulse">AI is analyzing telemetry, components, and incident data...</p>';
+    fraudContainer.innerHTML = `<p class="text-slate-300 text-sm italic animate-pulse">${window.t('adj-ai-pending', 'AI is analyzing telemetry, components, and incident data...')}</p>`;
     damageContainer.innerHTML = '';
 
     try {

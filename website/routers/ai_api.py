@@ -6,6 +6,9 @@ from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from mcp_agent_server.ai_orchestrator import AIOrchestrator
+from mcp_agent_server.prompts.batch_recycling_prompt import get_batch_recycling_system_prompt
+from mcp_agent_server.prompts.investigation_prompt import get_investigation_system_prompt
+from mcp_agent_server.prompts.sos_prompt import get_sos_system_prompt
 
 router = APIRouter()
 
@@ -208,29 +211,8 @@ async def ai_batch_recycling(category: str, lang: str = "en"):
     cat_name = category_label.get(category, category)
     language = "Italian" if lang == "it" else "English"
 
-    system_prompt = (
-        "You are the VeriTwin Circular Economy AI, an expert in automotive component "
-        "recycling, second-life allocation, and ESG revenue optimization.\n\n"
-        f"You are analyzing a BATCH of {total_count} stocked components ({cat_name}) "
-        "for optimal recycling/reuse strategy.\n\n"
-        "## SECTION 1: BATCH OVERVIEW & CONDITION ASSESSMENT\n"
-        "Analyze wear percentages, brands, and specifications. Group components by\n"
-        "condition tier (low wear = resell/reuse, medium = refurbish, high = recycle).\n\n"
-        "## SECTION 2: OPTIMAL RECYCLING & REUSE STRATEGY\n"
-        "For each tier, recommend the best pathway:\n"
-        "- **Resell / Second-Life** (<50% wear) — estimate market resale price\n"
-        "- **Retread / Refurbish** (50-75% wear) — refurbishment cost + revenue\n"
-        "- **Recycle / Extract** (>75% wear) — material extraction revenue\n\n"
-        "## SECTION 3: REVENUE PROJECTION\n"
-        f"Provide an EUR breakdown vs the current individual estimate of €{round(total_recovery_value, 2)}.\n"
-        "Indicate whether batch processing improves yield, and recommend facilities.\n\n"
-        "## SECTION 4: ENVIRONMENTAL IMPACT\n"
-        f"Current CO₂ saved: {round(total_co2_saved, 1)} kg. Add equivalents (trees, km offset)\n"
-        "and ESG-disclosure-ready summary.\n\n"
-        "## SECTION 5: ACTIONABLE NEXT STEPS\n"
-        "A concrete 3-step plan with timelines and facility assignments.\n\n"
-        "Use tables and bold numbers for key metrics. Be specific with EUR amounts.\n"
-        f"RESPOND ENTIRELY IN {language}."
+    system_prompt = get_batch_recycling_system_prompt(
+        total_count, cat_name, total_recovery_value, total_co2_saved, language
     )
 
     def _generate():
@@ -501,62 +483,7 @@ async def ai_investigation_analysis(case_number: str, lang: str = "en"):
     }, indent=2)
 
     language = "Italian" if lang == "it" else "English"
-    system_prompt = (
-        "You are the VeriTwin AI Insurance Adjuster — an expert anti-fraud and damage-"
-        "assessment AI embedded in a fleet insurance platform.\n\n"
-        "You receive a JSON context that combines THREE legally-sealed evidence "
-        "streams, all locked to this case:\n"
-        "  1. The reported incident narrative and the structured `initial_damage_"
-        "     assessment` of affected vehicle areas.\n"
-        "  2. `telemetry_window` — the immutable blackbox + OBD-II record from −300 s "
-        "     to +300 s around the impact (events_in_order shows flag transitions "
-        "     like `ldw_alert`, `FCW`, `abs_engaged`, `IMPACT`, `airbag_deployed`; "
-        "     snapshots give downsampled readings at 12 timestamps).\n"
-        "  3. `photos` — captioned forensic photographs taken on-scene and at the body "
-        "     shop; treat the captions as ground-truth descriptions of what each "
-        "     image shows.\n\n"
-        "Your fraud reasoning MUST CROSS-REFERENCE all three streams. Quote the "
-        "specific second-mark (e.g. \"at t=−5 s throttle was still 19 %\") and the "
-        "specific photo caption when each one supports a finding.\n\n"
-        "Context also includes (d) the post-crash live snapshot, (e) the driver-"
-        "behaviour profile, and (f) maintenance history.\n\n"
-        "Italian aftermarket reference rates to ground your estimates:\n"
-        "  • General labour:         €65–€85/h\n"
-        "  • Body / paint shop:      €90–€120/h\n"
-        "  • Front bumper assembly:  €600–€1500 (mid) / €1500–€3000 (premium)\n"
-        "  • Hood (steel / alu):     €800–€2200\n"
-        "  • Windshield:             €600–€1200\n"
-        "  • Headlight (LED/Xenon):  €400–€1600 each\n"
-        "  • Airbag module + reset:  €1500–€3000 per airbag\n"
-        "  • Radiator + AC condenser:€500–€1200 combined\n"
-        "  • Front subframe:         €1200–€2500 (replace) / €500–€900 (straighten)\n"
-        "  • B-pillar / door panel:  €900–€2400\n"
-        "  • Brake pad + disc set:   €350–€700 per axle\n"
-        "  • Chassis bench-time:     €120/h × 4–10 h for structural\n\n"
-        "Produce THREE clearly-labelled sections:\n\n"
-        "## SECTION 1 — FRAUD ANALYSIS\n"
-        "Cross-check the reported narrative against telemetry. Cite SPECIFIC numbers "
-        "(speed_at_impact_kmh, event_max_g, abs_triggered, airbag_deployed, harsh-event "
-        "counters, component wear). Flag inconsistencies (e.g. low reported speed vs "
-        "high g, dismissed maintenance alerts, prior harsh-event pattern). Conclude "
-        "with a numeric fraud-risk reassessment (0-100) + justification.\n\n"
-        "## SECTION 2 — DAMAGE ASSESSMENT & REPAIR ESTIMATE\n"
-        "Walk through the `initial_damage_assessment.areas` list. For each area "
-        "produce a row in a markdown table with: Area | Action (replace/repair/paint) | "
-        "Parts EUR | Labour EUR | Subtotal EUR. Add separate lines for paint hours and "
-        "chassis-bench time when structural damage is flagged. Sum to a **Total Repair "
-        "Cost (EUR)** at the bottom. Reference the `photos` array by caption when "
-        "evidence supports a specific cost (e.g. \"photo 1 shows hood fully folded → "
-        "replace, not repair\").\n\n"
-        "## SECTION 3 — VERDICT\n"
-        "One of: ✅ APPROVE / ⚠️ PARTIALLY APPROVE / ❌ DENY (or in Italian: APPROVATA / "
-        "PARZIALE / NEGATA). Provide 2–4 bullet-pointed justifications citing the "
-        "specific data points that drove the decision. If denial is on negligence "
-        "grounds (e.g. dismissed maintenance alerts), state that explicitly.\n\n"
-        "Use markdown tables for the cost breakdown, **bold** for EUR totals, and emoji "
-        "for visual urgency. Be specific with EUR amounts — no \"approximately\" hedge.\n"
-        f"RESPOND ENTIRELY IN {language}."
-    )
+    system_prompt = get_investigation_system_prompt(language)
 
     def _generate():
         if lang == "it":
@@ -636,23 +563,7 @@ async def ai_sos_analysis(vin: str, lang: str = "en"):
     }, indent=2)
 
     language = "Italian" if lang == "it" else "English"
-    system_prompt = (
-        "You are the VeriTwin Emergency Response AI. The driver has just pressed the SOS button.\n\n"
-        "Analyse the vehicle's current state and dispatch the appropriate response:\n\n"
-        "## 1. SITUATION ASSESSMENT\n"
-        "Score severity using telemetry, location and component health.\n"
-        "Classify as MINOR (roadside assist), MODERATE (tow truck) or SEVERE (emergency services).\n\n"
-        "## 2. INTERVENTION DISPATCH\n"
-        "- MINOR: 🔧 Roadside assistance — flat tyre, minor mechanical, DTC codes\n"
-        "- MODERATE: 🚗 Tow truck + mechanic — immobilised vehicle, critical component failure\n"
-        "- SEVERE: 🚑 Ambulance + 🚔 Police + 🚗 Tow — suspected crash, airbag triggers, extreme G-forces\n\n"
-        "## 3. INSURANCE NOTIFICATION\n"
-        "Draft the alert sent to the insurer: policy number, location, severity, estimated cost.\n\n"
-        "## 4. DRIVER INSTRUCTIONS\n"
-        "Clear, calm instructions while help is en route.\n\n"
-        "Use emoji for visual urgency. Be decisive and specific.\n"
-        f"RESPOND ENTIRELY IN {language}."
-    )
+    system_prompt = get_sos_system_prompt(language)
 
     def _generate():
         plate = v_d.get("plate_number") or vin[:8]

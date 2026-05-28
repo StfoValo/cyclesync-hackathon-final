@@ -1,7 +1,7 @@
 import qrcode
 
 # The URL you want the QR code to point to
-url = "https://cyclesync-digital-twin-keyo.onrender.com/"
+url = "https://cyclesync-veritwin.onrender.com"
 
 # Generate the QR code
 qr = qrcode.QRCode(
