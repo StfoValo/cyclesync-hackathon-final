@@ -130,7 +130,7 @@ function renderInvestigationList(investigations) {
                         <span class="text-xs text-slate-500">${typeHtml}</span>
                         <span class="text-xs text-slate-500">${inv.incident_date}</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2 line-clamp-1">${inv.incident_description || ''}</p>
+                    <p class="text-xs text-slate-400 mt-2 line-clamp-1">${window.t('adj-desc-' + inv.case_number, inv.incident_description) || ''}</p>
                 </div>
                 <div class="flex items-center gap-5 shrink-0">
                     <div class="text-center">
@@ -222,7 +222,7 @@ function renderInvestigationDetail(inv) {
     const tcLabel = tcD.key ? window.t(tcD.key, inv.incident_type) : inv.incident_type;
     document.getElementById('detail-incident-type').innerHTML = `<span class="inline-flex items-center gap-1.5 ${tcD.cls}">${incidentIcon(inv.incident_type, 'w-4 h-4')} ${tcLabel}</span>`;
     document.getElementById('detail-location').textContent = inv.incident_location || '—';
-    document.getElementById('detail-description').textContent = inv.incident_description || '—';
+    document.getElementById('detail-description').textContent = window.t('adj-desc-' + inv.case_number, inv.incident_description) || '—';
 
     document.getElementById('detail-abs').innerHTML = inv.abs_triggered ? `<span class="text-rose-400 font-semibold">${window.t('adj-yes', 'YES')}</span>` : `<span class="text-emerald-400">${window.t('adj-no', 'No')}</span>`;
     document.getElementById('detail-airbag').innerHTML = inv.airbag_deployed ? `<span class="text-rose-400 font-semibold">${window.t('adj-airbag-yes', 'DEPLOYED')}</span>` : `<span class="text-emerald-400">${window.t('adj-airbag-no', 'Not deployed')}</span>`;
